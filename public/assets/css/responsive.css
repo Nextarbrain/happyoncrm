@@ -1,0 +1,30 @@
+@media(max-width:767px){
+    .page-wrapper {
+        margin-top: 60px;
+    }
+    .topbar.d-flex.align-items-center {
+        background: #fff;
+    }
+    .d_card {
+        margin: 20px;
+    }
+    .chart_img img {
+        width: 100%;
+    }
+    div#example_length {
+        position: absolute;
+        bottom: -40px;
+        left: 0;
+    }
+}
+
+@media (max-width:475px){
+    .h_btn.s_btn a {
+        font-size: 16px;
+        line-height: 22px;
+        word-wrap: break-word;
+        display: block;
+        height: auto;
+    }
+   
+}

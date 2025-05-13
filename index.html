@@ -1,0 +1,41 @@
+<input type="hidden" value="${price}" class="product_price">
+<div class="row mb-3">
+    <div class="col-md-3">
+        <div class=" input_wrap">
+            <label>${name} Qty</label>
+            <select name="product_quantity[]" onchange="calculateTotal()" class="form-select">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="input_wrap dark">
+            <label>Price</label>
+            <input type="number" class="form-control" placeholder="Price" name="price[]" readonly>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="input_wrap dark">
+            <label>Tax</label>
+            <select name="tax[]" class="form-select">
+                <option value="18">${tax}%</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="input_wrap dark">
+            <label>Total</label>
+            <input type="text" value="${price}" class="final_price form-control">
+        </div>
+    </div>
+</div>
