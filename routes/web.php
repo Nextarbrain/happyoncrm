@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\BranchController;
 use App\Http\Controllers\AdminPermission;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\StaffController;
@@ -40,6 +41,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
 
 
     Route::post('/datawise-record-show', [AdminController::class, 'dashboard'])->name('datawiseRecordShow');
+    Route::post('/branch-wise-data', [AdminController::class, 'dashboard'])->name('branchWiseData');
 
     Route::get('/admin', [AdminController::class, 'adminPlansView'])->name('admin');
 
@@ -165,6 +167,15 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::get('/trashed', [TrashController::class, 'index'])->name('trash');
     Route::get('/restore/{id}/{model}', [TrashController::class, 'restore'])->name('restore');
     Route::get('/delete/{id}/{model}', [TrashController::class, 'delete'])->name('delete');
+
+    //BRANCH ROUTES
+    Route::get('/create-branch', [BranchController::class, 'branchView'])->name('branchView');
+    Route::get('/edit-branch/{id}', [BranchController::class, 'editBranchView'])->name('editBranchView');
+    Route::post('/edit-branch-post', [BranchController::class, 'editBranchPost'])->name('editBranchPost');
+    Route::get('/branch', [BranchController::class, 'branch'])->name('branch');
+    Route::post('/add-branch', [BranchController::class, 'addBranch'])->name('addBranch');
+    Route::delete('/delete-branch', [BranchController::class, 'deleteBranch'])->name('deleteBranch');
+
 
 });
 

@@ -31,15 +31,24 @@ class MembershipController extends Controller
     {
 
         hasPermission('reports-membership');
+        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         if (isset($request->daterange) && $request->daterange != "") {
             $daterange = explode("-", $request->daterange);
             $daterange[0] = date('y-m-d', strtotime($daterange[0]));
             $daterange[1] = date('y-m-d', strtotime($daterange[1]));
 
             if ($daterange[0] == $daterange[1]) {
-                $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo')->whereDate('created_at', $daterange[0])->get();
+                $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo')->whereDate('created_at', $daterange[0]);
+                if ($branchId) {
+                    $membershipUsers->where('branch_id', $branchId);
+                }
+                $membershipUsers = $membershipUsers->get();
             } else {
-                $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo')->whereBetween('created_at', [$daterange[0], $daterange[1]])->get();
+                $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo')->whereBetween('created_at', [$daterange[0], $daterange[1]]);
+                if ($branchId) {
+                    $membershipUsers->where('branch_id', $branchId);
+                }
+                $membershipUsers = $membershipUsers->get();
             }
 
             return view('happyView.membership-booking-reports', compact('membershipUsers'));
@@ -50,8 +59,7 @@ class MembershipController extends Controller
     {
         $search = $request->post('query');
 
-
-        $user = UserDetail::where('phone_no', 'LIKE', "%{$search}%")->where('membership_plan', '1')->latest()->limit(5)->get();
+        $user = UserDetail::where('phone_no', 'LIKE', "%{$search}%")->where('membership_plan', '1')->latest()->limit(5)->get();;
 
         $result = '';
         foreach ($user as $u) {
@@ -92,22 +100,37 @@ class MembershipController extends Controller
     public function membershipHistoryView(Request $request)
     {
         hasPermission('membership-history');
-        $membershipUser = MembershipHistory::with('user', 'kid', 'userDetails', 'membershipBuy')->where('user_id', $request->id)->latest()->get();
+        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        $membershipUser = MembershipHistory::with('user', 'kid', 'userDetails', 'membershipBuy')->where('user_id', $request->id);
+        if ($branchId) {
+            $membershipUser->where('branch_id', $branchId);
+        }
+        $membershipUser = $membershipUser->latest()->get();
         return view('happyView.membership-history-view', compact('membershipUser'));
     }
 
     public function membershipView()
     {
         hasPermission('membership');
+        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $membership = MembershipPlan::get();
         $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo')->latest()->get();
+        if ($branchId) {
+            $membershipUsers->where('branch_id', $branchId);
+        }
+        $membershipUsers = $membershipUsers->latest()->get();
         return view('happyView.memberships', compact('membership', 'membershipUsers'));
     }
 
     public function membershipHistory()
     {
         hasPermission('membership-history');
-        $membershipUsers = MembershipHistory::with('user', 'kid', 'userDetails', 'membershipBuy')->latest()->get();
+        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        $membershipUsers = MembershipHistory::with('user', 'kid', 'userDetails', 'membershipBuy');
+        if ($branchId) {
+            $membershipUsers->where('branch_id', $branchId);
+        }
+        $membershipUsers = $membershipUsers->latest()->get();
 
         return view('happyView.membership-history', compact('membershipUsers'));
     }
@@ -137,6 +160,7 @@ class MembershipController extends Controller
         hasPermission('membership-add');
         $userdetail = UserDetail::where('phone_no', $request->input('phone'))->where('membership_plan', 1)->first();
         $getPlan = MembershipPlan::where('id', $request->input('membershipPlan'))->first();
+        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
 
         if (isset($userdetail)) {
 
@@ -147,6 +171,7 @@ class MembershipController extends Controller
                     $kidsDetails = new Kid();
                     $kidsDetails->user_id = $userdetail->user_id;
                     $kidsDetails->name = $request->input('name');
+                    $kidsDetails->branch_id = $branchId;
                     $kidsDetails->save();
 
 
@@ -177,6 +202,7 @@ class MembershipController extends Controller
                     $amount = new PaymentMethod();
                     $amount->user_id = $userdetail->user_id;
                     $amount->subTotal = $request->input('subtotal');
+                    $amount->branch_id = $branchId;
                     $amount->gst18 = $request->input('gst18');
                     $amount->amounts = $request->input('totalamount');
                     $amount->payment_method = "Card";
@@ -216,6 +242,7 @@ class MembershipController extends Controller
                 } else {
                     $userSave = new User();
                     $userSave->name = $request->input('name');
+                    $userSave->branch_id = $branchId;
                     $userSave->email = $request->input('name') . rand(10, 100) . '@gmail.com';
                     $userSave->role = 2;
                     $userSave->save();
@@ -223,17 +250,20 @@ class MembershipController extends Controller
                         $userDetails = new UserDetail();
                         $userDetails->user_id = $userSave->id;
                         $userDetails->phone_no = $request->input('phone');
+                        $userDetails->branch_id = $branchId;
                         $userDetails->number_of_kids = 1;
                         $userDetails->membership_plan = 1;
                         $userDetails->save();
 
                         $kidsDetails = new Kid();
                         $kidsDetails->user_id = $userSave->id;
+                        $kidsDetails->branch_id = $branchId;
                         $kidsDetails->name = $request->input('name');
                         $kidsDetails->save();
 
                         $member = new MembershipBuy();
                         $member->user_id = $userSave->id;
+                        $member->branch_id = $branchId;
                         $member->plan = $getPlan->plan_name;
                         $member->credit_left = $getPlan->credits;
                         $member->total_credit = $getPlan->credits;
@@ -256,6 +286,7 @@ class MembershipController extends Controller
 
                         $amount = new PaymentMethod();
                         $amount->user_id = $userSave->id;
+                        $amount->branch_id = $branchId;
                         $amount->subTotal = $request->input('subtotal');
                         $amount->gst18 = $request->input('gst18');
                         $amount->amounts = $request->input('totalamount');
@@ -295,12 +326,14 @@ class MembershipController extends Controller
             } else {
                 $userSave = new User();
                 $userSave->name = $request->input('name');
+                $userSave->branch_id = $branchId;
                 $userSave->email = $request->input('name') . rand(10, 100) . '@gmail.com';
                 $userSave->role = 2;
                 $userSave->save();
                 if ($userSave->id) {
                     $userDetails = new UserDetail();
                     $userDetails->user_id = $userSave->id;
+                    $userDetails->branch_id = $branchId;
                     $userDetails->phone_no = $request->input('phone');
                     $userDetails->number_of_kids = 1;
                     $userDetails->membership_plan = 1;
@@ -308,12 +341,14 @@ class MembershipController extends Controller
 
                     $kidsDetails = new Kid();
                     $kidsDetails->user_id = $userSave->id;
+                    $kidsDetails->branch_id = $branchId;
                     $kidsDetails->name = $request->input('name');
                     $kidsDetails->save();
 
                     $member = new MembershipBuy();
                     $member->user_id = $userSave->id;
                     $member->plan = $getPlan->plan_name;
+                    $member->branch_id = $branchId;
                     $member->credit_left = $getPlan->credits;
                     $member->total_credit = $getPlan->credits;
                     $member->amount = $request->input('totalamount');
@@ -335,6 +370,7 @@ class MembershipController extends Controller
 
                     $amount = new PaymentMethod();
                     $amount->user_id = $userSave->id;
+                    $amount->branch_id = $branchId;
                     $amount->subTotal = $request->input('subtotal');
                     $amount->gst18 = $request->input('gst18');
                     $amount->amounts = $request->input('totalamount');
@@ -374,12 +410,14 @@ class MembershipController extends Controller
         } else {
                 $userSave = new User();
                 $userSave->name = $request->input('name');
+                $userSave->branch_id = $branchId;
                 $userSave->email = $request->input('name') . rand(10, 100) . '@gmail.com';
                 $userSave->role = 2;
                 $userSave->save();
                 if ($userSave->id) {
                     $userDetails = new UserDetail();
                     $userDetails->user_id = $userSave->id;
+                    $userDetails->branch_id = $branchId;
                     $userDetails->phone_no = $request->input('phone');
                     $userDetails->number_of_kids = 1;
                     $userDetails->membership_plan = 1;
@@ -387,11 +425,13 @@ class MembershipController extends Controller
 
                     $kidsDetails = new Kid();
                     $kidsDetails->user_id = $userSave->id;
+                    $kidsDetails->branch_id = $branchId;
                     $kidsDetails->name = $request->input('name');
                     $kidsDetails->save();
 
                     $member = new MembershipBuy();
                     $member->user_id = $userSave->id;
+                    $member->branch_id = $branchId;
                     $member->plan = $getPlan->plan_name;
                     $member->credit_left = $getPlan->credits;
                     $member->total_credit = $getPlan->credits;
@@ -414,6 +454,7 @@ class MembershipController extends Controller
 
                     $amount = new PaymentMethod();
                     $amount->user_id = $userSave->id;
+                    $amount->branch_id = $branchId;
                     $amount->subTotal = $request->input('subtotal');
                     $amount->gst18 = $request->input('gst18');
                     $amount->amounts = $request->input('totalamount');
@@ -455,10 +496,14 @@ class MembershipController extends Controller
     public function getPlan(Request $request)
     {
         $mobile = $request->input('mobile');
-
+        $branchId = auth('admin')->user()->branch_id ?? null;
         $findId = UserDetail::select('user_id')->where(['phone_no' => $mobile, 'membership_plan' => 1])->latest()->first();
 
-        $user = MembershipBuy::with('user', 'kid', 'userDetails')->where('user_id', $findId->user_id)->first();
+        $user = MembershipBuy::with('user', 'kid', 'userDetails')->where('user_id', $findId->user_id);
+        if ($branchId) {
+            $user->where('branch_id', $branchId);
+        }
+        $user = $user->first();
 
         return response()->json($user);
     }
@@ -485,6 +530,7 @@ class MembershipController extends Controller
     public function updateMembership(Request $request)
     {
         hasPermission('membership-edit');
+        $branchId = auth('admin')->user()->branch_id ?? null;
         if ($request->input('response_otp') > 0) {
             $user = User::where('id', $request->input('user_id'))->where('otp', $request->input('response_otp'))->first();
 
@@ -498,6 +544,7 @@ class MembershipController extends Controller
 
                 $event = new Event();
                 $event->user_id = $request->input('user_id');
+                $event->branch_id = $branchId;
                 $event->booking_date = now()->format('y-m-d');
                 $event->Hours =  now()->format('H:i');
                 $event->save();
@@ -507,10 +554,12 @@ class MembershipController extends Controller
                 $end_time = Carbon\Carbon::parse(now()->format('H:i'))->addHour($request->input('hrs'));
                 $time_str = $end_time->toTimeString();
                 $kidsDetails->end_time = $time_str;
+                $kidsDetails->branch_id = $branchId;
                 $kidsDetails->save();
 
                 $membershiphistory = new MembershipHistory;
                 $membershiphistory->user_id = $request->input('user_id');
+                $membershiphistory->branch_id = $branchId;
                 $membershiphistory->membership_buyer_id = $update->id;
                 $membershiphistory->use_credit = $request->input('hrs');
                 $membershiphistory->current_left = $update->credit_left;
@@ -550,6 +599,7 @@ class MembershipController extends Controller
         if ($request->input('plan') == null) {
             return back()->with('error', 'Please Provide Plan');
         }
+        $branchId = auth('admin')->user()->branch_id ?? null;
         $membership = new MembershipPlan();
         $membership->plan_name = $request->input('plan');
         $membership->price = $request->input('price');

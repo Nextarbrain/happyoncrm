@@ -44,18 +44,27 @@ class TicketController extends Controller
 
     function upcomingBirthdaysView(Request $request)
     {
+        $branchId = auth('admin')->user()->branch_id ?? null;
         $currentDate = LaravelCarbon::today();
         $endDate = $currentDate->copy()->addDays(60);
-        $user = UserDetail::whereRaw("DATE_FORMAT(dob, '%m-%d') BETWEEN DATE_FORMAT('{$currentDate}', '%m-%d') AND DATE_FORMAT('{$endDate}', '%m-%d')")
-            ->orderByRaw("DATE_FORMAT(dob, '%m-%d')")
-            ->get();
+        $user = UserDetail::whereRaw("DATE_FORMAT(dob, '%m-%d') BETWEEN DATE_FORMAT('{$currentDate}', '%m-%d') AND DATE_FORMAT('{$endDate}', '%m-%d')");
+        if ($branchId) {
+            $user->where('branch_id', $branchId);
+        }
+        $user = $user->orderByRaw("DATE_FORMAT(dob, '%m-%d')")->get();
         return view('happyView.upcomingbirthdays', compact('user'));
     }
 
     function filterCustomer(Request $request)
     {
+        $branchId = auth('admin')->user()->branch_id ?? null;
         if (isset($request->key)) {
-            $user = User::with('membership', 'kid', 'userDetails', 'event', 'paymentInfo')->where('role', '!=', 0)->latest()->get();
+            $user = User::with('membership', 'kid', 'userDetails', 'event', 'paymentInfo')->where('role', '!=', 0);
+            if ($branchId) {
+                $user->where('branch_id', $branchId);
+            }
+            $user = $user->latest()->get();
+
             $data = [];
             foreach ($user as $u) {
                 if ($u['paymentInfo']->payment_method == $request->key) {
@@ -64,7 +73,11 @@ class TicketController extends Controller
             }
             $user = $data;
         } else {
-            $user = User::with('membership', 'kid', 'userDetails', 'event', 'paymentInfo')->where('role', '!=', 0)->latest()->get();
+            $user = User::with('membership', 'kid', 'userDetails', 'event', 'paymentInfo')->where('role', '!=', 0);
+            if ($branchId) {
+                $user->where('branch_id', $branchId);
+            }
+            $user = $user->latest()->get();
         }
 
 
@@ -82,8 +95,10 @@ class TicketController extends Controller
     {
 
         // dd($request->tax, $request->price, $request->all());
+        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $userSave = new User();
         $userSave->name = ucfirst($request->input('name_of_kid'));
+        $userSave->branch_id = $branchId;
         $userSave->email = $request->input('name_of_kid') . rand(10000, 999999);
         $userSave->role = 1;
         $userSave->save();
@@ -91,6 +106,7 @@ class TicketController extends Controller
         if ($userSave->id) {
             $event = new Event();
             $event->user_id = $userSave->id;
+            $event->branch_id = $branchId;
             $event->booking_date = $request->input('date');
             $event->Hours =  now()->format('H:i');
             $event->save();
@@ -98,6 +114,7 @@ class TicketController extends Controller
             $userDetails = new UserDetail();
             $userDetails->user_id = $userSave->id;
             $userDetails->phone_no = $request->input('phone');
+            $userDetails->branch_id = $branchId;
             $userDetails->dob = $request->input('dob');
             $userDetails->number_of_kids = $request->input('kids');
             $userDetails->save();
@@ -110,6 +127,7 @@ class TicketController extends Controller
                     if ($request->input('hours')[$i] > 0) {
                         $kidsDetails = new Kid();
                         $kidsDetails->user_id = $userSave->id;
+                        $kidsDetails->branch_id = $branchId;
                         $kidsDetails->name = ucfirst($row);
                         $kidsDetails->kidPrice = $request->input('kid_price')[$i];
                         $kidsDetails->hours = $request->input('hours')[$i];
@@ -121,6 +139,7 @@ class TicketController extends Controller
                     } elseif ($request->input('hours')[$i] == "Unlimited") {
                         $kidsDetails = new Kid();
                         $kidsDetails->user_id = $userSave->id;
+                        $kidsDetails->branch_id = $branchId;
                         $kidsDetails->name = $row;
                         $kidsDetails->kidPrice = $request->input('kid_price')[$i];
                         $kidsDetails->hours = $request->input('hours')[$i];
@@ -135,6 +154,7 @@ class TicketController extends Controller
                 foreach ($request->product_quantity as $key => $val) {
                     $product_add = new UserProduct();
                     $product_add->user_id = $userSave->id;
+                    $product_add->branch_id = $branchId;
                     $product_add->product_name = $request->product_name[$key];
                     $product_add->price = $request->price[$key];
                     $product_add->qty = ($request->product_name[$key] == 'Socks') ? $val + count($kidsName) : $val;
@@ -144,6 +164,7 @@ class TicketController extends Controller
             if (!isset($request->product_name) || isset($request->product_name) && !in_array('Socks', $request->product_name)) {
                 $product_add = new UserProduct();
                 $product_add->user_id = $userSave->id;
+                $product_add->branch_id = $branchId;
                 $product_add->product_name = 'Socks';
                 $product_add->price = 0;
                 $product_add->qty = count($kidsName);
@@ -151,6 +172,7 @@ class TicketController extends Controller
             }
             $amount = new PaymentMethod();
             $amount->user_id = $userSave->id;
+            $amount->branch_id = $branchId;
             if ($request->input('payment_mode') == 1) {
                 $amount->payment_method = "UPI";
             } elseif ($request->input('payment_mode') == 2) {
@@ -265,10 +287,10 @@ class TicketController extends Controller
             $amount = $request->input('totalAmount');
             $msg = "Welcome to HappyOn Party & Play! You have been registered with the below details: Date: $date, Time-In: $time_in, Time-Out: $time_out Amount Paid: $amount., Have a Gadget Free time at HappyOn Play!";
             $template_id = "1707168001511714072";
-            try {
-                sendsms($mobile, $msg, $template_id);
-            } catch (Exception $e) {
-            }
+            // try {
+            //     sendsms($mobile, $msg, $template_id);
+            // } catch (Exception $e) {
+            // }
 
 
 
@@ -362,7 +384,7 @@ class TicketController extends Controller
                     "order_from" => "POS"
                 ]
             ];
-
+            // dd($postData);
 
             // Make the POST request
             $response = Http::post('https://api.reelo.io/v1/pos/integrations/e7499eb1-3ef1-4162-8dfb-8b5a55d3e6ba/bill/customer', $postData);
@@ -416,8 +438,8 @@ class TicketController extends Controller
     public function updateTickets(Request $request)
     {
 
-
         hasPermission('tickets-edit');
+        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $id = $request->input('id');
         $user = User::where('id', $id)->first();
         $userDetail = UserDetail::where('user_id', $id)->first();
@@ -504,6 +526,7 @@ class TicketController extends Controller
         if ($request->input('add_extra')) {
             $product_add2 = new UserProduct();
             $product_add2->user_id = $id;
+            $product_add2->branch_id = $branchId;
             $product_add2->product_name = 'Extra Time';
             $product_add2->price = $request->input('extra_time');
             $product_add2->save();
@@ -565,6 +588,7 @@ class TicketController extends Controller
                 $product_add = new UserProduct();
             }
             $product_add->user_id = $id;
+            $product_add->branch_id = $branchId;
             if ($request->input('adult_qty') != null) {
                 $product_add->product_name = 'Adult';
             }
@@ -592,6 +616,7 @@ class TicketController extends Controller
                     $product_add = new UserProduct();
                 }
                 $product_add->user_id = $id;
+                $product_add->branch_id = $branchId;
                 $product_add->product_name = $request->product_name[$key];
                 $product_add->price = $request->price[$key];
                 if ($request->product_name[$key] == 'Socks') {
@@ -799,7 +824,12 @@ class TicketController extends Controller
             $daterange[0] = date('y-m-d', strtotime($daterange[0]));
             $daterange[1] = date('y-m-d', strtotime($daterange[1]));
 
-            $user_bookings = User::with('membership', 'kid', 'userDetails', 'event', 'paymentInfo')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59'])->where('role', '!=', 0)->get();
+            $user_bookings = User::with('membership', 'kid', 'userDetails', 'event', 'paymentInfo')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59'])->where('role', '!=', 0);
+            if ($branchId) {
+                $user_bookings->where('branch_id', $branchId);
+            }
+            $user_bookings = $user_bookings->get();
+
             $data = [];
             foreach ($user_bookings as $user) {
                 if ($user['userDetails']->membership_plan == 0) {
@@ -892,7 +922,7 @@ class TicketController extends Controller
 
     public function addUser(Request $request)
     {
-
+        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         if ($request->input('user_name') == null) {
             return back()->with('error', 'Please Provide user_name');
         }
@@ -900,6 +930,7 @@ class TicketController extends Controller
         $user = new User();
         $user->name = $request->input('name');
         $user->username = $request->input('user_name');
+        $user->branch_id = $branchId;
         $user->email = $request->input('user_name') . '@gmail.com';
         $user->assign = $request->input('assign');
         $user->acess = $request->input('access');

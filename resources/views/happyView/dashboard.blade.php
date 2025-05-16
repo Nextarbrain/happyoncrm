@@ -43,11 +43,12 @@
                             <div class="d-flex">
                                 <input type="text" name="daterange" class="form-control float-right"
                                     id="reservation">
+                                <input type="hidden" name="branch_id" id="branch_id" value="{{ $branchId }}">
                                 <input type="submit" value="Apply" name="submit" class="btn btn-primary m-1">
                             </div>
                         </form>
                     </div>
-                    <div class="col-md-6 d-flex justify-content-between align-items-center">
+                    <div class="col-md-2 d-flex justify-content-between align-items-center">
                         <div class="fliter" style="z-index:0;">
                             <label>Analysis:</label>
                             @if ($applydate)
@@ -57,6 +58,24 @@
                                 $applydate = base64_encode($applydate);
                             @endphp
                         </div>
+                    </div>
+                    <div class="col-md-3 mt-1">
+                        @if($isSuperAdminShow)
+                        <form id="branchFilterForm" action="{{ url('/datawise-record-show') }}" method="POST">
+                            @csrf
+                                <label>Branch:</label>
+                                <div class="d-flex">
+                                    <select name="branch_id" class="form-control" id="branch_id" onchange="document.getElementById('branchFilterForm').submit();">
+                                        <option value="">-- Select --</option>
+                                        @foreach ($branches as $branch)
+                                            <option value="{{ $branch['id'] }}" {{ $branchId == $branch['id'] ? 'selected' : '' }}>{{ $branch['name'] }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </form>
+                        @endif
+                    </div>
+                    <div class="col-md-1 mt-4">
                         <div class="">
                             <a href="{{ route('logoutA') }}" class="btn btn-danger">Logout</a>
                         </div>
@@ -620,6 +639,28 @@
             // let ticketSellNumber = ticketSellValue.toLocaleString('en-IN');
             // $('#ticketSell').text(ticketSellNumber);
         });
+
+        function branchWiseData(selectElement) {
+            var branchId = selectElement.value;
+
+            if (branchId) {
+                $.ajax({
+                    url: "{{ url('/branch-wise-data') }}", // Update this to your actual route
+                    type: "POST",
+                    data: {
+                        branch_id: branchId,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        console.log(response);
+
+                    },
+                    error: function(xhr) {
+                        console.error("Error fetching branch data:", xhr);
+                    }
+                });
+            }
+        }
     </script>
 </body>
 

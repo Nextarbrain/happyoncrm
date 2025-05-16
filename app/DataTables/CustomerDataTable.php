@@ -101,7 +101,13 @@ class CustomerDataTable extends DataTable
      */
     public function query(User $model)
     {
-        return $model->with('paymentInfo', 'kid', 'userDetails')->latest();
+        $branchId = auth('admin')->user()->branch_id ?? null;
+        $model = $model->with('paymentInfo', 'kid', 'userDetails');
+        if ($branchId) {
+            $model->where('branch_id', $branchId);
+        }
+        $model = $model->latest();
+        return $model;   
     }
 
     /**

@@ -28,6 +28,24 @@
                 <div class="menu-title">Dashboard</div>
             </a>
         </li>
+        @if (!auth('admin')->user()->branch_id)
+            <li>
+                <a href="{{ url('/branch') }}" class="{{ in_array(Route::currentRouteName(), ['branch', 'create-branch']) ? 'active' : '' }}">
+                    <div class="parent-icon">
+
+                        <svg width="22" height="20" viewBox="0 0 22 20" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4.52637 7.05263L16.1414 2L18.0001 7.05263" stroke="#FDCF6F" stroke-width="2.5"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path
+                                d="M2 7.05261H20.5263V9.78945C19.1368 9.78945 17.7474 10.7017 17.7474 12.2982C17.7474 13.8947 19.1368 15.2631 20.5263 15.2631V18H2V15.2631C3.38955 15.2631 4.77895 14.3509 4.77895 12.5263C4.77895 10.7017 3.38947 9.78945 2 9.78945V7.05261Z"
+                                stroke="#FDCF6F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div class="menu-title">Branches</div>
+                </a>
+            </li>
+        @endif
         @if (can('tickets'))
             <li>
                 <a href="{{ url('/tickets') }}" class="{{ Route::currentRouteName() == 'tickets' ? 'active' : '' }}">

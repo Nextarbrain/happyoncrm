@@ -22,8 +22,11 @@ class UserDataTable extends DataTable
      */
     public function dataTable($query)
     {
-
+        $branchId = auth('admin')->user()->branch_id ?? null;
         $users = User::query();
+        if ($branchId) {
+            $users->where('branch_id', $branchId);
+        }
         $userData = $users->with('paymentInfo', 'kid', 'event', 'userDetails')->latest();
         return DataTables::of($userData)
             ->addColumn('checkbox', function ($user) {
@@ -224,9 +227,13 @@ class UserDataTable extends DataTable
      */
     public function query(User $model)
     {
-        return $model->with('membership', 'firstKid', 'userDetails', 'event', 'paymentInfo')
-            ->where('role', '!=', 0)
-            ->latest();
+        $branchId = auth('admin')->user()->branch_id ?? null;
+        $model = $model->with('membership', 'firstKid', 'userDetails', 'event', 'paymentInfo')->where('role', '!=', 0);
+        if ($branchId) {
+            $model->where('branch_id', $branchId);
+        }
+        $model = $model->latest();
+        return $model; 
     }
 
     /**
