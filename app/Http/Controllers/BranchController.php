@@ -52,8 +52,8 @@ class BranchController extends Controller
         if ($id) {
             $admin = Admin::where('id', $adminId)->first();
             if($admin !== null) {
-                $admin->name = $request->name;
-                $admin->role = 'staff';
+                $admin->name = $request->person_name;
+                $admin->role = 'Branch Superadmin';
                 $admin->isSuperAdmin = 1;
                 if (isset($request->password)) {
                     $admin->password = Hash::make($request->password);
@@ -69,7 +69,6 @@ class BranchController extends Controller
         $branch = new Branch();
         $branch->name = $request->name;
         $branch->location = $request->location;
-
         $branch->pincode = $request->pincode;
         $branch->phone = $request->phone;
         $branch->address = $request->address ?? '';
@@ -78,10 +77,12 @@ class BranchController extends Controller
         $branch->save();
         if ($branch->id) {
             $admin = new Admin();
-            $admin->name = $request->name;
+            $admin->name = $request->person_name;
             $admin->email = $request->email;
             $admin->phone = $request->phone;
             $admin->branch_id  = $branch->id;
+            $admin->role = 'Branch Superadmin';
+            $admin->isSuperAdmin = 1;
             if (isset($request->password)) {
                 $admin->password = Hash::make($request->password);
             }

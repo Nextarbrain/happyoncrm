@@ -287,10 +287,10 @@ class TicketController extends Controller
             $amount = $request->input('totalAmount');
             $msg = "Welcome to HappyOn Party & Play! You have been registered with the below details: Date: $date, Time-In: $time_in, Time-Out: $time_out Amount Paid: $amount., Have a Gadget Free time at HappyOn Play!";
             $template_id = "1707168001511714072";
-            // try {
-            //     sendsms($mobile, $msg, $template_id);
-            // } catch (Exception $e) {
-            // }
+            try {
+                sendsms($mobile, $msg, $template_id);
+            } catch (Exception $e) {
+            }
 
 
 
@@ -819,6 +819,7 @@ class TicketController extends Controller
     public function ticketsBookingReport(Request $request)
     {
         hasPermission('reports-ticket');
+        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         if (isset($request->daterange) && $request->daterange != "") {
             $daterange = explode("-", $request->daterange);
             $daterange[0] = date('y-m-d', strtotime($daterange[0]));

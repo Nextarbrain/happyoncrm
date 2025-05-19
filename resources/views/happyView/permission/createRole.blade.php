@@ -128,6 +128,15 @@
                                                         <span
                                                             class="text-danger font-weight-bold text-capitalize">{{ $message }}</span>
                                                     @enderror
+                                                    @if(!auth('admin')->user()->branch_id != null)
+                                                        {{ Form::label('branch_id', 'Branch') }}
+                                                        {!! Form::select('branch_id', $branches, null, ['class' => 'form-control']) !!}
+                                                        @error('branch_id')
+                                                            <span class="text-danger font-weight-bold text-capitalize">{{ $message }}</span>
+                                                        @enderror
+                                                    @else
+                                                        {!! Form::hidden('branch_id', auth('admin')->user()->branch_id ?? null) !!}
+                                                    @endif
                                                     @php
                                                         $current = null;
                                                         $index = 0;

@@ -279,7 +279,9 @@ class EventController extends Controller
 
     public function editEventItemPost(Request $request)
     {
+        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $item = EventItem::where('id', $request->eventItemId)->first();
+        $item->branch_id = $branchId;
         $item->item_price = $request->editprice;
         $item->item_qty = $request->editqty;
         $item->item_tax = $request->tax;

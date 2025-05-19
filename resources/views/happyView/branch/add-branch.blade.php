@@ -85,6 +85,14 @@
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap">
+                                                                <label>Person Name <span>*</span></label>
+                                                                <input type="text" class="form-control"
+                                                                    placeholder="Person Name" name="person_name" required>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="mb-4 input_wrap">
                                                                 <label>Email <span>*</span></label>
                                                                 <input type="email" class="form-control"
                                                                     placeholder="Email Name" name="email" required>

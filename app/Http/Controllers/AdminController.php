@@ -182,7 +182,6 @@ class AdminController extends Controller
         ini_set('max_execution_time', 180);
         $branches = Branch::where('status', 'Active')->get()->toArray();
         $branchId = $request->branch_id ?? auth('admin')->user()->branch_id ?? null;
-        // dd($branchId);
         $isSuperAdminShow = auth('admin')->user()->branch_id == null ? true : false;
         if (isset($request->daterange) && $request->daterange != "") {
             $daterange = explode("-", $request->daterange);
@@ -200,17 +199,17 @@ class AdminController extends Controller
             $user = $user->count();
 
             $date = now();
-            $customers = UserDetail::upcomingBirthdays()->take(3);
+            $customers = UserDetail::upcomingBirthdays();
             if ($branchId) {
                 $customers->where('branch_id', $branchId);
             }
-            $customers = $customers->get();
+            $customers = $customers->take(3)->get();
 
-            $event_bookings = EventBooking::whereDate('booking_date', '>=', Carbon\Carbon::today())->take(5)->latest();
+            $event_bookings = EventBooking::whereDate('booking_date', '>=', Carbon\Carbon::today());
             if ($branchId) {
                 $event_bookings->where('branch_id', $branchId);
             }
-            $event_bookings = $event_bookings->get();
+            $event_bookings = $event_bookings->take(5)->latest()->get();
 
             $event_gst18 = EventBooking::select('gst18')->where('payment_status', 'Paid')->whereBetween('booking_date', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
             if ($branchId) {
@@ -233,7 +232,7 @@ class AdminController extends Controller
             if ($daterange[0] == $daterange[1]) {
                 $event_booking =   EventBooking::whereDate('booking_date', $daterange[0])->where('payment_status', 'Paid')->count();
                 if($branchId) {
-                    $event_booking->where('branch_id', $branchId); 
+                    $event_booking->where('branch_id', $branchId);
                 }
                 $event_booking = $event_booking->count();
 
@@ -246,14 +245,14 @@ class AdminController extends Controller
                     ->where('payment_status', 'Paid')
                     ->whereDate('booking_date', $daterange[0]);
                 if($branchId) {
-                    $event_sale->where('branch_id', $branchId); 
+                    $event_sale->where('branch_id', $branchId);
                 }
                 $event_sale = $event_sale->sum('totalamount');
 
             } else {
                 $event_booking =   EventBooking::whereBetween('booking_date', [$daterange[0], $daterange[1]])->where('payment_status', 'Paid');
                 if($branchId) {
-                    $event_booking->where('branch_id', $branchId); 
+                    $event_booking->where('branch_id', $branchId);
                 }
                 $event_booking = $event_booking->count();
 
@@ -266,31 +265,31 @@ class AdminController extends Controller
                     ->where('payment_status', 'Paid')
                     ->whereBetween('booking_date', [$daterange[0], $daterange[1]]);
                 if($branchId) {
-                    $event_sale->where('branch_id', $branchId); 
+                    $event_sale->where('branch_id', $branchId);
                 }
                 $event_sale = $event_sale->sum('totalamount');
             }
             $event_booking_month = EventBooking::whereMonth('booking_date', '=', Carbon\Carbon::now());
             if($branchId) {
-                $event_booking_month->where('branch_id', $branchId); 
+                $event_booking_month->where('branch_id', $branchId);
             }
             $event_booking_month = $event_booking_month->count();
 
             $totalOpenBilling = OpenBilling::whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
             if($branchId) {
-                $totalOpenBilling->where('branch_id', $branchId); 
+                $totalOpenBilling->where('branch_id', $branchId);
             }
             $totalOpenBilling = $totalOpenBilling->count();
 
             $totalOpenBillingSales = OpenBilling::select('totalamount')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
             if($branchId) {
-                $totalOpenBillingSales->where('branch_id', $branchId); 
+                $totalOpenBillingSales->where('branch_id', $branchId);
             }
             $totalOpenBillingSales = $totalOpenBillingSales->sum('totalamount');
 
             $totalMembershipBuy = MembershipBuy::whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
             if($branchId) {
-                $totalMembershipBuy->where('branch_id', $branchId); 
+                $totalMembershipBuy->where('branch_id', $branchId);
             }
             $totalMembershipBuy = $totalMembershipBuy->count();
 
@@ -550,11 +549,11 @@ class AdminController extends Controller
 
             $date = now();
 
-            $customers = UserDetail::upcomingBirthdays()->take(3);
+            $customers = UserDetail::upcomingBirthdays();
             if ($branchId) {
                 $customers->where('branch_id', $branchId);
             }
-            $customers = $customers->get();
+            $customers = $customers->take(3)->get();
 
             $totalOpenBilling = OpenBilling::whereDate('created_at', $today);
             if ($branchId) {
@@ -825,7 +824,6 @@ class AdminController extends Controller
                 });
             $applydate = "Today";
         }
-        // dd($isSuperAdminShow);
         return view('happyView.dashboard', compact('shocksCount', 'user', 'kid', 'totalMemberAmount', 'totalMembershipBuy', 'totalSales', 'totalTicketAmount', 'totalOpenBillingSales', 'totalOpenBilling', 'totalTicket', 'upi', 'cash', 'card', 'member', 'applydate', 'event_booking', 'event_booking_month', 'event_bookings', 'event_sale', 'couponcodes', 'couponvalue', 'customers', 'gst18', 'gst12', 'gst5', 'branches', 'isSuperAdminShow', 'branchId'));
     }
 
@@ -1266,7 +1264,11 @@ class AdminController extends Controller
             }
             $openbillings = $openbillings->get();
 
-            $user = User::with('membership', 'kid', 'userDetails', 'event', 'paymentInfo')->whereDate('created_at', $today)->where('role', '!=', 0)->latest()->get();
+            $user = User::with('membership', 'kid', 'userDetails', 'event', 'paymentInfo')->whereDate('created_at', $today)->where('role', '!=', 0);
+            if ($branchId) {
+                $user->where('branch_id', $branchId);
+            }
+            $user = $user->latest()->get();
             return view('happyView.customer', compact('user', 'applydate', 'event_bookings', 'openbillings'));
         } else {
             $daterange = explode("-", base64_decode($request->date));

@@ -114,7 +114,7 @@ class MembershipController extends Controller
         hasPermission('membership');
         $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $membership = MembershipPlan::get();
-        $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo')->latest()->get();
+        $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo');
         if ($branchId) {
             $membershipUsers->where('branch_id', $branchId);
         }

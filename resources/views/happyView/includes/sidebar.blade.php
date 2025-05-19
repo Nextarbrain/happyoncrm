@@ -11,7 +11,9 @@
         <div class="mail-admin">
             <a href="mailto:contact@happyonplay.com" class="text-white">contact@happyonplay.com</a>
         </div>
-
+        <span class="text-white" style="display: block; text-align: center;">
+            {{ auth('admin')->user()->name ?? 'No name' }} ({{ auth('admin')->user()->branch ? auth('admin')->user()->branch->name : 'Main SuperAdmin' }})
+        </span>
     </div>
     <!--navigation-->
     <ul class="metismenu" id="menu" style="min-height: 80vh !important;">
@@ -305,7 +307,7 @@
         @if(auth('admin')->user()->isSuperAdmin)
         <li><a href="{{ route('trash') }}" class="nav-link"><i class="fa fa-list me-3"></i>Trash Items</a>
         </li>
-   @endif
+        @endif
         @if (can('permission-manage'))
             <li><a href="{{ route('permission.index') }}" class="nav-link"><i class="fa fa-lock me-3"></i>Add
                     Permission</a>
