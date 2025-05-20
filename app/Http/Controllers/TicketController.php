@@ -28,8 +28,13 @@ class TicketController extends Controller
 {
     public function ticketsView()
     {
+        $branchId = auth('admin')->user()->branch_id ?? null;
         if (can('tickets') || can('tickets-add') || can('customers')) {
-            $product = Product::select('product_name', 'product_price', 'product_tax')->get();
+            $product = Product::select('product_name', 'product_price', 'product_tax');
+            if ($branchId) {
+                $product->where('branch_id', $branchId);
+            }
+            $product = $product->get();
             $result = [];
             foreach ($product as $products) {
                 $data[$products->product_name] = $products->product_price;
@@ -412,13 +417,18 @@ class TicketController extends Controller
 
     public function ticketEdit(Request $request)
     {
+        $branchId = auth('admin')->user()->branch_id ?? null;
         if (can('tickets-edit')) {
             $id = $request->id;
             $user = User::with('membership', 'userDetails', 'event', 'paymentInfo')->where('id', $id)->first();
             $kid = Kid::where('user_id', $id)->get();
             $product = UserProduct::where('user_id', $id)->get();
 
-            $productData =  Product::select('product_name', 'product_price', 'product_tax', 'id')->get();
+            $productData =  Product::select('product_name', 'product_price', 'product_tax', 'id');
+            if ($branchId) {
+                $productData->where('branch_id', $branchId);
+            }
+            $productData = $productData->get();
             $result = [];
             foreach ($productData as $products) {
                 $data[$products->product_name] = $products->product_price;
@@ -426,9 +436,12 @@ class TicketController extends Controller
             $result[] = $data;
 
             $extraAdded = UserProduct::where('user_id', $id)->where('product_name', '=', "Extra Time",)->first();
-            $extraItems = Product::where('product_name', "Extra Time")->first();
+            $extraItems = Product::where('product_name', "Extra Time");
+            if($branchId){
+                $extraItems = $extraItems->where('branch_id', $branchId);
+            }
+            $extraItems = $extraItems->first();
             $paymentMethod = PaymentMethod::where('user_id', $id)->first();
-            // dd($product);
             return view('happyView.tickets-edit', compact('user', 'kid', 'product', 'paymentMethod', 'extraItems', 'extraAdded', 'result', 'productData'));
         } else {
             abort(401);

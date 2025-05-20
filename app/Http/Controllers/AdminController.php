@@ -156,7 +156,12 @@ class AdminController extends Controller
     {
         hasPermission('admin');
         $branchId = auth('admin')->user()->branch_id ?? null;
-        $product = Product::get();
+        $product = Product::query();
+        if ($branchId) {
+            $product->where('branch_id', $branchId);
+        }
+        $product = $product->get();
+
         $eventitem = EventItem::query();
         if ($branchId) {
             $eventitem->where('branch_id', $branchId);
@@ -1393,12 +1398,14 @@ class AdminController extends Controller
         if ($request->input('product_name') == null) {
             return back()->with('error', 'Please Provide Product Name');
         }
+        $branchId = auth('admin')->user()->branch_id ?? null;
         $product = new Product();
         $product->product_name = $request->input('product_name');
         $product->product_price = $request->input('price');
         $product->product_qty = $request->input('qty');
         $product->product_tax = $request->input('tax');
         $product->product_description = $request->input('product_name');
+        $product->branch_id = $branchId;
         $product->save();
         if ($product->id) {
             return back()->with('success', 'Success! Product created');
@@ -1492,10 +1499,12 @@ class AdminController extends Controller
     public function editProductPost(Request $request)
     {
         hasPermission('admin-products-edit');
+        $branchId = auth('admin')->user()->branch_id ?? null;
         $product = Product::where('id', $request->productId)->first();
         $product->product_price = $request->editprice;
         $product->product_qty = $request->editqty;
         $product->product_tax = $request->tax;
+        $product->branch_id = $branchId;
         $product->save();
         session()->flash('success', 'Product Updated successfully!');
         return redirect()->back();

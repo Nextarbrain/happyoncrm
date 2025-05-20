@@ -51,7 +51,12 @@ function hasProduct($userID, $name)
 }
 function getTax($name)
 {
-    $product = Product::select('product_tax')->where(['product_name' => $name])->first();
+    $branchId = auth('admin')->user()->branch_id ?? null;
+    $product = Product::select('product_tax')->where(['product_name' => $name]);
+    if($branchId) {
+        $product->where('branch_id', $branchId);
+    }
+    $product = $product->first();
     return is_null($product) ? 0 : $product->product_tax;
 }
 if (!function_exists('bindMsg')) {
@@ -111,7 +116,12 @@ function hasTwoProduct($userID, $name, $count)
 }
 function getProductPrice($name)
 {
-    $product = Product::where('product_name', $name)->first();
+    $branchId = auth('admin')->user()->branch_id ?? null;
+    $product = Product::where('product_name', $name);
+     if($branchId) {
+        $product->where('branch_id', $branchId);
+    }
+    $product = $product->first();
     return $product->product_price ?? null;
 }
 
