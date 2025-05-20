@@ -75,7 +75,7 @@
                             </form>
                         @endif
                     </div>
-                    <div class="col-md-1 mt-4">
+                    <div class="col-md-1" style="margin-top:40px; ">
                         <div class="">
                             <a href="{{ route('logoutA') }}" class="btn btn-danger">Logout</a>
                         </div>

@@ -139,11 +139,16 @@ class MembershipController extends Controller
     public function getMembershipPlan(Request $request)
     {
         hasPermission('membership');
+        $branchId = auth('admin')->user()->branch_id ??  auth('admin')->user()->branch_id;
         $id = $request->input('id');
         $data = MembershipPlan::where('id', $id)->first();
         $price = $data->price;
         if ($request->coupon) {
-            $coupon = Coupon::where('coupon_name', $request->coupon)->first();
+            $coupon = Coupon::where('coupon_name', $request->coupon);
+            if ($branchId) {
+                $coupon->where('branch_id', $branchId);
+            }
+            $coupon = $coupon->first();
         }
         if (isset($coupon) && !is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
             $data->price = $price - $coupon->discount;
@@ -207,7 +212,11 @@ class MembershipController extends Controller
 
                     $coupon = null;
                     if ($request->coupon_code) {
-                        $coupon = Coupon::where('coupon_name', $request->coupon_code)->first();
+                        $coupon = Coupon::where('coupon_name', $request->coupon_code);
+                        if ($branchId) {
+                            $coupon->where('branch_id', $branchId);
+                        }
+                        $coupon = $coupon->first();
                     }
                     if (!is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
                         $amount->couponvalue = $coupon->discount;
@@ -291,7 +300,11 @@ class MembershipController extends Controller
                         $amount->payment_method = "Card";
                         $coupon = null;
                         if ($request->coupon_code) {
-                            $coupon = Coupon::where('coupon_name', $request->coupon_code)->first();
+                            $coupon = Coupon::where('coupon_name', $request->coupon_code);
+                            if ($branchId) {
+                                $coupon->where('branch_id', $branchId);
+                            }
+                            $coupon = $coupon->first();
                         }
                         if (!is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
                             $amount->couponvalue = $coupon->discount;
@@ -375,7 +388,11 @@ class MembershipController extends Controller
                     $amount->payment_method = "Card";
                     $coupon = null;
                     if ($request->coupon_code) {
-                        $coupon = Coupon::where('coupon_name', $request->coupon_code)->first();
+                        $coupon = Coupon::where('coupon_name', $request->coupon_code);
+                        if ($branchId) {
+                            $coupon->where('branch_id', $branchId);
+                        }
+                        $coupon = $coupon->first();
                     }
                     if (!is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
                         $amount->couponvalue = $coupon->discount;
@@ -459,7 +476,11 @@ class MembershipController extends Controller
                     $amount->payment_method = "Card";
                     $coupon = null;
                     if ($request->coupon_code) {
-                        $coupon = Coupon::where('coupon_name', $request->coupon_code)->first();
+                        $coupon = Coupon::where('coupon_name', $request->coupon_code);
+                        if ($branchId) {
+                            $coupon->where('branch_id', $branchId);
+                        }
+                        $coupon = $coupon->first();
                     }
                     if (!is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
                         $amount->couponvalue = $coupon->discount;

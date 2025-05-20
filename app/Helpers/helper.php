@@ -118,7 +118,12 @@ function getProductPrice($name)
 function couponCountUpdate($code)
 {
     if($code){
-    $coupon = Coupon::where('coupon_name', $code)->first();
+    $branchId = auth('admin')->user()->branch_id ??  auth('admin')->user()->branch_id;
+    $coupon = Coupon::where('coupon_name', $code);
+    if ($branchId) {
+        $coupon->where('branch_id', $branchId);
+    }
+    $coupon = $coupon->first();
     $coupon->coupon_count = $coupon->coupon_count + 1;
     $coupon->save();
     return true;

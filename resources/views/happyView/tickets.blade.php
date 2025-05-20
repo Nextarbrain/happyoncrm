@@ -793,6 +793,7 @@
         //Coupon Code
         $("#couponCodebutton").on("click", function() {
             var sum = $("#subtotlSave").val();
+
             $.ajax({
                 url: baseUrl + '/get-coupon',
                 type: 'GET',
@@ -800,6 +801,12 @@
                     option: $("#couponCode").val()
                 },
                 success: function(data) {
+                    if(data.status === 400){
+                        $('#couponmsg').html(
+                            "<p style='color:red;'>"+data.msg+"</p>");
+                        return false;
+                    }
+
                     var discount = 0;
                     if (data != '') {
                         if (data.discount_type == 'flat') {
@@ -822,8 +829,7 @@
                             var sumamount = sum - discount;
 
                         }
-                        $('#couponmsg').html(
-                            "<p>Apply Coupon Successfull!</p>");
+                        $('#couponmsg').html("<p>Apply Coupon Successfull!</p>");
 
                         // Get the value of the first select box
                         var select1Value = parseInt($('#adult_qty')
@@ -850,8 +856,7 @@
                         // Add the values of the select boxes to the sum
                         console.log(finalAdultPrice);
 
-                        if (isNaN(finalSocksPrice) && isNaN(
-                                finalAdultPrice)) {
+                        if (isNaN(finalSocksPrice) && isNaN(finalAdultPrice)) {
                             finalSocksPrice = 0;
                             finalAdultPrice = 0;
 

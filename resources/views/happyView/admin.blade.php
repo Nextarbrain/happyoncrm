@@ -344,7 +344,7 @@
                                                         <div class="modal-content">
                                                             <div class="modal-header">
                                                                 <h5 class="modal-title" id="editMemberModalLabel">Edit
-                                                                    Product</h5>
+                                                                    Membership Plan</h5>
                                                                 <button type="button" class="close"
                                                                     onClick="modalClose();" aria-label="Close">
                                                                     <span aria-hidden="true">&times;</span>
@@ -643,7 +643,7 @@
                                                         <div class="modal-content">
                                                             <div class="modal-header">
                                                                 <h5 class="modal-title" id="editCouponModalLabel">Edit
-                                                                    Product</h5>
+                                                                    Coupon</h5>
                                                                 <button type="button" class="close"
                                                                     onClick="modalClose();" aria-label="Close">
                                                                     <span aria-hidden="true">&times;</span>

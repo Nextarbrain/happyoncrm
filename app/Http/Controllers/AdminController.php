@@ -162,7 +162,13 @@ class AdminController extends Controller
             $eventitem->where('branch_id', $branchId);
         }
         $eventitem = $eventitem->get();
-        $coupon = Coupon::get();
+
+        $coupon = Coupon::query();
+        if ($branchId) {
+            $coupon->where('branch_id', $branchId);
+        }
+        $coupon = $coupon->get();
+
         $membership = MembershipPlan::get();
         $hourPlan = DayPrice::get();
         $users = User::where('role', 0);
@@ -1405,12 +1411,14 @@ class AdminController extends Controller
         if ($request->input('name') == null) {
             return back()->with('error', 'Please Provide coupon name');
         }
+        $branchId = auth('admin')->user()->branch_id ?? null;
         $coupon = new Coupon();
         $coupon->coupon_name = $request->input('name');
         $coupon->discount_type = $request->input('type');
         $coupon->discount = $request->input('discount');
         $coupon->start_from = $request->input('start_date');
         $coupon->valid_till = $request->input('valid_till');
+        $coupon->branch_id = $branchId;
 
         $coupon->save();
         if ($coupon->id) {
@@ -1434,8 +1442,14 @@ class AdminController extends Controller
 
     public function getCoupon(Request $request)
     {
+        $branchId = auth('admin')->user()->branch_id ?? null;
         $todayDate = \Carbon\Carbon::now('Asia/Kolkata')->format('Y-m-d');
-        $coupon = Coupon::where('coupon_name', $request->input('option'))->first();
+        $coupon = Coupon::where('coupon_name', $request->input('option'));
+        if ($branchId) {
+            $coupon->where('branch_id', $branchId);
+        }
+        $coupon = $coupon->first();
+
         if (!$coupon) {
             return response()->json(['status' => 400, 'msg' => 'Please enter a valid coupon code']);
         }
@@ -1490,12 +1504,14 @@ class AdminController extends Controller
     public function editCouponPost(Request $request)
     {
         hasPermission('admin-coupon-edit');
+        $branchId = auth('admin')->user()->branch_id ?? null;
         $coupon = Coupon::where('id', $request->couponId)->first();
         $coupon->coupon_name = $request->couponName;
         $coupon->discount_type = $request->couponType;
         $coupon->discount = $request->couponDiscount;
         $coupon->start_from = $request->couponStart;
         $coupon->valid_till = $request->couponValid;
+        $coupon->branch_id = $branchId;
         $coupon->save();
 
         session()->flash('success', 'Coupon Updated Successfully!');
