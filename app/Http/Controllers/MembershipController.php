@@ -263,7 +263,7 @@ class MembershipController extends Controller
 
                         $member = new MembershipBuy();
                         $member->user_id = $userSave->id;
-                        $member->branch_id = $branchId;
+                        // $member->branch_id = $branchId;
                         $member->plan = $getPlan->plan_name;
                         $member->credit_left = $getPlan->credits;
                         $member->total_credit = $getPlan->credits;
@@ -348,7 +348,7 @@ class MembershipController extends Controller
                     $member = new MembershipBuy();
                     $member->user_id = $userSave->id;
                     $member->plan = $getPlan->plan_name;
-                    $member->branch_id = $branchId;
+                    // $member->branch_id = $branchId;
                     $member->credit_left = $getPlan->credits;
                     $member->total_credit = $getPlan->credits;
                     $member->amount = $request->input('totalamount');
@@ -431,7 +431,7 @@ class MembershipController extends Controller
 
                     $member = new MembershipBuy();
                     $member->user_id = $userSave->id;
-                    $member->branch_id = $branchId;
+                    // $member->branch_id = $branchId;
                     $member->plan = $getPlan->plan_name;
                     $member->credit_left = $getPlan->credits;
                     $member->total_credit = $getPlan->credits;
@@ -559,7 +559,7 @@ class MembershipController extends Controller
 
                 $membershiphistory = new MembershipHistory;
                 $membershiphistory->user_id = $request->input('user_id');
-                $membershiphistory->branch_id = $branchId;
+                // $membershiphistory->branch_id = $branchId;
                 $membershiphistory->membership_buyer_id = $update->id;
                 $membershiphistory->use_credit = $request->input('hrs');
                 $membershiphistory->current_left = $update->credit_left;
