@@ -147,7 +147,7 @@
                 </a>
             </li>
         @endif
-        @if (can('reports-ticket') || can('reports-membership') || can('reports-event') || can('reports-openbilling'))
+        @if (can('reports-ticket') || can('reports-membership') || can('reports-event') || can('reports-openbilling') || can('report-membership-user'))
             <li onclick="showReportMenu()">
 
                 <a href="javascript:void(0);" aria-expanded="false" style="justify-content: space-between;">
@@ -172,6 +172,10 @@
                     @endif
                     @if (can('reports-membership'))
                         <li><a href="{{ url('/reports?key=Membership') }}" class="menu-title">Membership Report</a>
+                        </li>
+                    @endif
+                    @if (can('report-membership-user'))
+                        <li><a href="{{ url('/reports?key=MembershipUser') }}" class="menu-title">Membership User</a>
                         </li>
                     @endif
                     @if (can('reports-event'))

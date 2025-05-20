@@ -41,7 +41,7 @@
             <div class="page-content">
                 <div class="row mb-3">
                     <div class="col-md-12">
-  
+
                         <!-- Modal -->
                         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
@@ -54,22 +54,40 @@
                             <form action="{{url('/tickets-booking-report')}}" method="post">
                             @elseif($_GET['key'] == "Membership")
                             <form action="{{url('/membership-booking-report')}}" method="post">
+                            @elseif($_GET['key'] == "MembershipUser")
+                            <form action="{{url('/membership-booking-user')}}" method="post">
                             @elseif($_GET['key'] == "Event")
                             <form action="{{url('/event-booking-report')}}" method="post">
                             @else
 							<form action="{{url('/open-billing-report')}}" method="post">
 							@endif
+                            @if($_GET['key'] == "MembershipUser")
                             <div class="modal-body">
-                                
+                                @csrf
+                                <label>Membership User:</label>
+                                <div class="d-flex">
+                                    <select name="membership_user" class="form-control selectpicker" data-live-search="true">
+                                        <option value="">-- Select User --</option>
+                                        @foreach ($membershipUsers as $user)
+                                            <option value="{{ $user->user->id }}">{{ $user->user->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            @else
+                            <div class="modal-body">
+
                                     @csrf
                                     <label>Analysis date wise:</label>
                                     <div class="d-flex">
                                         <input type="text" name="daterange" class="form-control float-right"
                                             id="reservation">
-                                        
+
                                     </div>
-                                
+
                             </div>
+                            @endif
+
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                 <button type="submit" class="btn btn-primary" name="submit">Apply</button>
@@ -80,9 +98,9 @@
                         </div>
 
                     </div>
-                   
+
                 </div>
-               
+
             </div>
         </div>
         <!--end page wrapper -->
@@ -116,6 +134,7 @@
     <script src="assets/js/app.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.0/js/toastr.js"></script>
+    <script src="assets/js/bootstrap-select.min.js"></script>
 
     <script>
         $('#reservation').daterangepicker({
@@ -128,7 +147,7 @@
     });
     </script>
 
-  
+
     <script>
         $(document).ready(function() {
             toastr.options.timeOut = 10000;
@@ -137,6 +156,9 @@
             @elseif (Session::has('success'))
                 toastr.success('{{ Session::get('success') }}');
             @endif
+        });
+        $(document).ready(function() {
+            $('.selectpicker').selectpicker();
         });
     </script>
 </body>

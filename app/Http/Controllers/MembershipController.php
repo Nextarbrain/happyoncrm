@@ -136,8 +136,6 @@ class MembershipController extends Controller
     }
 
 
-
-
     public function getMembershipPlan(Request $request)
     {
         hasPermission('membership');
@@ -675,5 +673,17 @@ class MembershipController extends Controller
         } catch (Exception $e) {
             return response()->json(['success' => $e->getMessage()], 500);
         }
+    }
+
+    public function membershipBookingUser(Request $request)
+    {
+        hasPermission('report-membership-user');
+        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        $membershipUsers = MembershipHistory::with('user', 'kid', 'userDetails', 'membershipBuy')->where('user_id', $request->membership_user);
+        if ($branchId) {
+            $membershipUsers->where('branch_id', $branchId);
+        }
+        $membershipUsers = $membershipUsers->latest()->get();
+        return view('happyView.membership-booking-user', compact('membershipUsers'));
     }
 }

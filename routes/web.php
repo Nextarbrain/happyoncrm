@@ -114,6 +114,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
     /******************* Membership Routes **************/
 
     Route::post('/membership-booking-report', [MembershipController::class, 'membershipBookingReport'])->name('membershipBookingReport');
+    Route::post('/membership-booking-user', [MembershipController::class, 'membershipBookingUser'])->name('membershipBookingUser');
     Route::post('/get-membership-phone-list', [MembershipController::class, 'getMembershipPhoneList']);
     Route::get('/invoice-membership-pdf/{id}', [MembershipController::class, 'invoiceMembershipGenerate']);
     Route::get('/membership-history/{id}', [MembershipController::class, 'membershipHistoryView']);

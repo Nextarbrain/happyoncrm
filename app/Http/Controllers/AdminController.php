@@ -1421,7 +1421,12 @@ class AdminController extends Controller
     public function reports(Request $request)
     {
         if (can('reports-event') || can('reports-openbilling')) {
-            return view('happyView.reports', ['key' => $request->key]);
+            $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo');
+            // if ($branchId) {
+            //     $membershipUsers->where('branch_id', $branchId);
+            // }
+            $membershipUsers = $membershipUsers->latest()->get();
+            return view('happyView.reports', ['key' => $request->key, 'membershipUsers' => $membershipUsers]);
         } else {
             abort(401);
         }
