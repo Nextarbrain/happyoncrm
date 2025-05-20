@@ -67,7 +67,7 @@
                                 <label>Membership User:</label>
                                 <div class="d-flex">
                                     <select name="membership_user" class="form-control selectpicker" data-live-search="true">
-                                        <option value="">-- Select User --</option>
+                                        <option value="">-- Select Membership User --</option>
                                         @foreach ($membershipUsers as $user)
                                             <option value="{{ $user->user->id }}">{{ $user->user->name }}</option>
                                         @endforeach
@@ -76,15 +76,13 @@
                             </div>
                             @else
                             <div class="modal-body">
+                                @csrf
+                                <label>Analysis date wise:</label>
+                                <div class="d-flex">
+                                    <input type="text" name="daterange" class="form-control float-right"
+                                        id="reservation">
 
-                                    @csrf
-                                    <label>Analysis date wise:</label>
-                                    <div class="d-flex">
-                                        <input type="text" name="daterange" class="form-control float-right"
-                                            id="reservation">
-
-                                    </div>
-
+                                </div>
                             </div>
                             @endif
 

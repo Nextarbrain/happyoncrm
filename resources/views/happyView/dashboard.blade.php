@@ -66,7 +66,7 @@
                                 <label>Branch:</label>
                                 <div class="d-flex">
                                     <select name="branch_id" class="form-control" id="branch_id" onchange="document.getElementById('branchFilterForm').submit();">
-                                        <option value="">-- Select --</option>
+                                        <option value="">-- All Branches --</option>
                                         @foreach ($branches as $branch)
                                             <option value="{{ $branch['id'] }}" {{ $branchId == $branch['id'] ? 'selected' : '' }}>{{ $branch['name'] }}</option>
                                         @endforeach
