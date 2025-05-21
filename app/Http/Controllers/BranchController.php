@@ -47,6 +47,7 @@ class BranchController extends Controller
         $branch->phone = $request->phone;
         $branch->address = $request->address ?? '';
         $branch->status = $request->status;
+        $branch->type = $request->type;
         $branch->save();
 
         if ($id) {
@@ -74,6 +75,7 @@ class BranchController extends Controller
         $branch->address = $request->address ?? '';
         $branch->user_id  = auth()->guard('admin')->user()->id;
         $branch->status = $request->status;
+        $branch->type = $request->type;
         $branch->save();
         if ($branch->id) {
             $admin = new Admin();

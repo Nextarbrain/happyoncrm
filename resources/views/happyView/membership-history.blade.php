@@ -43,13 +43,12 @@
 						<div class="dashboard_left">
 							<div class="user_list">
 								<div class="row align-items-center text-center">
-									<div class="col-md-6">
+									<div class="col-md-3">
 										<p>User List ({{count($membershipUsers)}})</p>
 									</div>
-
-									<div class="col-md-6">
-
-										<div class="count" id="user_delete">
+                                    <div class="col-md-7"></div>
+									<div class="col-md-2">
+                                        <div class="count" id="user_delete">
 												<i class="fa fa-trash-o  m-0" aria-hidden="true"></i>
 											</div>
 									</div>

@@ -36,6 +36,7 @@ class TicketController extends Controller
             }
             $product = $product->get();
             $result = [];
+            $data = [];
             foreach ($product as $products) {
                 $data[$products->product_name] = $products->product_price;
             }

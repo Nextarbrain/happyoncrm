@@ -46,7 +46,7 @@
                         <div class="dashboard_left">
                             <div class="user_list">
                                 <div class="row align-items-center text-center">
-                                    <div class="col-md-3">
+                                    <div class="col-md-9">
                                         {{-- <p>User List ({{count($user)}}) </p> --}}
                                     </div>
                                     {{--	<div class="col-md-3">
@@ -60,20 +60,37 @@
 											</div>
 										</form>
 									</div> --}}
-                                    <div class="col-md-3">
-                                        @if (can('tickets-add'))
-                                            <div class="add_btn">
-                                                <a href="{{ url('/tickets') }}">ADD NEW +</a>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    <div class="col-md-3">
+                                    {{-- <div class="col-md-1">
                                         @if (can('tickets-delete'))
                                             <div class="count" id="user_delete">
                                                 <i class="fa fa-trash-o  m-0" aria-hidden="true"></i>
                                             </div>
                                         @endif
                                     </div>
+                                    <div class="col-md-2">
+                                        @if (can('tickets-add'))
+                                            <div class="add_btn">
+                                                <a href="{{ url('/tickets') }}">ADD NEW +</a>
+                                            </div>
+                                        @endif
+                                    </div> --}}
+                                    <div class="col-md-3 d-flex align-items-center justify-content-center">
+                                        <div>
+                                            @if (can('tickets-delete'))
+                                                <div class="count" id="user_delete">
+                                                    <i class="fa fa-trash-o  m-0" aria-hidden="true"></i>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div>
+                                            @if (can('tickets-add'))
+                                                <div class="add_btn">
+                                                    <a href="{{ url('/tickets') }}">ADD NEW +</a>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
 
                                     <div class="col-md-3 d-none">
 

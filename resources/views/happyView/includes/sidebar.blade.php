@@ -12,7 +12,8 @@
             <a href="mailto:contact@happyonplay.com" class="text-white">contact@happyonplay.com</a>
         </div>
         <span class="text-white" style="display: block; text-align: center;">
-            {{ auth('admin')->user()->name ?? 'No name' }} ({{ auth('admin')->user()->branch ? auth('admin')->user()->branch->name : 'Main SuperAdmin' }})
+            {{ auth('admin')->user()->name ?? 'No name' }}
+            ({{ auth('admin')->user()->branch ? auth('admin')->user()->branch->name : 'Main SuperAdmin' }})
         </span>
     </div>
     <!--navigation-->
@@ -32,7 +33,8 @@
         </li>
         @if (!auth('admin')->user()->branch_id)
             <li>
-                <a href="{{ url('/branch') }}" class="{{ in_array(Route::currentRouteName(), ['branch', 'create-branch']) ? 'active' : '' }}">
+                <a href="{{ url('/branch') }}"
+                    class="{{ in_array(Route::currentRouteName(), ['branch', 'create-branch']) ? 'active' : '' }}">
                     <div class="parent-icon">
 
                         <svg width="22" height="20" viewBox="0 0 22 20" fill="none"
@@ -115,7 +117,7 @@
                 </a>
             </li>
         @endif
-        @if (can('membership'))
+        {{-- @if (can('membership'))
             <li>
                 <a href="{{ url('/memberships') }}"
                     class="{{ Route::currentRouteName() == 'memberships' ? 'active' : '' }}">
@@ -130,8 +132,8 @@
                     <div class="menu-title">Memberships</div>
                 </a>
             </li>
-        @endif
-        @if (can('member-history'))
+        @endif --}}
+        {{-- @if (can('member-history'))
             <li>
                 <a href="{{ url('/membership-history') }}"
                     class="{{ Route::currentRouteName() == 'membershipHistory' ? 'active' : '' }}">
@@ -146,8 +148,47 @@
                     <div class="menu-title">Member History</div>
                 </a>
             </li>
+        @endif --}}
+        @if (can('membership') || can('member-history'))
+            <li onclick="showMembershipSystemMenu()">
+
+                <a href="javascript:void(0);" aria-expanded="false" style="justify-content: space-between;">
+                    <div class="parent-icon">
+                        <svg width="15" height="16" viewBox="0 0 15 16" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M13.5 0H1.5C0.6675 0 0 0.712 0 1.6V10.4C0 11.288 0.6675 12 1.5 12H4.5V16L7.5 14.4L10.5 16V12H13.5C14.3325 12 15 11.288 15 10.4V1.6C15 0.712 14.3325 0 13.5 0ZM13.5 10.4H1.5V8.8H13.5V10.4ZM13.5 6.4H1.5V1.6H13.5V6.4Z"
+                                fill="#FACB6A" />
+                        </svg>
+                    </div>Member Services<span class="fa arrow"></span>
+                </a>
+
+                <ul aria-expanded="false" id="membershipMenu" class="d-none ml-3"
+                    style="border:none; background:none;">
+                    @if (can('membership'))
+                        <li>
+                            <a href="{{ url('/memberships') }}"
+                                class="{{ Route::currentRouteName() == 'memberships' ? 'active' : '' }}">
+                                Memberships
+                            </a>
+                        </li>
+                    @endif
+                    @if (can('member-history'))
+                        <li>
+                            <a href="{{ url('/membership-history') }}"
+                                class="{{ Route::currentRouteName() == 'membershipHistory' ? 'active' : '' }}">
+                                Member History
+                            </a>
+                        </li>
+                    @endif
+                </ul>
+            </li>
         @endif
-        @if (can('reports-ticket') || can('reports-membership') || can('reports-event') || can('reports-openbilling') || can('report-membership-user'))
+        @if (can('reports-ticket') ||
+                can('reports-membership') ||
+                can('reports-event') ||
+                can('reports-openbilling') ||
+                can('report-membership-user'))
             <li onclick="showReportMenu()">
 
                 <a href="javascript:void(0);" aria-expanded="false" style="justify-content: space-between;">
@@ -164,7 +205,8 @@
 
                 </a>
 
-                <ul aria-expanded="false" id="reportMenu" class="d-none ml-3" style="border:none; background:none;  ">
+                <ul aria-expanded="false" id="reportMenu" class="d-none ml-3"
+                    style="border:none; background:none;  ">
                     @if (can('reports-ticket'))
                         <li><a href="{{ url('/reports?key=Ticket') }}"
                                 class="menu-title {{ Route::currentRouteName() == 'reports' ? 'active' : '' }}">Ticket
@@ -280,7 +322,7 @@
                 </a>
             </li>
         @endif
-        @if (can('admin'))
+        {{-- @if (can('admin'))
             <li>
                 <a href="{{ url('/admin') }}" class="{{ Route::currentRouteName() == 'admin' ? 'active' : '' }}">
                     <div class="parent-icon">
@@ -294,7 +336,7 @@
                     <div class="menu-title">Admin</div>
                 </a>
             </li>
-        @endif
+        @endif --}}
         {{-- <li>
             <a href="{{ url('/staffs') }}" class="{{ Route::currentRouteName() == 'staffs' ? 'active' : '' }}">
                 <div class="parent-icon">
@@ -308,11 +350,11 @@
                 <div class="menu-title">Staffs</div>
             </a>
         </li> --}}
-        @if(auth('admin')->user()->isSuperAdmin)
+        {{-- @if (auth('admin')->user()->isSuperAdmin)
         <li><a href="{{ route('trash') }}" class="nav-link"><i class="fa fa-list me-3"></i>Trash Items</a>
         </li>
-        @endif
-        @if (can('permission-manage'))
+        @endif --}}
+        {{-- @if (can('permission-manage'))
             <li><a href="{{ route('permission.index') }}" class="nav-link"><i class="fa fa-lock me-3"></i>Add
                     Permission</a>
             </li>
@@ -322,6 +364,48 @@
             <li><a href="{{ route('admin.admin.permission') }}" class="nav-link"><i
                         class="fa fa-users me-3"></i>Manage
                     Admin</a>
+            </li>
+        @endif --}}
+        @if (can('permission-manage') || auth('admin')->user()->isSuperAdmin || can('admin'))
+            <li onclick="showReportSystemMenu()">
+
+                <a href="javascript:void(0);" aria-expanded="false" style="justify-content: space-between;">
+                    <div class="parent-icon">
+                        <svg width="21" height="21" viewBox="0 0 21 21" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M6.60595 11.2329C7.78176 11.2329 8.72408 12.1844 8.72408 13.3686V16.2114C8.72408 17.3872 7.78176 18.3462 6.60595 18.3462H3.78733C2.61985 18.3462 1.66919 17.3872 1.66919 16.2114L1.66919 13.3686C1.66919 12.1844 2.61985 11.2329 3.78733 11.2329L6.60595 11.2329ZM16.2294 11.2329C17.3969 11.2329 18.3475 12.1844 18.3475 13.3686V16.2114C18.3475 17.3872 17.3969 18.3462 16.2294 18.3462H13.4108C12.2349 18.3462 11.2926 17.3872 11.2926 16.2114L11.2926 13.3686C11.2926 12.1844 12.2349 11.2329 13.4108 11.2329H16.2294ZM6.60595 1.66821C7.78176 1.66821 8.72408 2.62721 8.72408 3.80386V6.64667C8.72408 7.83082 7.78176 8.78148 6.60595 8.78148H3.78733C2.61985 8.78148 1.66919 7.83082 1.66919 6.64667L1.66919 3.80386C1.66919 2.62721 2.61985 1.66821 3.78733 1.66821L6.60595 1.66821ZM16.2294 1.66821C17.3969 1.66821 18.3475 2.62721 18.3475 3.80386V6.64667C18.3475 7.83082 17.3969 8.78148 16.2294 8.78148H13.4108C12.2349 8.78148 11.2926 7.83082 11.2926 6.64667L11.2926 3.80386C11.2926 2.62721 12.2349 1.66821 13.4108 1.66821L16.2294 1.66821Z"
+                                fill="#FDCF6F" />
+                        </svg>
+                    </div>System <span class="fa arrow"></span>
+
+                </a>
+
+                <ul aria-expanded="false" id="reportSystemMenu" class="d-none ml-3"
+                    style="border:none; background:none;">
+                    @if (can('permission-manage'))
+                        <li><a href="{{ route('permission.index') }}" class="nav-link"><i
+                                    class="fa fa-lock me-3"></i>Add
+                                Permission</a>
+                        </li>
+                        <li><a href="{{ route('admin.admin.role') }}" class="nav-link"><i
+                                    class="fa fa-lock me-3"></i>Manage
+                                Role</a>
+                        </li>
+                        <li><a href="{{ route('admin.admin.permission') }}" class="nav-link"><i
+                                    class="fa fa-users me-3"></i>Manage
+                                Admin</a>
+                        </li>
+                    @endif
+                    @if (can('admin'))
+                        <li>
+                            <a href="{{ url('/admin') }}"
+                                class="{{ Route::currentRouteName() == 'admin' ? 'active' : '' }}">
+                                <i class="fa fa-user me-3"></i>Admin
+                            </a>
+                        </li>
+                    @endif
+                </ul>
             </li>
         @endif
         <li>
@@ -342,7 +426,15 @@
 </div>
 <!--end sidebar wrapper -->
 <script>
-    function showReportMenu(){
+    function showReportMenu() {
         document.querySelector('#reportMenu').classList.toggle('d-none');
+    }
+
+    function showReportSystemMenu() {
+        document.querySelector('#reportSystemMenu').classList.toggle('d-none');
+    }
+
+    function showMembershipSystemMenu() {
+        document.querySelector('#membershipMenu').classList.toggle('d-none');
     }
 </script>

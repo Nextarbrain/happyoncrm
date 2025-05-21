@@ -129,6 +129,15 @@
                                                         </div>
                                                         <div class="col-md-6 ">
                                                             <div class="mb-4 input_wrap">
+                                                                <label>Type</label>
+                                                                <select name="type" id="type" class="form-select">
+                                                                    <option value="Branch" {{ $branch->type && $branch->type == 'Branch' ? 'selected' : '' }}>Branch</option>
+                                                                    <option value="Franchise" {{ $branch->type && $branch->type == 'Franchise' ? 'selected' : '' }}>Franchise</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6 ">
+                                                            <div class="mb-4 input_wrap">
                                                                 <label>Status</label>
                                                                 <select name="status" id="status"
                                                                     class="form-select">

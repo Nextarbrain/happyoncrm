@@ -44,7 +44,7 @@
 						<div class="dashboard_left">
 							<div class="user_list">
 								<div class="row align-items-center text-center">
-									<div class="col-md-4">
+									<div class="col-md-3">
 										<p>Events Bookings List ({{count($event_bookings)}}) </p>
 									</div>
 
@@ -68,7 +68,7 @@
 
 													<th>18% GST</th>
 													<th>12% GST</th>
-                          <th>5% GST</th>
+                                                    <th>5% GST</th>
 
 													<th>Total</th>
 													<th>Payment Method</th>

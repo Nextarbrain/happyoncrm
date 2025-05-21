@@ -44,32 +44,27 @@
                         <div class="dashboard_left">
                             <div class="user_list">
                                 <div class="row align-items-center text-center">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <p>User List</p>
                                     </div>
-
-                                    <div class="col-md-4">
-                                        @if (can('customers-add'))
-                                            <div class="add_btn">
-                                                <a href="{{ url('/tickets') }}">ADD NEW +</a>
-                                            </div>
-                                        @endif
+                                    <div class="col-md-9"></div>
+                                    <div class="col-md-3 d-flex align-items-center justify-content-center">
+                                         <div>
+                                            @if (can('customers-delete'))
+                                                <div class="count" id="user_delete">
+                                                    <i class="fa fa-trash-o  m-0" aria-hidden="true"></i>
+                                                </div>
+                                            @endif
+                                        </div>
+                                         <div>
+                                            @if (can('customers-add'))
+                                                <div class="add_btn">
+                                                    <a href="{{ url('/tickets') }}">ADD NEW +</a>
+                                                </div>
+                                            @endif
+                                        </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        @if (can('customers-delete'))
-                                            <div class="count" id="user_delete">
-                                                <i class="fa fa-trash-o  m-0" aria-hidden="true"></i>
-                                            </div>
-                                        @endif
-
-                                    </div>
-
-
-
-
                                 </div>
-
-
                             </div>
                             <!-- data table  -->
                             <div class="container">

@@ -43,7 +43,7 @@
                         <div class="dashboard_left">
                             <div class="user_list">
                                 <div class="row align-items-center text-center">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <p>List ({{ count($membershipUsers) }})</p>
                                     </div>
 

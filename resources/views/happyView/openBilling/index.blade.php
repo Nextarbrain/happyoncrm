@@ -43,22 +43,22 @@
                         <div class="dashboard_left">
                             <div class="user_list">
                                 <div class="row align-items-center text-center">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <p>Billing List ({{ count($open_billings) }})</p>
-
                                     </div>
-
-                                    <div class="col-md-4">
-
-                                        <div class="add_btn">
-                                            <a href="{{ url('/add-open-billing') }}">ADD NEW +</a>
+                                    <div class="col-md-6"></div>
+                                    <div class="col-md-3 d-flex align-items-center justify-content-center">
+                                        <div>
+                                            <div class="count" id="user_delete">
+                                                <i class="fa fa-trash-o m-0" aria-hidden="true"></i>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4">
-
-                                        <div class="count" id="user_delete">
-                                            <i class="fa fa-trash-o m-0" aria-hidden="true"></i>
+                                        <div>
+                                            <div class="add_btn">
+                                                <a href="{{ url('/add-open-billing') }}">ADD NEW +</a>
+                                            </div>
                                         </div>
+
                                     </div>
 
                                 </div>

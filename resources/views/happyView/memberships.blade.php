@@ -70,18 +70,19 @@
                                             <div class="count">
                                                 <p>All ({{ count($membershipUsers) }})</p>
                                             </div>
-                                            @if (can('membership-add'))
-                                                <div class="add_btn">
-                                                    <button type="button" class="btn" data-bs-toggle="modal"
-                                                        data-bs-target="#Addnew">ADD NEW +</button>
+                                            <div class="col-md-9"></div>
+                                            <div class="col-md-3 d-flex align-items-center justify-content-center">
+                                                <div class="pl-3">
+                                                    @if (can('admin-membership-delete'))
+                                                        <div class="count" id="membership_div">
+                                                            <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                                        </div>
+                                                    @endif
                                                 </div>
-                                            @endif
-
-                                            <div class="col-md-3 pl-3">
-
-                                                @if (can('admin-membership-delete'))
-                                                    <div class="count" id="membership_div">
-                                                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                                @if (can('membership-add'))
+                                                    <div class="add_btn">
+                                                        <button type="button" class="btn" data-bs-toggle="modal"
+                                                            data-bs-target="#Addnew">ADD NEW +</button>
                                                     </div>
                                                 @endif
                                             </div>
@@ -180,11 +181,14 @@
                                                                     <div class="col-md-12">
                                                                         <div class="mb-4 input_wrap">
                                                                             <label>COUPAN CODE</label>
-                                                                           <div class="d-flex align-items-center">
-                                                                            <input type="text" class="form-control"
-                                                                                placeholder="Any Discount Code"
-                                                                                name="coupon_code">
-                                                                                <button type="button" class="btn btn-primary" id="apply-coupon" >Apply</button>
+                                                                            <div class="d-flex align-items-center">
+                                                                                <input type="text"
+                                                                                    class="form-control"
+                                                                                    placeholder="Any Discount Code"
+                                                                                    name="coupon_code">
+                                                                                <button type="button"
+                                                                                    class="btn btn-primary"
+                                                                                    id="apply-coupon">Apply</button>
                                                                             </div>
                                                                             <input type="hidden" id="plan_value">
                                                                         </div>
@@ -294,10 +298,12 @@
                                                         <td class="status">SMS Sent</td>
                                                         <td><a href="#"><i class="fa fa-whatsapp"
                                                                     aria-hidden="true"></i></a>
-                                                            <a target="_blank" class="btn btn-sm btn-primary" style="width: 30px; height: 30px; border-radius: 50%;"
+                                                            <a target="_blank" class="btn btn-sm btn-primary"
+                                                                style="width: 30px; height: 30px; border-radius: 50%;"
                                                                 href="{{ url('invoice-membership-pdf/' . $membershipUser['user']->id) }}"><i
                                                                     class="fa fa-file" aria-hidden="true"></i></a>
-                                                            <a class="btn btn-sm btn-dark" style="width: 30px; height: 30px; border-radius: 50%;"
+                                                            <a class="btn btn-sm btn-dark"
+                                                                style="width: 30px; height: 30px; border-radius: 50%;"
                                                                 href="{{ url('membership-history/' . $membershipUser['user']->id) }}"><i
                                                                     class="fa fa-list" aria-hidden="true"></i></a>
                                                         </td>
@@ -387,56 +393,56 @@
             }
         }
 
-       $(document).ready(function() {
-        $('#membershipPlan').change(function() {
-            getMembershipPlan();
+        $(document).ready(function() {
+            $('#membershipPlan').change(function() {
+                getMembershipPlan();
+            });
+            $('input[name="coupon_code"]').blur(function() {
+                getMembershipPlan();
+            });
+            $('#apply-coupon').click(function() {
+                getMembershipPlan();
+            });
         });
-        $('input[name="coupon_code"]').blur(function() {
-            getMembershipPlan();
-        });
-        $('#apply-coupon').click(function() {
-            getMembershipPlan();
-        });
-    });
 
-    function getMembershipPlan() {
-        var membershipId = $('#membershipPlan').val();
-        var couponcode = $('input[name="coupon_code"]').val();
-        console.log(membershipId);
-        var baseUrl = "{{ URL::to('/') }}";
-        $.ajax({
-            url: baseUrl + '/get-membership-plan',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            type: 'POST',
-            data: {
-                id: membershipId,
-                coupon: couponcode
-            },
-            success: function(response) {
-                console.log(response.price);
-                $('#plan_value').val(response.price);
-                var fullPrice = '₹ ' + parseFloat(response.price);
-                $('#subtotal').val(parseFloat(response.price));
-                $('#price').text(fullPrice);
-                $('#gst').html("Includes Gst @18% on " + fullPrice);
+        function getMembershipPlan() {
+            var membershipId = $('#membershipPlan').val();
+            var couponcode = $('input[name="coupon_code"]').val();
+            console.log(membershipId);
+            var baseUrl = "{{ URL::to('/') }}";
+            $.ajax({
+                url: baseUrl + '/get-membership-plan',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: 'POST',
+                data: {
+                    id: membershipId,
+                    coupon: couponcode
+                },
+                success: function(response) {
+                    console.log(response.price);
+                    $('#plan_value').val(response.price);
+                    var fullPrice = '₹ ' + parseFloat(response.price);
+                    $('#subtotal').val(parseFloat(response.price));
+                    $('#price').text(fullPrice);
+                    $('#gst').html("Includes Gst @18% on " + fullPrice);
 
-                var total = (parseFloat(response.price) * 18) / 100;
-                $('#gstTotal').html(total);
-                $('#gst18').val(total);
-                var totalAmount = parseFloat(response.price) + total;
-                $('#totalAmount').html('₹ ' + totalAmount);
-                $('#wholeAMount').val(totalAmount);
+                    var total = (parseFloat(response.price) * 18) / 100;
+                    $('#gstTotal').html(total);
+                    $('#gst18').val(total);
+                    var totalAmount = parseFloat(response.price) + total;
+                    $('#totalAmount').html('₹ ' + totalAmount);
+                    $('#wholeAMount').val(totalAmount);
 
 
 
-            },
-            error: function(xhr) {
-                console.log(xhr.responseText); // Handle errors
-            }
-        });
-    }
+                },
+                error: function(xhr) {
+                    console.log(xhr.responseText); // Handle errors
+                }
+            });
+        }
         //Current Date
 
         //var today1 =  new Date().toISOString().substr(0,10);

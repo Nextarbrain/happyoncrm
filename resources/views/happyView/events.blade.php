@@ -43,10 +43,11 @@
                         <div class="dashboard_left">
                             <div class="user_list">
                                 <div class="row align-items-center text-center">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <p>Event List ({{ count($event_bookings) }})</p>
 
                                     </div>
+                                    <div class="col-md-5"></div>
 
                                     <div class="col-md-4 d-flex my-3 align-items-center justify-content-center">
 
@@ -60,26 +61,30 @@
                                     </div>
 
                                 </div>
-
-                                <form action="{{ url()->current() }}" method="get">
-                                    @csrf
-                                    <label>Analysis date wise:</label>
-                                    <div class="row">
-                                        <div class="col-md-2 my-2">
-                                            <input type="date" name="fromDate"
-                                                value="{{ request()->get('fromDate') }}"
-                                                class="form-control float-right" id="reservation">
+                                <div class="row">
+                                    <div class="col-md-1"></div>
+                                    <div class="col-md-11">
+                                    <form action="{{ url()->current() }}" method="get">
+                                        @csrf
+                                        <label>Analysis date wise:</label>
+                                        <div class="row">
+                                            <div class="col-md-3 my-2">
+                                                <input type="date" name="fromDate"
+                                                    value="{{ request()->get('fromDate') }}"
+                                                    class="form-control float-right" id="reservation">
+                                            </div>
+                                            <div class="col-md-3 my-2">
+                                                <input type="date" name="toDate" value="{{ request()->get('toDate') }}"
+                                                    class="form-control float-right" id="reservation">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <input type="submit" value="Apply" name="submit"
+                                                    class="btn btn-primary m-1">
+                                            </div>
                                         </div>
-                                        <div class="col-md-2 my-2">
-                                            <input type="date" name="toDate" value="{{ request()->get('toDate') }}"
-                                                class="form-control float-right" id="reservation">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <input type="submit" value="Apply" name="submit"
-                                                class="btn btn-primary m-1">
-                                        </div>
+                                    </form>
                                     </div>
-                                </form>
+                                </div>
                             </div>
                             <!-- data table  -->
                             <div class="container">

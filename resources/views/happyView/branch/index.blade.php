@@ -43,27 +43,13 @@
                         <div class="dashboard_left">
                             <div class="user_list">
                                 <div class="row align-items-center text-center">
+                                    <div class="col-md-8"></div>
                                     <div class="col-md-4">
-                                        <p>Brnach List ({{ count($branch) }})</p>
-
-                                    </div>
-
-                                    <div class="col-md-4">
-
-                                        <div class="add_btn">
+                                        <div class="add_btn mt-3" style="margin-left: 5rem">
                                             <a href="{{ url('/create-branch') }}">ADD NEW +</a>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-
-                                        {{-- <div class="count" id="user_delete">
-                                            <i class="fa fa-trash-o m-0" aria-hidden="true"></i>
-                                        </div> --}}
-                                    </div>
-
                                 </div>
-
-
                             </div>
                             <!-- data table  -->
                             <div class="container">
@@ -79,6 +65,7 @@
                                                     <th>Location</th>
                                                     <th>Pincode</th>
                                                     <th>Phone</th>
+                                                    <th>Type</th>
                                                     <th>Status</th>
                                                     <th>Action</th>
                                                 </tr>
@@ -97,6 +84,7 @@
                                                         <td class="text-capitalize">{{ $item['location'] }} </td>
                                                         <td class="text-capitalize">{{ $item['pincode'] }} </td>
                                                         <td>{{ $item['phone'] }}</td>
+                                                        <td class="text-capitalize">{{ $item['type'] }} </td>
                                                         <td class="text-capitalize">{{ $item['status'] }} </td>
                                                         <td><a  class="btn btn-sm btn-primary"  href="{{ url('/edit-branch', $item['id']) }}"><i
                                                                     class="fa fa-pencil" aria-hidden="true"></i></a>
@@ -192,45 +180,45 @@
         }
 
 
-        document.getElementById('user_delete').addEventListener("click", function() {
-            var selectedItems = [];
-            $('.users_checkbox:checked').each(function() {
-                var userId = $(this).data('item-id');
-                selectedItems.push(userId);
-            });
-            console.log(selectedItems);
-            var baseUrl = "{{ URL::to('/') }}";
-            if (selectedItems.length > 0 && confirm('Are you Sure to Delete Data?')) {
-                $.ajax({
-                    type: 'Delete',
-                    url: baseUrl + '/delete-branch',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    data: {
-                        selectedItems: selectedItems
-                    },
-                    success: function(response) {
-                        toastr.success('Branch deleted successfully');
-                        location.reload();
+        // document.getElementById('user_delete').addEventListener("click", function() {
+        //     var selectedItems = [];
+        //     $('.users_checkbox:checked').each(function() {
+        //         var userId = $(this).data('item-id');
+        //         selectedItems.push(userId);
+        //     });
+        //     console.log(selectedItems);
+        //     var baseUrl = "{{ URL::to('/') }}";
+        //     if (selectedItems.length > 0 && confirm('Are you Sure to Delete Data?')) {
+        //         $.ajax({
+        //             type: 'Delete',
+        //             url: baseUrl + '/delete-branch',
+        //             headers: {
+        //                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        //             },
+        //             data: {
+        //                 selectedItems: selectedItems
+        //             },
+        //             success: function(response) {
+        //                 toastr.success('Branch deleted successfully');
+        //                 location.reload();
 
-                    },
-                    error: function(xhr, status, error) {
-                        var statusCode = xhr.status;
-                        var errorMessage = xhr.responseJSON.success;
-                        if (statusCode == 500) {
-                            toastr.error(errorMessage);
-                            $('#message_container').text(errorMessage);
-                        } else {
-                            toastr.error('No Permission to Delete');
-                            $('#message_container').text('No Permission to Delete');
-                        }
-                    }
+        //             },
+        //             error: function(xhr, status, error) {
+        //                 var statusCode = xhr.status;
+        //                 var errorMessage = xhr.responseJSON.success;
+        //                 if (statusCode == 500) {
+        //                     toastr.error(errorMessage);
+        //                     $('#message_container').text(errorMessage);
+        //                 } else {
+        //                     toastr.error('No Permission to Delete');
+        //                     $('#message_container').text('No Permission to Delete');
+        //                 }
+        //             }
 
-                });
-            }
+        //         });
+        //     }
 
-        });
+        // });
 
 
         $(document).ready(function() {
