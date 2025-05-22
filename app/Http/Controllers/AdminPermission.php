@@ -28,7 +28,7 @@ class AdminPermission extends Controller
         $branchId = $req->branch_id ? $req->branch_id : auth('admin')->user()->branch_id;
         $roles = Role::query();
         if($branchId) {
-            $roles->where('branch_id', $branchId); 
+            $roles->where('branch_id', $branchId);
         }
         $roles = $roles->pluck('name', 'name')->all();
         $req->validate([
@@ -59,7 +59,7 @@ class AdminPermission extends Controller
         $role = [];
         $role = Role::query();
        if ($branchId) {
-            $role->where('branch_id', $branchId); 
+            $role->where('branch_id', $branchId);
         }
         $role = $role->get()->toArray();
         $roles = [];
@@ -120,6 +120,10 @@ class AdminPermission extends Controller
 
     public function store(object $req)
     {
+        $req->merge([
+         'name' => $req->name . ' ' . $req->branch_id
+        ]);
+
         $req->validate([
             'name' => 'required|unique:roles,name',
             'permission' => 'required',
@@ -137,7 +141,7 @@ class AdminPermission extends Controller
 
             $role = Role::query();
             if($branchId) {
-                $role->where('branch_id', $branchId); 
+                $role->where('branch_id', $branchId);
             }
             $role = $role->get();
             if (count($role) > 0) {

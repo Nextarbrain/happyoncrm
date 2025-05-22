@@ -62,7 +62,7 @@
                             </nav>
                             {{ Form::open(['route' => ['admin.admin.role.edit', request()->route('id')], 'files' => false, 'method' => 'PUT']) }}
                             {{ Form::label('name', ucwords('name')) }}
-                            {!! Form::text('name', $user->name, ['class' => 'form-control']) !!}
+                            {!! Form::text('name', $user->name, ['class' => 'form-control', 'readonly' => true]) !!}
                             @error('name')
                                 <span class="text-danger font-weight-bold text-capitalize">{{ $message }}</span>
                             @enderror
