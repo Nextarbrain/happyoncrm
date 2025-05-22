@@ -426,7 +426,7 @@
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
                                                                     <h5 class="modal-title" id="productModalLabel">Add
-                                                                        New Coupon</h5>
+                                                                        New Product</h5>
                                                                     <button type="button" class="close"
                                                                         data-dismiss="modal" aria-label="Close">
                                                                         <span aria-hidden="true">&times;</span>
@@ -440,10 +440,10 @@
                                                                             Name</label>
                                                                         <input type="text" class="form-control"
                                                                             id="productNameModalForm"
-                                                                            placeholder="Product Name"
+                                                                            placeholder="Extra Time, Adult, Socks"
                                                                             name="product_name" required>
                                                                         <label for="priceModalForm">Price</label>
-                                                                        <input type="number" class="form-control"
+                                                                        <input type="text" class="form-control"
                                                                             id="priceModalForm" placeholder="Price"
                                                                             name="price" required>
                                                                         <label for="quantityModalForm">Qty</label>

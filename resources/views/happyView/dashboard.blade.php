@@ -60,7 +60,7 @@
                         </div>
                     </div>
                     <div class="col-md-3 mt-1">
-                        @if($isSuperAdminShow)
+                        @if (auth('admin')->user()->branch_id != null && auth('admin')->user()->isSuperAdmin == 1 && auth('admin')->user()->branch->type == 'Branch')
                         <form id="branchFilterForm" action="{{ url('/datawise-record-show') }}" method="POST">
                             @csrf
                                 <label>Branch:</label>

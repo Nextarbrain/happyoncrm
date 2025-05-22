@@ -69,4 +69,8 @@ class User extends Authenticatable
     {
         return $this->belongsTo(PaymentMethod::class, 'id','user_id');
     }
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class, 'id','branch_id');
+    }
 }
