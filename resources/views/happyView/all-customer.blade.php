@@ -44,11 +44,8 @@
                         <div class="dashboard_left">
                             <div class="user_list">
                                 <div class="row align-items-center text-center">
-                                    <div class="col-md-3">
-                                        <p>User List</p>
-                                    </div>
                                     <div class="col-md-9"></div>
-                                    <div class="col-md-3 d-flex align-items-center justify-content-center">
+                                    <div class="col-md-3 d-flex align-items-center">
                                          <div>
                                             @if (can('customers-delete'))
                                                 <div class="count" id="user_delete">

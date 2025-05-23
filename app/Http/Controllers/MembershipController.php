@@ -39,15 +39,15 @@ class MembershipController extends Controller
 
             if ($daterange[0] == $daterange[1]) {
                 $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo')->whereDate('created_at', $daterange[0]);
-                // if ($branchId) {
-                //     $membershipUsers->where('branch_id', $branchId);
-                // }
+                if ($branchId) {
+                    $membershipUsers->where('branch_id', $branchId);
+                }
                 $membershipUsers = $membershipUsers->get();
             } else {
                 $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo')->whereBetween('created_at', [$daterange[0], $daterange[1]]);
-                // if ($branchId) {
-                //     $membershipUsers->where('branch_id', $branchId);
-                // }
+                if ($branchId) {
+                    $membershipUsers->where('branch_id', $branchId);
+                }
                 $membershipUsers = $membershipUsers->get();
             }
 
@@ -270,7 +270,7 @@ class MembershipController extends Controller
 
                         $member = new MembershipBuy();
                         $member->user_id = $userSave->id;
-                        // $member->branch_id = $branchId;
+                        $member->branch_id = $branchId;
                         $member->plan = $getPlan->plan_name;
                         $member->credit_left = $getPlan->credits;
                         $member->total_credit = $getPlan->credits;
@@ -359,7 +359,7 @@ class MembershipController extends Controller
                     $member = new MembershipBuy();
                     $member->user_id = $userSave->id;
                     $member->plan = $getPlan->plan_name;
-                    // $member->branch_id = $branchId;
+                    $member->branch_id = $branchId;
                     $member->credit_left = $getPlan->credits;
                     $member->total_credit = $getPlan->credits;
                     $member->amount = $request->input('totalamount');
@@ -446,7 +446,7 @@ class MembershipController extends Controller
 
                     $member = new MembershipBuy();
                     $member->user_id = $userSave->id;
-                    // $member->branch_id = $branchId;
+                    $member->branch_id = $branchId;
                     $member->plan = $getPlan->plan_name;
                     $member->credit_left = $getPlan->credits;
                     $member->total_credit = $getPlan->credits;

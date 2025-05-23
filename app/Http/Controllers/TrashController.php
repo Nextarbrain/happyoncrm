@@ -22,15 +22,15 @@ class TrashController extends Controller
         $users = $users->onlyTrashed()->get();
         $mps = MembershipPlan::onlyTrashed()->get();
         $mhs = MembershipHistory::with('singleUser');
-        // if($branchId) {
-        //     $mhs->where('branch_id', $branchId);
-        // }
+        if($branchId) {
+            $mhs->where('branch_id', $branchId);
+        }
         $mhs = $mhs->onlyTrashed()->get();
 
         $mbs = MembershipBuy::with('singleUser');
-        // if($branchId) {
-        //     $mbs->where('branch_id', $branchId);
-        // }
+        if($branchId) {
+            $mbs->where('branch_id', $branchId);
+        }
         $mbs = $mbs->onlyTrashed()->get();
 
         $eventItems = EventItem::query();

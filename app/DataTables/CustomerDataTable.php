@@ -103,11 +103,11 @@ class CustomerDataTable extends DataTable
     {
         $branchId = auth('admin')->user()->branch_id ?? null;
         $model = $model->with('paymentInfo', 'kid', 'userDetails');
-        if ($branchId) {
-            $model->where('branch_id', $branchId);
-        }
+        // if ($branchId) {
+        //     $model->where('branch_id', $branchId);
+        // }
         $model = $model->latest();
-        return $model;   
+        return $model;
     }
 
     /**
