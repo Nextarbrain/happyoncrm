@@ -115,7 +115,7 @@
                                             word-wrap: break-word;
                                         }
                                         #example1 td:nth-child(3) {
-                                            max-width: 250px;
+                                            max-width: 450px;
                                         }
                                         .table-wrapper {
                                             overflow-x: auto;
