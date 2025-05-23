@@ -128,6 +128,10 @@
                                                         <span
                                                             class="text-danger font-weight-bold text-capitalize">{{ $message }}</span>
                                                     @enderror
+                                                    @error('permission')
+                                                        <span
+                                                            class="text-danger font-weight-bold text-capitalize">{{ $message }}</span>
+                                                    @enderror
                                                     @if(!auth('admin')->user()->branch_id != null)
                                                         {{ Form::label('branch_id', 'Branch') }}
                                                         {!! Form::select('branch_id', $branches, null, ['class' => 'form-control']) !!}
@@ -160,10 +164,6 @@
                                                         $current = $array[0];
                                                     @endphp
                                                     @endforeach
-                                                    @error('permission')
-                                                        <span
-                                                            class="text-danger font-weight-bold text-capitalize">{{ $message }}</span>
-                                                    @enderror
                                                 </div>
                                                 <div class="modal-footer mt-3">
                                                     <button type="button" class="btn btn-secondary"

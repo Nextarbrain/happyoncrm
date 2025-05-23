@@ -161,7 +161,7 @@ class AdminPermission extends Controller
             return view('happyView.permission.editAdmin', compact('user', 'roles', 'userRole','branches'));
         } elseif ($req->isMethod('PUT')) {
             $req->validate([
-                'name' => 'required|regex:/(^[A-Za-z ]+$)+/',
+                'name' => 'required|regex:/(^[A-Za-z ]+$)+/|max:200',
                 'email' => "required|email|unique:admins,email,$id",
                 'confirm_password' => 'same:password',
                 'roles' => "required"
@@ -180,7 +180,7 @@ class AdminPermission extends Controller
                 $admin->removeRole($req->roles);
                 $admin->assignRole($req->roles);
             }
-            return redirect()->back()->with(bindMsg("Role and Profile Updated", 'success'));
+            return redirect()->route('admin.admin.permission')->with(bindMsg("Role and Profile Updated", 'success'));
         }
     }
 }

@@ -119,8 +119,8 @@
                                 </div>
                                 <a href="{{ url('datawise-record-show/' . $applydate) }}">
                                     <div class="d_card_footer">
-                                        <p class="text-white">Updated hour ago</p>
-                                        <img src="assets/images/right.png" alt="icon">
+                                        <p class="text-black">Updated hour ago</p>
+                                        <img src="assets/images/right-arrow.png" alt="icon">
                                     </div>
                                 </a>
                             </div>

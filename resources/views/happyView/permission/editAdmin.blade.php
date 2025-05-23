@@ -57,7 +57,7 @@
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page">Permission</li>
+                                    <li class="breadcrumb-item active" aria-current="page">Edit User</li>
                                 </ol>
                             </nav>
                             {{ Form::open(['route' => ['admin.admin.edit', request()->route('id')], 'files' => false, 'method' => 'PUT']) }}
@@ -104,8 +104,12 @@
                                 <span class="text-danger font-weight-bold text-capitalize d-block">{{ $message }}</span>
                                 @enderrorger font-weight-bold text-capitalize">{{ $message }}</span>
                             @enderror
-                            <button type="submit" class="d-block my-3 btn btn-primary">Update</button>
-                            {!! Form::close() !!}
+                            <div class="d-flex gap-2 my-3">
+                                <button type="submit" class="btn btn-primary">Update</button>
+
+                                <a href="{{ route('admin.admin.permission') }}" class="btn btn-secondary">Cancel</a>
+                            </div>
+                        {!! Form::close() !!}
                         </div>
                     </div>
                 </div>
