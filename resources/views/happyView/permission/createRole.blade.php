@@ -66,7 +66,7 @@
                                                     <th>Sl.No.</th>
                                                     <th>Name</th>
                                                     <th>Permissions</th>
-                                                    <th>Guard</th>
+                                                    {{-- <th>Guard</th> --}}
                                                     <th>Created</th>
                                                     <th>Last Updated</th>
                                                     <th>Action</th>
@@ -85,7 +85,7 @@
                                                                 [{{ $value['name'] }}]
                                                             @endforeach
                                                         </td>
-                                                        <td>{{ $role->guard_name }}</td>
+                                                        {{-- <td>{{ $role->guard_name }}</td> --}}
                                                         <td>{{ $role->created_at }}</td>
                                                         <td>{{ $role->updated_at }}</td>
                                                         <td>
@@ -109,6 +109,16 @@
                                             text-transform: uppercase;
                                             color: #fff;
                                             font-size: 12px;
+                                        }
+                                        #example1 th, #example1 td {
+                                            white-space: normal !important;
+                                            word-wrap: break-word;
+                                        }
+                                        #example1 td:nth-child(3) {
+                                            max-width: 250px;
+                                        }
+                                        .table-wrapper {
+                                            overflow-x: auto;
                                         }
                                     </style>
                                     <div class="modal fade" id="addNew" tabindex="-1"

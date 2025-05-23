@@ -66,7 +66,7 @@
                                                 <tr>
                                                     <th>ID</th>
                                                     <th>Name</th>
-                                                    <th>Guard</th>
+                                                    {{-- <th>Guard</th> --}}
                                                     <th>Created</th>
                                                     <th>Last Updated</th>
                                                 </tr>
@@ -76,7 +76,7 @@
                                                     <tr>
                                                         <td>{{ $permission->id }}</td>
                                                         <td>{{ $permission->name }}</td>
-                                                        <td>{{ $permission->guard_name }}</td>
+                                                        {{-- <td>{{ $permission->guard_name }}</td> --}}
                                                         <td>{{ $permission->created_at }}</td>
                                                         <td>{{ $permission->updated_at }}</td>
                                                     </tr>
@@ -100,7 +100,7 @@
                                     </div>
                                     <div class="modal-body">
                                         {{ Form::label('Name', ucwords('Name')) }}
-                                        {{ Form::text('name', null, ['class' => 'form-control' . ($errors->has('name') ? ' form-error' : null), 'placeholder' => 'Enter Permission Name']) }}
+                                        {{ Form::text('name', null, ['class' => 'form-control' . ($errors->has('name') ? ' form-error' : null), 'placeholder' => 'Enter Permission Name', "required" => true]) }}
                                         @error('name')
                                             <span class="text-danger font-weight-bold text-capitalize">{{ $message }}</span>
                                         @enderror
