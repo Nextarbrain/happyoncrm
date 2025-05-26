@@ -742,7 +742,7 @@
                                                                 <button class="btn btn-primary" type="submit"
                                                                     id="submit-button">Use <span
                                                                         id="credit"></span>
-                                                                    hrs Credit</button>
+                                                                    hours Credit</button>
 
                                                                 {{-- <button class="btn btn-dark" type="submit"
                                                                 id="left_credit"> left Credit </button> --}}

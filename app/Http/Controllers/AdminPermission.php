@@ -121,9 +121,8 @@ class AdminPermission extends Controller
     public function store(object $req)
     {
         $req->merge([
-         'name' => $req->name . ' ' . $req->branch_id
+         'name' => $req->name . ' ' . ($req->name ? $req->branch_id : ''),
         ]);
-
         $req->validate([
             'name' => 'required|unique:roles,name',
             'permission' => 'required',

@@ -46,7 +46,7 @@
                                             <ul class="nav nav-tabs" role="tablist">
                                                 <li class="nav-item" role="presentation">
                                                     <a class="nav-link active rounded" data-bs-toggle="tab"
-                                                        href="#paid" aria-selected="true" role="tab">
+                                                        href="#paid" aria-selected="true" role="tab" style="pointer-events: none;">
                                                         <p class="heading">Open Billing</p>
                                                     </a>
                                                 </li>
