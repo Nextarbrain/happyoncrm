@@ -74,7 +74,7 @@
                                             <div class="col-md-3 d-flex align-items-center justify-content-center">
                                                 <div class="pl-3">
                                                     @if (can('admin-membership-delete'))
-                                                        <div class="count" id="membership_div">
+                                                        <div class="count" id="membership_div" style="cursor: pointer;">
                                                             <i class="fa fa-trash-o" aria-hidden="true"></i>
                                                         </div>
                                                     @endif
@@ -152,7 +152,7 @@
                                                                             <select name="membershipPlan"
                                                                                 id="membershipPlan" class="form-select"
                                                                                 required>
-                                                                                <option value="Select">Select Plan
+                                                                                <option value="">Select Plan
                                                                                 </option>
                                                                                 @foreach ($membership as $memberships)
                                                                                     <option
@@ -421,19 +421,32 @@
                     coupon: couponcode
                 },
                 success: function(response) {
-                    console.log(response.price);
-                    $('#plan_value').val(response.price);
-                    var fullPrice = '₹ ' + parseFloat(response.price);
-                    $('#subtotal').val(parseFloat(response.price));
-                    $('#price').text(fullPrice);
-                    $('#gst').html("Includes Gst @18% on " + fullPrice);
 
-                    var total = (parseFloat(response.price) * 18) / 100;
-                    $('#gstTotal').html(total);
-                    $('#gst18').val(total);
-                    var totalAmount = parseFloat(response.price) + total;
-                    $('#totalAmount').html('₹ ' + totalAmount);
-                    $('#wholeAMount').val(totalAmount);
+                    if(response && response.price) {
+                        $('#plan_value').val(response.price);
+                        var fullPrice = '₹ ' + parseFloat(response.price);
+                        $('#subtotal').val(parseFloat(response.price));
+                        $('#price').text(fullPrice);
+                        $('#gst').html("Includes Gst @18% on " + fullPrice);
+
+                        var total = (parseFloat(response.price) * 18) / 100;
+                        $('#gstTotal').html(total);
+                        $('#gst18').val(total);
+                        var totalAmount = parseFloat(response.price) + total;
+                        $('#totalAmount').html('₹ ' + totalAmount);
+                        $('#wholeAMount').val(totalAmount);
+                    } else {
+                        console.log("No price data in response");
+                        $('#plan_value').val(0);
+                        $('#subtotal').val(0);
+                        $('#price').text('₹ 0');
+                        $('#gst').html("Includes Gst @18% on ₹ 0");
+                        $('#gstTotal').html(0);
+                        $('#gst18').val(0);
+                        $('#totalAmount').html('₹ 0');
+                        $('#wholeAMount').val(0);
+                    }
+
 
 
 
@@ -513,6 +526,9 @@
                     }
 
                 });
+            } else {
+                toastr.error('Please select at least one membership to delete');
+                $('#message_container').text('Please select at least one membership to delete');
             }
         });
 

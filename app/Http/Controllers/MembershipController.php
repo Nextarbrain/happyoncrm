@@ -142,6 +142,9 @@ class MembershipController extends Controller
         $branchId = auth('admin')->user()->branch_id ??  auth('admin')->user()->branch_id;
         $id = $request->input('id');
         $data = MembershipPlan::where('id', $id)->first();
+        if(!$data) {
+            return response()->json([]);
+        }
         $price = $data->price;
         if ($request->coupon) {
             $coupon = Coupon::where('coupon_name', $request->coupon);
