@@ -134,9 +134,13 @@ function couponCountUpdate($code)
         $coupon->where('branch_id', $branchId);
     }
     $coupon = $coupon->first();
-    $coupon->coupon_count = $coupon->coupon_count + 1;
-    $coupon->save();
-    return true;
+    if($coupon) {
+        $coupon->coupon_count = ($coupon->coupon_count ?? 0) + 1;
+        $coupon->save();
+        return true;
+    }
+        return false;
+
     }
     return false;
 }
