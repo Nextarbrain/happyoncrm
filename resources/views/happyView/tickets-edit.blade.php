@@ -1330,7 +1330,13 @@
                         },
 
                         success: function(data) {
-                            $('#resultmembership').html(data);
+                            if(data) {
+                                $('#submit-button').prop('disabled', false);
+                                $('#resultmembership').html(data);
+                            } else {
+                                $('#submit-button').prop('disabled', true);
+                                toastr.error('Member User Not Found.');
+                            }
                         }
                     });
                 } else {
@@ -1357,23 +1363,28 @@
                     },
 
                     success: function(response) {
+                        if(response && response.user) {
+                            $('#submit-button').prop('disabled', false);
+                            document.getElementById('nameCustomer').innerHTML = "" + response.user.name;
+                            if (response.renewal_date) {
+                                document.getElementById('planDate').innerHTML = "" + response.renewal_date;
+                            } else {
+                                document.getElementById('planDate').innerHTML = "";
+                            }
 
-                        document.getElementById('nameCustomer').innerHTML = "" + response.user.name;
-                        if (response.renewal_date) {
-                            document.getElementById('planDate').innerHTML = "" + response.renewal_date;
+                            document.getElementById("mobile_no").value = response.user_details.phone_no;
+                            document.getElementById("credit_left").value = response.credit_left;
+                            document.getElementById("kidsName2").value = response.user.name;
+                            var hrs = document.getElementById('hrs').value;
+
+
+                            document.getElementById("user_id").value = response.user.id;
+                            document.getElementById("credit").value = hrs;
+                            $('#resultmembership').css("display", "none");
                         } else {
-                            document.getElementById('planDate').innerHTML = "";
+                            $('#submit-button').prop('disabled', true);
+                            toastr.error('No membership found for this user.');
                         }
-
-                        document.getElementById("mobile_no").value = response.user_details.phone_no;
-                        document.getElementById("credit_left").value = response.credit_left;
-                        document.getElementById("kidsName2").value = response.user.name;
-                        var hrs = document.getElementById('hrs').value;
-
-
-                        document.getElementById("user_id").value = response.user.id;
-                        document.getElementById("credit").value = hrs;
-                        $('#resultmembership').css("display", "none");
                     }
                 });
             }

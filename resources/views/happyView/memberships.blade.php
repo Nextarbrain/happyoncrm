@@ -436,7 +436,6 @@
                         $('#totalAmount').html('₹ ' + totalAmount);
                         $('#wholeAMount').val(totalAmount);
                     } else {
-                        console.log("No price data in response");
                         $('#plan_value').val(0);
                         $('#subtotal').val(0);
                         $('#price').text('₹ 0');
@@ -446,10 +445,6 @@
                         $('#totalAmount').html('₹ 0');
                         $('#wholeAMount').val(0);
                     }
-
-
-
-
                 },
                 error: function(xhr) {
                     console.log(xhr.responseText); // Handle errors
