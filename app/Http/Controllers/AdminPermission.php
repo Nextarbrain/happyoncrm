@@ -163,19 +163,21 @@ class AdminPermission extends Controller
                 'name' => 'required|regex:/(^[A-Za-z ]+$)+/|max:200',
                 'email' => "required|email|unique:admins,email,$id",
                 'confirm_password' => 'same:password',
-                'roles' => "required"
             ]);
             $role = $req->role;
             $admin = Admin::findOrFail($id);
             $admin->name = $req->name;
             $admin->branch_id = $branchId;
             $admin->email = $req->email;
-            $admin->role = $req->roles ?? null;
+            if($req->roles) {
+                $admin->role = $req->roles;
+            }
+
             if (isset($req->password)) {
                 $admin->password =  Hash::make($req->password);
             }
             $admin->save();
-            if ($admin->role != $role) {
+            if ($req->roles && $admin->role != $role) {
                 $admin->removeRole($req->roles);
                 $admin->assignRole($req->roles);
             }

@@ -95,15 +95,16 @@
                             @else
                                 {!! Form::hidden('branch_id', auth('admin')->user()->branch_id ?? null) !!}
                             @endif
-
-                            {{ Form::label('roles', ucwords('Assign Role')) }}
-                            {!! Form::select('roles', $roles, $userRole, [
-                                'class' => 'form-control' . ($errors->has('roles') ? ' form-error' : null),
-                            ]) !!}
-                            @error('roles')
-                                <span class="text-danger font-weight-bold text-capitalize d-block">{{ $message }}</span>
-                                @enderrorger font-weight-bold text-capitalize">{{ $message }}</span>
-                            @enderror
+                            @if(!$user->isSuperAdmin)
+                                {{ Form::label('roles', ucwords('Assign Role')) }}
+                                {!! Form::select('roles', $roles, $userRole, [
+                                    'class' => 'form-control' . ($errors->has('roles') ? ' form-error' : null),
+                                ]) !!}
+                                @error('roles')
+                                    <span class="text-danger font-weight-bold text-capitalize d-block">{{ $message }}</span>
+                                    @enderrorger font-weight-bold text-capitalize">{{ $message }}</span>
+                                @enderror
+                            @endif
                             <div class="d-flex gap-2 my-3">
                                 <button type="submit" class="btn btn-primary">Update</button>
 
