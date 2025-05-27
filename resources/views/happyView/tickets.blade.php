@@ -106,7 +106,7 @@
                                                                 <label for="phone">Phone <span>*</span></label>
                                                                 <input type="tel" class="form-control"
                                                                     placeholder="Phone" name="phone" id="phone"
-                                                                    pattern="[0-9]{10}" required>
+                                                                    pattern="[0-9]{10}" maxlength="10" required>
                                                                 <div id="result" class="shadow phone-list"></div>
                                                             </div>
                                                         </div>
@@ -117,7 +117,7 @@
                                                                 <label>Number of kids <span>*</span></label>
                                                                 <select name="kids" id="kidsQty"
                                                                     class="form-select" required>
-                                                                    <option value="0">0</option>
+                                                                    <option value="">0</option>
                                                                     <option value="1">1</option>
                                                                     <option value="2">2</option>
                                                                     <option value="3">3</option>
@@ -432,7 +432,7 @@
                                                             <div class="col-md-12">
                                                                 <div class="input_button">
                                                                     <div class="mb-4 input_wrap">
-                                                                        <label>Credit Left</label>
+                                                                        <label>OTP</label>
                                                                         <input type="number" class="form-control"
                                                                             placeholder="Enter OTP"
                                                                             name="response_otp" required>
@@ -829,6 +829,7 @@
                             var sumamount = sum - discount;
 
                         }
+                        $('#couponCodebutton').prop('disabled', true);
                         $('#couponmsg').html("<p>Apply Coupon Successfull!</p>");
 
                         // Get the value of the first select box

@@ -246,7 +246,7 @@ class AdminController extends Controller
             $gst5 = $gst5->sum('gst5');
 
             if ($daterange[0] == $daterange[1]) {
-                $event_booking =   EventBooking::whereDate('booking_date', $daterange[0])->where('payment_status', 'Paid')->count();
+                $event_booking =   EventBooking::whereDate('booking_date', $daterange[0])->where('payment_status', 'Paid');
                 if($branchId) {
                     $event_booking->where('branch_id', $branchId);
                 }

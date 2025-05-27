@@ -204,7 +204,6 @@ class TicketController extends Controller
             //invoice generate
             $id = $userSave->id;
             $user = User::with('membership', 'userDetails', 'event', 'kid', 'paymentInfo')->where('id', $id)->first();
-
             $kidValue = Kid::where('user_id', $id);
 
             $kidTotal = $kidValue->count();
@@ -252,7 +251,7 @@ class TicketController extends Controller
                 "date" => $user['event']->booking_date,
                 "time" => $in_time,
                 "end_time" => $out_time,
-                "hours" => $user['kid']->hours,
+                "hours" => $user['kid'] && $user['kid']->hours ? $user['kid']->hours : 0,
                 "couponcode" => $user['paymentInfo']->couponcode,
                 "couponvalue" => $user['paymentInfo']->couponvalue,
                 "invoiceNo" => $paymentMethod->id,

@@ -15,11 +15,11 @@
 	<script src="{{asset('assets/js/circle-progress.min.js')}}"></script>
 	<script src="{{asset('assets/js/app.js')}}"></script>
 	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-    
+
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.0/js/toastr.js"></script>
-	
+
     <script>
         document.getElementById('product_div').addEventListener("click", function() {
             var selectedItems = [];
@@ -41,6 +41,7 @@
                     success: function(response){
                         toastr.success('Items deleted successfully');
                         $('#message_container').text('Items deleted successfully');
+                        location.reload();
                     },
                     error: function(xhr,status, error){
 
@@ -48,7 +49,7 @@
 
                 });
             }
-            
+
         });
 
 
@@ -60,7 +61,7 @@
             });
             var baseUrl = "{{URL::to('/')}}";
             if(selectedItems.length > 0){
-                
+
                 $.ajax({
                     type: 'Delete',
                     url: baseUrl+'/delete-membership',
@@ -73,6 +74,7 @@
                     success: function(response){
                         toastr.success('Items deleted successfully');
                         $('#message_container').text('Items deleted successfully');
+                        location.reload();
                     },
                     error: function(xhr,status, error){
 
@@ -80,7 +82,7 @@
 
                 });
             }
-            
+
         });
 
 
@@ -104,6 +106,7 @@
                     success: function(response){
                         toastr.success('Items deleted successfully');
                         $('#message_container').text('Items deleted successfully');
+                        location.reload();
                     },
                     error: function(xhr,status, error){
 
@@ -111,9 +114,9 @@
 
                 });
             }
-            
+
         });
-        
+
         document.getElementById('user_div').addEventListener("click", function() {
             var selectedItems = [];
             $('.user_checkbox:checked').each(function(){
@@ -141,7 +144,7 @@
 
                 });
             }
-            
+
         });
 
         document.getElementById('product_edit').addEventListener("click", function() {
@@ -178,9 +181,9 @@
 
                 });
             }
-            
+
         });
-        
+
         document.getElementById('membership_edit').addEventListener("click", function() {
             var selectedItems = [];
             $('.membership_checkbox:checked').each(function(){
@@ -214,7 +217,7 @@
 
                 });
             }
-            
+
         });
         document.getElementById('coupon_edit').addEventListener("click", function() {
             var selectedItems = [];
@@ -251,7 +254,7 @@
 
                 });
             }
-            
+
         });
 
         document.getElementById('day_price_edit').addEventListener("click", function() {
@@ -279,7 +282,7 @@
                         $('#tuesday').val(response.tuesday);
                         $('#wednesday').val(response.wednesday);
                         $('#thursday').val(response.thursday);
-                      
+
                         $('#dayPriceId').val(response.id);
                         console.log(response);
                     },
@@ -289,7 +292,7 @@
 
                 });
             }
-            
+
         });
 
         document.getElementById('weekend_edit').addEventListener("click", function() {
@@ -316,7 +319,7 @@
                         $('#friday').val(response.friday);
                         $('#saturday').val(response.saturday);
                         $('#sunday').val(response.sunday);
-                       
+
                         $('#weekendId').val(response.id);
                         console.log(response);
                     },
@@ -326,13 +329,13 @@
 
                 });
             }
-            
+
         });
-        
-        
-        
+
+
+
         function modalClose(){
-           
+
             $('#editproductModal').hide();
             $('#editMemberModal').hide();
             $('#editCouponModal').hide();
