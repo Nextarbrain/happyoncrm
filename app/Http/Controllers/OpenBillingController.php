@@ -82,6 +82,12 @@ class OpenBillingController extends Controller
     public function editOpenBillingPost(Request $request)
     {
         // dd(count($request->open_billing_item_ids));
+        $request->merge([
+            'billing_name' => trim($request->input('billing_name')),
+        ]);
+         $request->validate([
+            'billing_name' => 'required',
+        ]);
         $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $id = $request->id;
         $openbilling = OpenBilling::where('id', $id)->first();
@@ -138,6 +144,12 @@ class OpenBillingController extends Controller
 
     public function addOpenBillingPost(Request $request)
     {
+        $request->merge([
+            'billing_name' => trim($request->input('billing_name')),
+        ]);
+         $request->validate([
+            'billing_name' => 'required',
+        ]);
         $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $openbilling = new OpenBilling();
 

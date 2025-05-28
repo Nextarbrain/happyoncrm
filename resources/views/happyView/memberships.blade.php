@@ -142,7 +142,7 @@
                                                                         <div class="mb-4 input_wrap">
                                                                             <label>Phone <span>*</span></label>
                                                                             <input type="text" class="form-control"
-                                                                                placeholder="Phone" name="phone"
+                                                                                placeholder="Phone" name="phone" maxlength="10"
                                                                                 required>
                                                                         </div>
                                                                     </div>

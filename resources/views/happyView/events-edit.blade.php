@@ -88,7 +88,7 @@
                                                                 <input type="date" class="form-control"
                                                                     placeholder="Booking Date" id="booking_date"
                                                                     name="booking_date"
-                                                                    value="{{ $eventbooking->booking_date }}" required>
+                                                                    value="{{ $eventbooking->booking_date }}" maxlength="10" required>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-3 input_wrap time">

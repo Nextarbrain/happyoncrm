@@ -85,19 +85,20 @@
                                                             <div class="mb-4 input_wrap">
                                                                 <label>Billing Name <span>*</span></label>
                                                                 <input type="text" class="form-control"
-                                                                    placeholder="Billing Name" name="billing_name"
-                                                                    required>
-
+                                                                    placeholder="Billing Name" name="billing_name" required>
+                                                                @error('billing_name')
+                                                                    <span
+                                                                        class="text-danger font-weight-bold text-capitalize">{{ $message }}</span>
+                                                                @enderror
                                                             </div>
                                                         </div>
 
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap">
-                                                                <label for="phone">Phone </label>
+                                                                <label for="phone">Phone<span>*</span></label>
                                                                 <input type="tel" class="form-control"
                                                                     placeholder="Phone" name="phone" id="phone"
-                                                                    pattern="[0-9]{10}" >
-
+                                                                    pattern="[0-9]{10}" maxlength="10">
                                                             </div>
                                                         </div>
 

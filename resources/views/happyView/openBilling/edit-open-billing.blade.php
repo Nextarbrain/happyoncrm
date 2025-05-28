@@ -84,7 +84,10 @@
                                                                     placeholder="Billing Name"
                                                                     value="{{ $open_billing->bill_name }}"
                                                                     name="billing_name" required>
-
+                                                                @error('billing_name')
+                                                                    <span
+                                                                        class="text-danger font-weight-bold text-capitalize">{{ $message }}</span>
+                                                                @enderror
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">
@@ -93,7 +96,7 @@
                                                                 <input type="tel" class="form-control"
                                                                     placeholder="Phone"
                                                                     value="{{ $open_billing->phone }}" name="phone"
-                                                                    id="phone" pattern="[0-9]{10}" required>
+                                                                    id="phone" pattern="[0-9]{10}" maxlength="10" required>
 
                                                             </div>
                                                         </div>
