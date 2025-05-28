@@ -8,11 +8,11 @@
         <header>
             <div class="topbar d-flex align-items-center">
                 <nav class="navbar navbar-expand">
-                    @if (session()->has('success'))
+                    {{-- @if (session()->has('success'))
                         <div id="success-message" class="alert alert-success">
                             {{ session()->get('success') }}
                         </div>
-                    @endif
+                    @endif --}}
                     <div class="mobile-toggle-menu">
                         <i class="fa fa-bars" aria-hidden="true"></i>
                     </div>

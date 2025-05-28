@@ -605,7 +605,7 @@
                                                         <label>Phone Number</label>
                                                         <input type="text" class="form-control"
                                                             placeholder="+91 0123456789" onkeyup="calculatePlan()"
-                                                            id="mobile_no">
+                                                            id="mobile_no" maxlength="10">
                                                         <div id="resultmembership" class="shadow phone-list">
                                                         </div>
                                                         <div class="happy_card">

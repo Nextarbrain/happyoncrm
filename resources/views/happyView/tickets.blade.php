@@ -308,7 +308,7 @@
                                                         <div class="mb-4 input_wrap">
                                                             <label>Phone Number</label>
                                                             <input type="text" class="form-control"
-                                                                placeholder="+91 0123456789" id="mobile_no">
+                                                                placeholder="+91 0123456789" id="mobile_no" maxlength="10">
                                                             <div id="resultmembership" class="shadow phone-list">
                                                             </div>
                                                             <div class="happy_card">
@@ -433,11 +433,11 @@
                                                                 <div class="input_button">
                                                                     <div class="mb-4 input_wrap">
                                                                         <label>OTP</label>
-                                                                        <input type="number" class="form-control"
+                                                                        <input type="text" class="form-control"
                                                                             placeholder="Enter OTP"
-                                                                            name="response_otp" required>
+                                                                            name="response_otp" maxlength="6" pattern="\d*" inputmode="numeric" required>
                                                                         <div class="h_btn">
-                                                                            <a href="#"
+                                                                            <a href="javascript:void(0)"
                                                                                 onclick="verifyMember()">Send</a>
                                                                         </div>
                                                                     </div>
@@ -520,7 +520,14 @@
                         },
 
                         success: function(data) {
-                            $('#result').html(data);
+                            if(data) {
+                                $('#result').html(data);
+                            } else {
+                                $('#nameOfKid').val('');
+                                $('#kidsQty').val('');
+                                $('#parent-div').empty();
+                            }
+
                         }
                     });
                 } else {
@@ -561,7 +568,7 @@
                             i +
                             '" onkeyup="calculate()" readonly></div></div><div class="col-md-4 "><div class="mb-4 input_wrap"> <label>Hours <span>*</span></label><select onchange="calculateTotal()" name="hours[]" id="kid_hrs' +
                             i +
-                            '" class="form-select hours"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="Unlimited">Unlimited</option></select></div></div></div> ';
+                            '" class="form-select hours" required><option value="">0</option><option value="1">1</option><option value="2">2</option><option value="Unlimited">Unlimited</option></select></div></div></div> ';
                         $("#parent-div").append(childDiv);
                         $('#result').css("display", "none");
 
@@ -584,7 +591,7 @@
                     i +
                     '" readonly></div></div><div class="col-md-4 "><div class="mb-4 input_wrap"> <label>Hours <span>*</span></label><select name="hours[]" id="kid_hrs' +
                     i +
-                    '" class="form-select hours" ><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="Unlimited">Unlimited</option></select></div></div></div> ';
+                    '" class="form-select hours" required><option value="">0</option><option value="1">1</option><option value="2">2</option><option value="Unlimited">Unlimited</option></select></div></div></div> ';
                 $("#parent-div").append(childDiv);
             }
         });
@@ -982,7 +989,7 @@
         $(document).ready(function() {
 
             var baseUrl = "{{ URL::to('/') }}";
-
+            let errorShown = false;
             $('#mobile_no').keyup(function() {
                 var search = $(this).val();
                 if (search.length > 0) {
@@ -1002,15 +1009,20 @@
                             if(data) {
                                 $('#submit-button').prop('disabled', false);
                                 $('#resultmembership').html(data);
+                                 errorShown = false;
                             } else {
                                 $('#submit-button').prop('disabled', true);
-                                toastr.error('Member User Not Found.');
+                                if (!errorShown) {
+                                    toastr.error('Member User Not Found.');
+                                    errorShown = true;
+                                }
                             }
 
                         }
                     });
                 } else {
                     $('#resultmembership').css("display", "none");
+                    errorShown = false;
                 }
 
             });
@@ -1109,6 +1121,8 @@
                     }
 
                 });
+            } else {
+                 toastr.error('Mobile number can’t be empty');
             }
 
         }

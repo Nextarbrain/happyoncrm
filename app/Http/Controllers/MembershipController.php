@@ -611,7 +611,7 @@ class MembershipController extends Controller
                 return redirect('/tickets')->with('error', 'OTP Wrong!');
             }
         } else {
-            return redirect('/tickets')->with('error', 'Please endter OTP!');
+            return redirect('/tickets')->with('error', 'Please enter OTP!');
         }
     }
 
