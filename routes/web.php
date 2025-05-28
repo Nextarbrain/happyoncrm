@@ -15,8 +15,9 @@ use App\Http\Controllers\OpenBillingController;
 use App\Http\Controllers\TrashController;
 
 Route::get('/', [AdminController::class, 'index'])->name('login');
-
+Route::get('/logout-g', [AdminController::class, 'logout'])->name('logoutA');
 Route::post('/auth', [AdminController::class, 'auth'])->name('auth');
+
 
 
 Route::group(['middleware' => 'admin_auth'], function () {
@@ -35,7 +36,6 @@ Route::group(['middleware' => 'admin_auth'], function () {
     //     return redirect('/')->with('success', 'Logged out successfully.');
     // });
 
-    Route::get('/logout-g', [AdminController::class, 'logout'])->name('logoutA');
 
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 

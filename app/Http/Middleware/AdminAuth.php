@@ -19,7 +19,7 @@ class AdminAuth
         if (auth('admin')->check()) {
            return $next($request);
         } else {
-            return redirect(route('login'))->with('error', 'Logged out successfully');
+            return redirect(route('login'))->with('error', 'Access Denied');
         }
     }
 }

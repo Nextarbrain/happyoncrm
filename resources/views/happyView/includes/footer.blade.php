@@ -245,6 +245,7 @@
                         $('#couponDiscount').val(response.discount);
                         $('#couponStart').val(response.start_from);
                         $('#couponValid').val(response.valid_till);
+                        $('#couponType').val(response.discount_type);
                         $('#couponId').val(response.id);
                         console.log(response);
                     },

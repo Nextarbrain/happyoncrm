@@ -480,13 +480,13 @@ class AdminController extends Controller
             $ticketSale = $ticketSale->get();
 
             foreach ($ticketSale as $ticketSales) {
-                if ($ticketSales['paymentInfo']->payment_method && $ticketSales['paymentInfo']->payment_method == 'UPI') {
+                if ($ticketSales['paymentInfo']->payment_method != null && $ticketSales['paymentInfo']->payment_method == 'UPI') {
                     $upi += isset($ticketSales['paymentInfo']) ? $ticketSales['paymentInfo']->amounts : 0;
                 }
-                if ($ticketSales['paymentInfo']->payment_method && $ticketSales['paymentInfo']->payment_method == 'Cash') {
+                if ($ticketSales['paymentInfo']->payment_method != null && $ticketSales['paymentInfo']->payment_method == 'Cash') {
                     $cash += isset($ticketSales['paymentInfo']) ? $ticketSales['paymentInfo']->amounts : 0;
                 }
-                if ($ticketSales['paymentInfo']->payment_method && $ticketSales['paymentInfo']->payment_method == 'Debit/Credit') {
+                if ($ticketSales['paymentInfo']->payment_method != null && $ticketSales['paymentInfo']->payment_method == 'Debit/Credit') {
                     $card += isset($ticketSales['paymentInfo']) ? $ticketSales['paymentInfo']->amounts : 0;
                 }
             }
@@ -1581,6 +1581,6 @@ class AdminController extends Controller
     {
         $admin = Auth::guard('admin')->user();
         Auth::guard('admin')->logout();
-        return back()->with('success', 'Logged out successfully.');
+        return redirect(route('login'))->with('success', 'Logged out successfully');
     }
 }

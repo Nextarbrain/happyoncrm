@@ -144,7 +144,7 @@
                                                                     <thead>
                                                                         <tr>
                                                                             <th><input type="checkbox"
-                                                                                    onclick="checkAll(this)"></th>
+                                                                                    onclick="checkWeekendAll(this)"></th>
                                                                             <th>Hour</th>
                                                                             <th>Monday</th>
                                                                             <th>Tue</th>
@@ -383,7 +383,7 @@
                                             <table class="table table-striped text-center" style="width:100%">
                                                 <thead>
                                                     <tr>
-                                                        <th><input type="checkbox" onclick="checkAll(this)"></th>
+                                                        <th><input type="checkbox" onclick="checkMemberShipAll(this)"></th>
                                                         <th>Plan</th>
                                                         <th>Price</th>
                                                         <th>Entry</th>
@@ -527,7 +527,7 @@
                                             <table class="table table-striped text-center" style="width:100%">
                                                 <thead>
                                                     <tr>
-                                                        <th><input type="checkbox" onclick="checkAll(this)"></th>
+                                                        <th><input type="checkbox" onclick="checkProductAll(this)"></th>
                                                         <th>Product Name</th>
                                                         <th>Price</th>
                                                         <th>Qty</th>
@@ -695,7 +695,7 @@
                                             <table class="table table-striped text-center" style="width:100%">
                                                 <thead>
                                                     <tr>
-                                                        <th><input type="checkbox" onclick="checkAll(this)"></th>
+                                                        <th><input type="checkbox" onclick="checkCoupanAll(this)"></th>
                                                         <th>Coupon Name</th>
                                                         <th>Discount Type</th>
                                                         <th>Discount</th>
@@ -929,6 +929,47 @@
         <!--Start Back To Top Button-->
         <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
         <!--End Back To Top Button-->
+        <script>
+                function checkCoupanAll(bx) {
+                    var cbs = document.getElementsByClassName('coupon_checkbox');
+                    for (var i = 0; i < cbs.length; i++) {
+                        if (cbs[i].type == 'checkbox') {
+                            cbs[i].checked = bx.checked;
+                        }
+                    }
+                }
+
+                function checkProductAll(bx) {
+                    var cbs = document.getElementsByClassName('product_checkbox');
+                    for (var i = 0; i < cbs.length; i++) {
+                        if (cbs[i].type == 'checkbox') {
+                            cbs[i].checked = bx.checked;
+                        }
+                    }
+                }
+
+                function checkMemberShipAll(bx) {
+                    var cbs = document.getElementsByClassName('membership_checkbox');
+                    for (var i = 0; i < cbs.length; i++) {
+                        if (cbs[i].type == 'checkbox') {
+                            cbs[i].checked = bx.checked;
+                        }
+                    }
+                }
+
+
+
+                function checkWeekendAll(bx) {
+                    // var cbs = document.getElementsByClassName('day_price_checkbox');
+                    // for (var i = 0; i < cbs.length; i++) {
+                    //     if (cbs[i].type == 'checkbox') {
+                    //         cbs[i].checked = bx.checked;
+                    //     }
+                    // }
+                }
+
+
+        </script>
 
     </div>
     <!--end wrapper-->

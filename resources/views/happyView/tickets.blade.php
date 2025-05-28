@@ -520,14 +520,10 @@
                         },
 
                         success: function(data) {
-                            if(data) {
-                                $('#result').html(data);
-                            } else {
-                                $('#nameOfKid').val('');
-                                $('#kidsQty').val('');
-                                $('#parent-div').empty();
-                            }
-
+                            $('#nameOfKid').val('');
+                            $('#kidsQty').val('');
+                            $('#parent-div').empty();
+                            $('#result').html(data);
                         }
                     });
                 } else {
@@ -601,8 +597,6 @@
         //Kids Hours Options
         $(document).on('change', 'select[id^="kid_hrs"]', function() {
             var selectBoxId = $(this);
-
-            console.log(selectBoxId);
             var inputTag = selectBoxId.closest('.child-div').find('.kid_price');
             console.log(inputTag);
             // Make the AJAX call to fetch data from the server
@@ -800,7 +794,6 @@
         //Coupon Code
         $("#couponCodebutton").on("click", function() {
             var sum = $("#subtotlSave").val();
-
             $.ajax({
                 url: baseUrl + '/get-coupon',
                 type: 'GET',
@@ -811,6 +804,11 @@
                     if(data.status === 400){
                         $('#couponmsg').html(
                             "<p style='color:red;'>"+data.msg+"</p>");
+                        return false;
+                    }
+
+                    if(!sum) {
+                        toastr.error("Please select Number of kids & Hours");
                         return false;
                     }
 

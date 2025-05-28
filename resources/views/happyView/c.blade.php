@@ -400,7 +400,7 @@
     });
     console.log(selectedItems);
     var baseUrl = "{{URL::to('/')}}";
-    if(selectedItems.length > 0  && confirm('Are you Sure to Delete Data?')){
+    if(selectedItems.length > 0  && confirm('Are you sure you want to delete this data?')){
         $.ajax({
             type: 'Delete',
             url: baseUrl + '/delete-customer',
