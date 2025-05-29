@@ -503,13 +503,13 @@ class AdminController extends Controller
 
             $amountMember = [];
             foreach ($memberSale as $memberTicket) {
-                if ($memberTicket['paymentInfo']->payment_method == 'UPI') {
+                if (isset($memberTicket['paymentInfo']) && $memberTicket['paymentInfo']->payment_method == 'UPI') {
                     $upi += isset($memberTicket['paymentInfo']) ? $memberTicket['paymentInfo']->amounts : 0;
                 }
-                if ($memberTicket['paymentInfo']->payment_method == 'Cash') {
+                if (isset($memberTicket['paymentInfo']) && $memberTicket['paymentInfo']->payment_method == 'Cash') {
                     $cash += isset($memberTicket['paymentInfo']) ? $memberTicket['paymentInfo']->amounts : 0;
                 }
-                if ($memberTicket['paymentInfo']->payment_method == 'Debit/Credit') {
+                if (isset($memberTicket['paymentInfo']) && $memberTicket['paymentInfo']->payment_method == 'Debit/Credit') {
                     $card += isset($memberTicket['paymentInfo']) ? $memberTicket['paymentInfo']->amounts : 0;
                 }
             }
