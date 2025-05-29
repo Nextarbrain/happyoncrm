@@ -98,7 +98,7 @@
                                                                 <label for="phone">Phone<span>*</span></label>
                                                                 <input type="tel" class="form-control"
                                                                     placeholder="Phone" name="phone" id="phone"
-                                                                    pattern="[0-9]{10}" maxlength="10">
+                                                                    pattern="[0-9]{10}" maxlength="10" required>
                                                             </div>
                                                         </div>
 

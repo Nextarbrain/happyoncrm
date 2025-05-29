@@ -119,25 +119,27 @@ class OpenBillingController extends Controller
             $item_tax = $request->item_tax;
             $open_billing_item_ids = $request->open_billing_item_ids;
 
+            if($open_billing_item_ids !== null) {
+                for ($i = 0; $i <= count($open_billing_item_ids) - 1; $i++) {
 
-            for ($i = 0; $i <= count($open_billing_item_ids) - 1; $i++) {
+                    if ($open_billing_item_ids[$i] > 0 && $open_billing_item_ids[$i] != null) {
+                        $event_item = OpenBillingItem::where('id', $open_billing_item_ids[$i])->first();
+                    } else {
+                        $event_item = new OpenBillingItem();
+                    }
 
-                if ($open_billing_item_ids[$i] > 0 && $open_billing_item_ids[$i] != null) {
-                    $event_item = OpenBillingItem::where('id', $open_billing_item_ids[$i])->first();
-                } else {
-                    $event_item = new OpenBillingItem();
-                }
-
-                if (isset($item_name[$i])) {
-                    $event_item->open_billing_id = $id;
-                    $event_item->item_name = $item_name[$i];
-                    $event_item->item_price = $item_price[$i];
-                    $event_item->item_qty = $item_qty[$i];
-                    $event_item->item_tax = $item_tax[$i];
-                    $event_item->branch_id = $branchId;
-                    $event_item->save();
+                    if (isset($item_name[$i])) {
+                        $event_item->open_billing_id = $id;
+                        $event_item->item_name = $item_name[$i];
+                        $event_item->item_price = $item_price[$i];
+                        $event_item->item_qty = $item_qty[$i];
+                        $event_item->item_tax = $item_tax[$i];
+                        $event_item->branch_id = $branchId;
+                        $event_item->save();
+                    }
                 }
             }
+
         }
         return redirect('/open-billing')->with('success', 'Successfully Updated!');
     }
