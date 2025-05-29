@@ -200,7 +200,7 @@
                                                                 <div class="h_btn">
                                                                     <a href="javascript:void(0)"
                                                                         onclick="AddItems(event, '{{ $pro->product_name }}', '{{ $pro->product_price }}', '{{ $pro->product_tax }}')"
-                                                                        class="more_adult">+
+                                                                        class="more_adult" id="{{ Str::slug($pro->product_name) }}">+
                                                                         {{ $pro->product_name }}</a>
                                                                 </div>
                                                             @endforeach
@@ -579,6 +579,21 @@
         $("#kidsQty").on("change", function() {
             var numDivs = $(this).val(); // Get the selected value
             $('#parent-div').empty();
+            if(!numDivs) {
+                $('#subtotal').text("");
+                $('#subtotlSave').val('0');
+                $("#chargeAmount").val('0');
+                document.getElementById('gstOn').innerHTML = "Includes Gst @18% on 0";
+                document.getElementById('gstValue').innerHTML = '0';
+                document.getElementById('totalAmount').innerHTML = '₹ 0';
+                $('#valueGst').text("₹ 0");
+                $('#gst18').val('0');
+                $('#dataRow').empty();
+                $('#extra-time').css("display", "block");
+                $('#socks').css("display", "block");
+                $('#adult').css("display", "block");
+            }
+
             for (var i = 1; i <= numDivs; i++) {
                 var childDiv =
                     '<div class="row child-div"><div class="col-md-4"><div class="mb-4 input_wrap dark"><label>Kid Name <span>*</span></label><input type="text" class="form-control" placeholder="Kid Name " name="kidName[]" id ="kidName' +
