@@ -602,7 +602,7 @@
                     i +
                     '" readonly></div></div><div class="col-md-4 "><div class="mb-4 input_wrap"> <label>Hours <span>*</span></label><select name="hours[]" id="kid_hrs' +
                     i +
-                    '" class="form-select hours" required><option value="">0</option><option value="1">1</option><option value="2">2</option><option value="Unlimited">Unlimited</option></select></div></div></div> ';
+                    '" class="form-select hours" required><option value="">0</option><option value="1">1</option><option value="2">2</option><option value="Unlimited">Unlimited</option></select></div></div></div>';
                 $("#parent-div").append(childDiv);
             }
         });

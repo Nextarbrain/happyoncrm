@@ -581,7 +581,7 @@ class MembershipController extends Controller
 
                 $membershiphistory = new MembershipHistory;
                 $membershiphistory->user_id = $request->input('user_id');
-                // $membershiphistory->branch_id = $branchId;
+                $membershiphistory->branch_id = $branchId;
                 $membershiphistory->membership_buyer_id = $update->id;
                 $membershiphistory->use_credit = $request->input('hrs');
                 $membershiphistory->current_left = $update->credit_left;
