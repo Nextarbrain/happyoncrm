@@ -211,7 +211,7 @@
     width: 20%;
     text-align: center;
 ">
-                                                        {{ $item->item_tax }}</td>
+                                                        {{ $item->item_tax ? $item->item_tax ."%" : 0 }}</td>
 
                                                     @php
 

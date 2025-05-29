@@ -340,7 +340,7 @@
                                                             <hr>
                                                             <div class="amount">
                                                                 <p>Total Amount</p>
-                                                                <p id="totalAmount">{{ $eventbooking->totalamount }}
+                                                                <p id="totalAmount">{{ number_format($eventbooking->totalamount, 2) }}
                                                                 </p>
                                                                 <input type="hidden"
                                                                     value="{{ $eventbooking->totalamount }}"
@@ -600,8 +600,9 @@
                                                             <p>By Agreeing to the <b>Terms and Condition</b> of HappyOn
                                                             </p>
                                                         </div>
-                                                        <div class="h_btn s_btn">
+                                                        <div class="h_btn s_btn" style="display: flex; gap: 2px;">
                                                             <button class="btn btn-primary">Update Event</button>
+                                                            <a href="{{ route('events') }}" class="btn btn-secondary" style="margin-top: 0px;color: #fff; background-color: #6c757d; border-color: #6c757d;">Cancel</a>
                                                         </div>
                                                     </div>
                                                 </form>
