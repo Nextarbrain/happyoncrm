@@ -480,13 +480,13 @@ class AdminController extends Controller
             $ticketSale = $ticketSale->get();
 
             foreach ($ticketSale as $ticketSales) {
-                if ($ticketSales['paymentInfo']->payment_method != null && $ticketSales['paymentInfo']->payment_method == 'UPI') {
+                if (isset($ticketSales['paymentInfo']) && $ticketSales['paymentInfo']->payment_method == 'UPI') {
                     $upi += isset($ticketSales['paymentInfo']) ? $ticketSales['paymentInfo']->amounts : 0;
                 }
-                if ($ticketSales['paymentInfo']->payment_method != null && $ticketSales['paymentInfo']->payment_method == 'Cash') {
+                if (isset($ticketSales['paymentInfo']) && $ticketSales['paymentInfo']->payment_method == 'Cash') {
                     $cash += isset($ticketSales['paymentInfo']) ? $ticketSales['paymentInfo']->amounts : 0;
                 }
-                if ($ticketSales['paymentInfo']->payment_method != null && $ticketSales['paymentInfo']->payment_method == 'Debit/Credit') {
+                if (isset($ticketSales['paymentInfo']) && $ticketSales['paymentInfo']->payment_method == 'Debit/Credit') {
                     $card += isset($ticketSales['paymentInfo']) ? $ticketSales['paymentInfo']->amounts : 0;
                 }
             }
