@@ -143,6 +143,7 @@ class AdminPermission extends Controller
                 $role->where('branch_id', $branchId);
             }
             $role = $role->get();
+            $roles = [];
             if (count($role) > 0) {
                 foreach ($role as $value) {
                     if ($value) {
