@@ -850,7 +850,7 @@
 
                         }
                         $('#couponCodebutton').prop('disabled', true);
-                        $('#couponmsg').html("<p>Apply Coupon Successfull!</p>");
+                        $('#couponmsg').html('<p style="color:#0A5F59;">Apply Coupon Successful!</p>');
 
                         // Get the value of the first select box
                         var select1Value = parseInt($('#adult_qty')
@@ -866,6 +866,7 @@
                         // Get the value of the second select box
                         var select2Value = parseInt($('#socks_qty')
                             .val());
+
                         var socks_price = document.getElementById(
                             'socks_price_backend').value;
                         var finalSocksPrice = parseFloat(socks_price) *
@@ -925,6 +926,11 @@
                         document.getElementById('gstValue').innerHTML =
                             '' + gstKid.toFixed(2);
                         var finalAmount = sumamount + gstKid;
+
+                        if(!isNaN(finalSocksPrice)) {
+                            var gstSocks = (socks_price * 5) / 100;
+                            finalAmount+=gstSocks;
+                        }
                         document.getElementById('totalAmount')
                             .innerHTML = '₹ ' + finalAmount.toFixed(2);
                         $("#chargeAmount").val(finalAmount.toFixed(2));
