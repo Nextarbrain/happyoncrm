@@ -81,6 +81,9 @@ class CustomerDataTable extends DataTable
             ->editColumn('updated_at', function ($user) {
                 return $user->updated_at ? $user->updated_at->format('d-m-Y H:i a') : '';
             })
+            ->addColumn('branch', function ($user) {
+                return isset($user->branch->name) ? $user->branch->name : '';
+            })
             ->addColumn('action', function ($user) {
                 $actions = '';
                 if (can('tickets-edit')) {
@@ -102,10 +105,10 @@ class CustomerDataTable extends DataTable
     public function query(User $model)
     {
         $branchId = auth('admin')->user()->branch_id ?? null;
-        $model = $model->with('paymentInfo', 'kid', 'userDetails');
-        // if ($branchId) {
-        //     $model->where('branch_id', $branchId);
-        // }
+        $model = $model->with('paymentInfo', 'kid', 'userDetails','branch');
+        if ($branchId) {
+            $model->where('branch_id', $branchId);
+        }
         $model = $model->latest();
         return $model;
     }
@@ -168,6 +171,7 @@ class CustomerDataTable extends DataTable
             Column::make('amount_spent')->title('Amount Spent'),
             Column::make('phone')->title('Phone'),
             Column::make('updated_at')->title('Updated At'),
+            Column::make('branch')->title('Branch'),
             Column::computed('action')
                 ->exportable(false)
                 ->printable(false)

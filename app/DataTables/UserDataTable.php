@@ -24,9 +24,9 @@ class UserDataTable extends DataTable
     {
         $branchId = auth('admin')->user()->branch_id ?? null;
         $users = User::query();
-        // if ($branchId) {
-        //     $users->where('branch_id', $branchId);
-        // }
+        if ($branchId) {
+            $users->where('branch_id', $branchId);
+        }
         $userData = $users->with('paymentInfo', 'kid', 'event', 'userDetails')->latest();
         return DataTables::of($userData)
             ->addColumn('checkbox', function ($user) {
@@ -205,6 +205,9 @@ class UserDataTable extends DataTable
             ->addColumn('payment_method', function ($user) {
                 return isset($user->paymentInfo->payment_method) ? $user->paymentInfo->payment_method : '';
             })
+            ->addColumn('branch', function ($user) {
+                return isset($user->branch->name) ? $user->branch->name : '';
+            })
             ->editColumn('action', function ($user) {
                 $actions = '';
                 if (can('tickets-edit')) {
@@ -228,7 +231,7 @@ class UserDataTable extends DataTable
     public function query(User $model)
     {
         $branchId = auth('admin')->user()->branch_id ?? null;
-        $model = $model->with('membership', 'firstKid', 'userDetails', 'event', 'paymentInfo')->where('role', '!=', 0);
+        $model = $model->with('membership', 'firstKid', 'userDetails', 'event', 'paymentInfo','branch')->where('role', '!=', 0);
         if ($branchId) {
             $model->where('branch_id', $branchId);
         }
@@ -292,6 +295,7 @@ class UserDataTable extends DataTable
             Column::make('kids'),
             Column::make('hours'),
             Column::make('payment_method'),
+            Column::make('branch'),
             Column::computed('action')
                 ->exportable(false)
                 ->printable(false)

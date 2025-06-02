@@ -64,21 +64,26 @@
                                 <div class="modal-body">
                                     @if($_GET['key'] == "MembershipUser")
                                         @csrf
+                                         @if (auth('admin')->user()->branch_id == null)
+                                            <label>Branches:</label>
+                                             <select name="branch_id[]" class="selectpicker form-control" style="margin-bottom: 15px;" title="Select Branch" id="branchMembershipUser" multiple>
+                                                @foreach ($branches as $branch)
+                                                    <option value="{{ $branch['id'] }}">{{ $branch['name'] }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        @endif
+
                                         <label>Membership User:</label>
                                         <div class="d-flex">
                                             <select name="membership_user" class="form-control selectpicker" data-live-search="true">
-                                                <option value="">-- Select Membership User --</option>
-                                                @foreach ($membershipUsers as $user)
-                                                    <option value="{{ $user->user->id }}">{{ $user->user->name }}</option>
-                                                @endforeach
                                             </select>
                                         </div>
                                     @else
                                         @csrf
                                         @if (auth('admin')->user()->branch_id == null)
                                             <label>Branches:</label>
-                                            <select name="branch_id[]" class="selectpicker form-control"
-                                                data-live-search="true" style="margin-bottom: 15px;" multiple data-live-search="true" title="Choose options" multiple>
+                                            <select name="branch_id[]" class="selectpicker form-control" style="margin-bottom: 15px;" data-live-search="true" title="Select Branch" multiple>
                                                 @foreach ($branches as $branch)
                                                     <option value="{{ $branch['id'] }}">{{ $branch['name'] }}
                                                     </option>
@@ -151,6 +156,35 @@
     $('.modal').modal('show');
     });
     </script>
+    <script>
+        $(document).on('change', '#branchMembershipUser', function() {
+            var baseUrl = "{{ URL::to('/') }}";
+            var selectedBranches = $('#branchMembershipUser').val();
+            console.log(selectedBranches, '--selectedBranches---');
+            $.ajax({
+                url: baseUrl + '/get-membership-users-by-branch',
+                type: 'GET',
+                data: {
+                    branches: selectedBranches
+                },
+                success: function(response) {
+                    if(response && response.data) {
+                        let $dropdown = $('select[name="membership_user"]');
+                        $dropdown.selectpicker('destroy');
+                        $dropdown.empty();
+                        $dropdown.append('<option value="">-- Select Membership User --</option>');
+                        response.data.forEach(function(user) {
+                            $dropdown.append(`<option value="${user.user.id}">${user.user.name}</option>`);
+                        });
+                        $dropdown.selectpicker();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log(error);
+                }
+            });
+        });
+    </script>
 
 
     <script>
@@ -164,6 +198,7 @@
         });
         $(document).ready(function() {
             $('.selectpicker').selectpicker();
+            $('select[name="membership_user"]').selectpicker();
         });
     </script>
 </body>

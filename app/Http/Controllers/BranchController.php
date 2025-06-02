@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\MembershipBuy;
 use App\Models\Branch;
 use App\Models\Admin;
 use Illuminate\Http\Request;
@@ -107,5 +108,21 @@ class BranchController extends Controller
             return response()->json(['success' => $e->getMessage()], 500);
         }
     }
+
+    public function getMembershipUserByBranch(Request $request)
+    {
+        try {
+            $branches = $request->branches;
+            $membershipUsers = MembershipBuy::with('user');
+            if ($branches) {
+                $membershipUsers->whereIn('branch_id', $branches);
+            }
+            $membershipUsers = $membershipUsers->latest()->get();
+            return response()->json(['status' => true, 'data' => $membershipUsers ]);
+        } catch (Exception $e) {
+            return response()->json(['success' => $e->getMessage()], 500);
+        }
+    }
+
 
 }

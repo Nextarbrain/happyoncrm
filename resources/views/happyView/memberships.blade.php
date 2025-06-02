@@ -253,6 +253,7 @@
                                                     <th>Payment Method</th>
                                                     <th>Kids</th>
                                                     <th>Status</th>
+                                                    <th>Branch</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -296,6 +297,7 @@
                                                             <i class="fa fa-eye" aria-hidden="true"></i>
                                                         </td>
                                                         <td class="status">SMS Sent</td>
+                                                        <td>{{ optional($membershipUser['branch'])->name ?? '' }}</td>
                                                         <td><a href="#"><i class="fa fa-whatsapp"
                                                                     aria-hidden="true"></i></a>
                                                             <a target="_blank" class="btn btn-sm btn-primary"

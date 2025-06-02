@@ -101,9 +101,9 @@ class MembershipController extends Controller
         hasPermission('membership-history');
         $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $membershipUser = MembershipHistory::with('user', 'kid', 'userDetails', 'membershipBuy')->where('user_id', $request->id);
-        // if ($branchId) {
-        //     $membershipUser->where('branch_id', $branchId);
-        // }
+        if ($branchId) {
+            $membershipUser->where('branch_id', $branchId);
+        }
         $membershipUser = $membershipUser->latest()->get();
         return view('happyView.membership-history-view', compact('membershipUser'));
     }
@@ -113,10 +113,10 @@ class MembershipController extends Controller
         hasPermission('membership');
         $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $membership = MembershipPlan::get();
-        $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo');
-        // if ($branchId) {
-        //     $membershipUsers->where('branch_id', $branchId);
-        // }
+        $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo', 'branch');
+        if ($branchId) {
+            $membershipUsers->where('branch_id', $branchId);
+        }
         $membershipUsers = $membershipUsers->latest()->get();
         return view('happyView.memberships', compact('membership', 'membershipUsers'));
     }
@@ -125,10 +125,10 @@ class MembershipController extends Controller
     {
         hasPermission('membership-history');
         $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
-        $membershipUsers = MembershipHistory::with('user', 'kid', 'userDetails', 'membershipBuy');
-        // if ($branchId) {
-        //     $membershipUsers->where('branch_id', $branchId);
-        // }
+        $membershipUsers = MembershipHistory::with('user', 'kid', 'userDetails', 'membershipBuy', 'branch');
+        if ($branchId) {
+            $membershipUsers->where('branch_id', $branchId);
+        }
         $membershipUsers = $membershipUsers->latest()->get();
 
         return view('happyView.membership-history', compact('membershipUsers'));
@@ -703,11 +703,11 @@ class MembershipController extends Controller
     public function membershipBookingUser(Request $request)
     {
         hasPermission('report-membership-user');
-        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
-        $membershipUsers = MembershipHistory::with('user', 'kid', 'userDetails', 'membershipBuy')->where('user_id', $request->membership_user);
-        // if ($branchId) {
-        //     $membershipUsers->where('branch_id', $branchId);
-        // }
+        $branchId = !empty($request->branch_id) && count($request->branch_id) > 0 ? $request->branch_id : (auth('admin')->user()->branch_id ? [strval(auth('admin')->user()->branch_id)]: null);
+        $membershipUsers = MembershipHistory::with('user', 'kid', 'userDetails', 'membershipBuy', 'branch')->where('user_id', $request->membership_user);
+        if ($branchId) {
+            $membershipUsers->whereIn('branch_id', $branchId);
+        }
         $membershipUsers = $membershipUsers->latest()->get();
         return view('happyView.membership-booking-user', compact('membershipUsers'));
     }

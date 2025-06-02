@@ -170,12 +170,15 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::get('/delete/{id}/{model}', [TrashController::class, 'delete'])->name('delete');
 
     //BRANCH ROUTES
+    Route::get('/get-membership-users-by-branch', [BranchController::class, 'getMembershipUserByBranch']);
     Route::get('/create-branch', [BranchController::class, 'branchView'])->name('branchView');
     Route::get('/edit-branch/{id}', [BranchController::class, 'editBranchView'])->name('editBranchView');
     Route::post('/edit-branch-post', [BranchController::class, 'editBranchPost'])->name('editBranchPost');
     Route::get('/branch', [BranchController::class, 'branch'])->name('branch');
     Route::post('/add-branch', [BranchController::class, 'addBranch'])->name('addBranch');
     Route::delete('/delete-branch', [BranchController::class, 'deleteBranch'])->name('deleteBranch');
+
+
 
 
 });
