@@ -985,6 +985,10 @@
                         document.getElementById('gstValue').innerHTML =
                             '' + gstKid.toFixed(2);
                         var finalAmount = sum + gstKid;
+                        if(!isNaN(finalSocksPrice)) {
+                            var gstSocks = (socks_price * 5) / 100;
+                            finalAmount+=gstSocks;
+                        }
                         document.getElementById('totalAmount')
                             .innerHTML = '₹ ' + finalAmount.toFixed(2);
                         $("#chargeAmount").val(finalAmount.toFixed(2));
