@@ -537,7 +537,8 @@ class AdminController extends Controller
             $member = User::with('membership', 'userDetails')
                 ->where('role', 2)
                 ->whereHas('membership', function ($query) {
-                    $query->where('credit_left', '>', 0)->where('credit_left', '<', 5);
+                    $query->where('credit_left', '>', 0)->where('credit_left', '<', 5)->whereBetween('date', [
+                  Carbon\Carbon::now()->subDays(360), Carbon\Carbon::now() ]);
                 });
 
             if ($branchId) {
@@ -825,12 +826,12 @@ class AdminController extends Controller
             $gst18 += $event_gst18 + $open_gst18;
             $gst12 += $event_gst12 + $open_gst12;
             $gst5 += $open_gst5;
-
             $member = User::with('membership', 'userDetails')
                 ->where('role', 2)
                 ->whereHas('membership', function ($query) {
-                    $query->where('credit_left', '>', 0)->where('credit_left', '<', 5);
-                });
+                    $query->where('credit_left', '>', 0)->where('credit_left', '<', 5)->whereBetween('date', [
+                  Carbon\Carbon::now()->subDays(360), Carbon\Carbon::now() ]);
+            });
             if ($branchId) {
                 $member->where('branch_id', $branchId);
             }
