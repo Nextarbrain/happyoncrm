@@ -704,7 +704,10 @@ class MembershipController extends Controller
     {
         hasPermission('report-membership-user');
         $branchId = !empty($request->branch_id) && count($request->branch_id) > 0 ? $request->branch_id : (auth('admin')->user()->branch_id ? [strval(auth('admin')->user()->branch_id)]: null);
-        $membershipUsers = MembershipHistory::with('user', 'kid', 'userDetails', 'membershipBuy', 'branch')->where('user_id', $request->membership_user);
+        $membershipUsers = MembershipHistory::with('user', 'kid', 'userDetails', 'membershipBuy', 'branch');
+        if($request->membership_user) {
+          $membershipUsers->where('user_id', $request->membership_user);
+        }
         if ($branchId) {
             $membershipUsers->whereIn('branch_id', $branchId);
         }

@@ -1441,13 +1441,13 @@ class AdminController extends Controller
     {
         $branchId = auth('admin')->user()->branch_id ?? null;
         if (can('reports-event') || can('reports-openbilling')) {
-            // $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo');
-            // if ($branchId) {
-            //     $membershipUsers->where('branch_id', $branchId);
-            // }
-            // $membershipUsers = $membershipUsers->latest()->get();
+            $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo');
+            if ($branchId) {
+                $membershipUsers->where('branch_id', $branchId);
+            }
+            $membershipUsers = $membershipUsers->latest()->get();
             $branches = Branch::where('status', 'Active')->get()->toArray();
-            return view('happyView.reports', ['key' => $request->key, 'membershipUsers' => [], 'branches' => $branches]);
+            return view('happyView.reports', ['key' => $request->key, 'membershipUsers' => $membershipUsers, 'branches' => $branches]);
         } else {
             abort(401);
         }

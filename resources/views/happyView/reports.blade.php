@@ -73,12 +73,17 @@
                                                 @endforeach
                                             </select>
                                         @endif
-
+                                     @if (auth('admin')->user()->branch_id != null)
                                         <label>Membership User:</label>
                                         <div class="d-flex">
                                             <select name="membership_user" class="form-control selectpicker" data-live-search="true">
+                                                <option value="">-- Select Membership User --</option>
+                                                @foreach ($membershipUsers as $user)
+                                                    <option value="{{ $user->user->id }}">{{ $user->user->name }}</option>
+                                                @endforeach
                                             </select>
                                         </div>
+                                    @endif
                                     @else
                                         @csrf
                                         @if (auth('admin')->user()->branch_id == null)
