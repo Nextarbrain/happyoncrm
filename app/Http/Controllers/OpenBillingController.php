@@ -27,13 +27,13 @@ class OpenBillingController extends Controller
     public function openBillingReport(Request $request)
     {
         if (isset($request->daterange) && $request->daterange != "") {
-            $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+            $branchId = !empty($request->branch_id) && count($request->branch_id) > 0 ? $request->branch_id : (auth('admin')->user()->branch_id ? [strval(auth('admin')->user()->branch_id)]: null);
             $daterange = explode("-", $request->daterange);
             $daterange[0] = date('y-m-d', strtotime($daterange[0]));
             $daterange[1] = date('y-m-d', strtotime($daterange[1]));
-            $open_billings = OpenBilling::whereBetween('created_at', [$daterange[0], $daterange[1]]);
+            $open_billings = OpenBilling::with('branch')->whereBetween('created_at', [$daterange[0], $daterange[1]]);
             if ($branchId) {
-                $open_billings->where('branch_id', $branchId);
+                $open_billings->whereIn('branch_id', $branchId);
             }
             $open_billings = $open_billings->get();
             return view('happyView.openBilling.open-billing-report', compact('open_billings'));

@@ -73,6 +73,7 @@
 
 													<th>Total</th>
 													<th>Payment Method</th>
+													<th>Branch</th>
 												</tr>
 											</thead>
 											<tbody>
@@ -91,22 +92,23 @@
 													<td>{{isset($user_booking['event']->booking_date) ? date("d M, Y",strtotime($user_booking['event']->booking_date)) : '';}}</td>
 													<td>TKT{{$user_booking->id}}</td>
 													<td style="text-transform: capitalize;">{{$user_booking->name}}</td>
-													<td>{{$user_booking['paymentInfo']->subTotal}}</td>
+													<td>{{$user_booking['paymentInfo'] != null && $user_booking['paymentInfo']->subTotal ? $user_booking['paymentInfo']->subTotal : 0}}</td>
 
-													<td>{{number_format($user_booking['paymentInfo']->gst18 / 2, 2)}}</td>
-													<td>{{number_format($user_booking['paymentInfo']->gst18 / 2, 2)}}</td>
-													<td>{{number_format($user_booking['paymentInfo']->gst5 / 2, 2)}}</td>
-													<td>{{number_format($user_booking['paymentInfo']->gst5 / 2, 2)}}</td>
+                                                    <td>{{ isset($user_booking['paymentInfo']) && $user_booking['paymentInfo']->gst18 ? number_format($user_booking['paymentInfo']->gst18 / 2, 2) : '0.00' }}</td>
+                                                    <td>{{ isset($user_booking['paymentInfo']) && $user_booking['paymentInfo']->gst18 ? number_format($user_booking['paymentInfo']->gst18 / 2, 2) : '0.00' }}</td>
+                                                    <td>{{ isset($user_booking['paymentInfo']) && $user_booking['paymentInfo']->gst18 ? number_format($user_booking['paymentInfo']->gst5 / 2, 2) : '0.00' }}</td>
+                                                    <td>{{ isset($user_booking['paymentInfo']) && $user_booking['paymentInfo']->gst18 ? number_format($user_booking['paymentInfo']->gst5 / 2, 2) : '0.00' }}</td>
 
-													<td>{{number_format($user_booking['paymentInfo']->amounts, 2)}}</td>
-													<td>{{$user_booking['paymentInfo']->payment_method}}</td>
+													<td>{{ isset($user_booking['paymentInfo']) && isset($user_bookin ['paymentInfo']->amounts) ? number_format($user_booking['paymentInfo']->amounts, 2) : '0.00' }}</td>
+													<td>{{$user_booking['paymentInfo'] != null && $user_booking['paymentInfo']->payment_method ? $user_booking['paymentInfo']->payment_method : 0}}</td>
+                                                    <td>{{ isset($user_booking['branch']) && $user_booking['branch'] ? $user_booking['branch']->name : '' }}</td>
 												</tr>
 												@php
-													$subtotal += $user_booking['paymentInfo']->subTotal;
-													$gst18 += $user_booking['paymentInfo']->gst18;
-													$gst12 += $user_booking['paymentInfo']->gst12;
-													$gst5 += $user_booking['paymentInfo']->gst5;
-													$total += $user_booking['paymentInfo']->amounts;
+													$subtotal += isset($user_booking['paymentInfo']) && $user_booking['paymentInfo']->subTotal ? $user_booking['paymentInfo']->subTotal : 0;
+													$gst18 += isset($user_booking['paymentInfo']) && $user_booking['paymentInfo']->gst18 ? $user_booking['paymentInfo']->gst18 : 0;
+													$gst12 += isset($user_booking['paymentInfo']) &&  $user_booking['paymentInfo']->gst12 ? $user_booking['paymentInfo']->gst12 : 0;
+													$gst5 += isset($user_booking['paymentInfo']) && $user_booking['paymentInfo']->gst5 ? $user_booking['paymentInfo']->gst5 : 0;
+													$total += isset($user_booking['paymentInfo']) &&  $user_booking['paymentInfo']->amounts  ?  $user_booking['paymentInfo']->amounts : 0;
 
 												@endphp
 
@@ -125,6 +127,7 @@
 														<td>{{number_format($gst5 / 2, 2)}}</td>
 														<td>{{number_format($gst5 / 2, 2)}}</td>
 														<td>{{number_format($total, 2)}}</td>
+														<td></td>
 														<td></td>
 												</tr>
 											</tbody>

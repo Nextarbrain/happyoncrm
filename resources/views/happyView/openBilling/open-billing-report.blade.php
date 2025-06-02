@@ -68,10 +68,11 @@
 
 													<th>18% GST</th>
 													<th>12% GST</th>
-                          <th>5% GST</th>
+                                                    <th>5% GST</th>
 
 													<th>Total</th>
 													<th>Payment Method</th>
+                                                    <th>Branch</th>
 												</tr>
 											</thead>
 											<tbody>
@@ -88,24 +89,25 @@
 												<tr>
 													<td>{{++$key}}</td>
 													<td>{{date("d M, Y",strtotime($open_billing->created_at))}}</td>
-                            <td>OB{{$open_billing->id}}</td>
-                            <td style="text-transform: capitalize;">{{$open_billing->bill_name}}</td>
-                            <td>{{$open_billing->subtotal}}</td>
+                                                    <td>OB{{$open_billing->id}}</td>
+                                                    <td style="text-transform: capitalize;">{{$open_billing->bill_name}}</td>
+                                                    <td>{{$open_billing->subtotal}}</td>
 
-                            <td>{{$open_billing->gst18}}</td>
-                            <td>{{$open_billing->gst12}}</td>
-                            <td>{{$open_billing->gst5}}</td>
-                            <td>{{$open_billing->totalamount}}</td>
-							<td>{{$open_billing->payment_method}}</td>
-                          </tr>
-                          @php
-                          $subtotal += $open_billing->subtotal;
-                          $gst18 += $open_billing->gst18;
-                          $gst12 += $open_billing->gst12;
-                          $gst5 += $open_billing->gst5;
-                          $total += $open_billing->totalamount;
+                                                    <td>{{$open_billing->gst18}}</td>
+                                                    <td>{{$open_billing->gst12}}</td>
+                                                    <td>{{$open_billing->gst5}}</td>
+                                                    <td>{{$open_billing->totalamount}}</td>
+                                                    <td>{{$open_billing->payment_method}}</td>
+                                                    <td>{{optional($open_billing['branch'])->name ?? ''}}</td>
+                                                </tr>
+                                                @php
+                                                $subtotal += $open_billing->subtotal;
+                                                $gst18 += $open_billing->gst18;
+                                                $gst12 += $open_billing->gst12;
+                                                $gst5 += $open_billing->gst5;
+                                                $total += $open_billing->totalamount;
 
-                          @endphp
+                                                @endphp
 
 												@endforeach
 												<tr>
@@ -117,8 +119,9 @@
 														<td>{{$subtotal}}</td>
 														<td>{{$gst18}}</td>
 														<td>{{$gst12}}</td>
-                            <td>{{$gst5}}</td>
+                                                        <td>{{$gst5}}</td>
 														<td>{{$total}}</td>
+														<td></td>
 														<td></td>
 
 												</tr>

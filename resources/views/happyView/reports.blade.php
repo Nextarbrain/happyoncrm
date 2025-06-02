@@ -61,34 +61,41 @@
                             @else
 							<form action="{{url('/open-billing-report')}}" method="post">
 							@endif
-                            @if($_GET['key'] == "MembershipUser")
-                            <div class="modal-body">
-                                @csrf
-                                <label>Membership User:</label>
-                                <div class="d-flex">
-                                    <select name="membership_user" class="form-control selectpicker" data-live-search="true">
-                                        <option value="">-- Select Membership User --</option>
-                                        @foreach ($membershipUsers as $user)
-                                            <option value="{{ $user->user->id }}">{{ $user->user->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            @else
-                            <div class="modal-body">
-                                @csrf
-                                <label>Analysis date wise:</label>
-                                <div class="d-flex">
-                                    <input type="text" name="daterange" class="form-control float-right"
-                                        id="reservation">
+                                <div class="modal-body">
+                                    @if($_GET['key'] == "MembershipUser")
+                                        @csrf
+                                        <label>Membership User:</label>
+                                        <div class="d-flex">
+                                            <select name="membership_user" class="form-control selectpicker" data-live-search="true">
+                                                <option value="">-- Select Membership User --</option>
+                                                @foreach ($membershipUsers as $user)
+                                                    <option value="{{ $user->user->id }}">{{ $user->user->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    @else
+                                        @csrf
+                                        @if (auth('admin')->user()->branch_id == null)
+                                            <label>Branches:</label>
+                                            <select name="branch_id[]" class="selectpicker form-control"
+                                                data-live-search="true" style="margin-bottom: 15px;" multiple data-live-search="true" title="Choose options" multiple>
+                                                @foreach ($branches as $branch)
+                                                    <option value="{{ $branch['id'] }}">{{ $branch['name'] }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        @endif
+                                        <label>Analysis date wise:</label>
+                                        <div class="d-flex">
+                                            <input type="text" name="daterange" class="form-control float-right"
+                                                id="reservation">
 
+                                        </div>
+                                        @endif
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary" name="submit">Apply</button>
                                 </div>
-                            </div>
-                            @endif
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary" name="submit">Apply</button>
                             </div>
                             </form>
                             </div>

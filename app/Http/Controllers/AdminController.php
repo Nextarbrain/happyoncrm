@@ -831,7 +831,6 @@ class AdminController extends Controller
                 ->whereHas('membership', function ($query) {
                     $query->where('credit_left', '>', 0)->where('credit_left', '<', 5);
                 });
-
             if ($branchId) {
                 $member->where('branch_id', $branchId);
             }
@@ -1447,7 +1446,8 @@ class AdminController extends Controller
                 $membershipUsers->where('branch_id', $branchId);
             }
             $membershipUsers = $membershipUsers->latest()->get();
-            return view('happyView.reports', ['key' => $request->key, 'membershipUsers' => $membershipUsers]);
+            $branches = Branch::where('status', 'Active')->get()->toArray();
+            return view('happyView.reports', ['key' => $request->key, 'membershipUsers' => $membershipUsers, 'branches' => $branches]);
         } else {
             abort(401);
         }

@@ -833,15 +833,15 @@ class TicketController extends Controller
     public function ticketsBookingReport(Request $request)
     {
         hasPermission('reports-ticket');
-        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        $branchId = !empty($request->branch_id) && count($request->branch_id) > 0 ? $request->branch_id : (auth('admin')->user()->branch_id ? [strval(auth('admin')->user()->branch_id)]: null);
         if (isset($request->daterange) && $request->daterange != "") {
             $daterange = explode("-", $request->daterange);
             $daterange[0] = date('y-m-d', strtotime($daterange[0]));
             $daterange[1] = date('y-m-d', strtotime($daterange[1]));
 
-            $user_bookings = User::with('membership', 'kid', 'userDetails', 'event', 'paymentInfo')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59'])->where('role', '!=', 0);
+            $user_bookings = User::with('membership', 'kid', 'userDetails', 'event', 'paymentInfo', 'branch')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59'])->where('role', '!=', 0);
             if ($branchId) {
-                $user_bookings->where('branch_id', $branchId);
+                $user_bookings->whereIn('branch_id', $branchId);
             }
             $user_bookings = $user_bookings->get();
 

@@ -105,7 +105,7 @@
                                                     <div class="modal-content">
                                                         <div class="modal-body">
                                                             <div class="h_btn">
-                                                                <button type="button" class="btn">Add New
+                                                                <button type="button" class="btn" style="pointer-events: none;">Add New
                                                                     Membership</button>
                                                             </div>
 
@@ -224,9 +224,9 @@
                                                                         <p>By Agreeing to the <b>Terms and Condition</b>
                                                                             of HappyOn</p>
                                                                     </div>
-                                                                    <div class="s_btn">
-                                                                        <button type="submit" class="btn">Create
-                                                                            Member and Add Credit</button>
+                                                                    <div class="s_btn d-flex gap-2 my-3">
+                                                                        <button type="submit" class="btn">Create Member and Add Credit</button>
+                                                                        <a href="javascript:void(0);" class="btn btn-secondary" style="padding-top: 12px;font-size: 18px;" onclick="handleCancel()" >Cancel</a>
                                                                     </div>
 
                                                                 </div>
@@ -393,6 +393,14 @@
             }
         }
 
+        function handleCancel () {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('Addnew'));
+            modal.hide();
+            setTimeout(() => {
+                location.reload();
+            }, 300);
+        }
+
         $(document).ready(function() {
             $('#membershipPlan').change(function() {
                 getMembershipPlan();
@@ -421,6 +429,7 @@
                     coupon: couponcode
                 },
                 success: function(response) {
+                    console.log("response => ", response);
 
                     if(response && response.price) {
                         $('#plan_value').val(response.price);

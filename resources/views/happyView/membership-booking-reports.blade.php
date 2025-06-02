@@ -70,6 +70,7 @@
 
 													<th>Total</th>
 													<th>Payment Method</th>
+                                                    <th>Branch</th>
 												</tr>
 											</thead>
 											<tbody>
@@ -85,22 +86,22 @@
 												<tr>
 													<td>{{++$key}}</td>
 													<td>{{date("d M, Y",strtotime($membershipUser->date))}}</td>
-                          <td>MS{{$membershipUser->id}}</td>
-                          <td style="text-transform: capitalize;">{{$membershipUser['user']->name}}</td>
-                          <td>{{$membershipUser['paymentInfo']->subTotal}}</td>
+                                                    <td>MS{{$membershipUser->id}}</td>
+                                                    <td style="text-transform: capitalize;">{{$membershipUser['user']->name}}</td>
+                                                    <td>{{isset($membershipUser['paymentInfo']) && $membershipUser['paymentInfo']->subTotal ? $membershipUser['paymentInfo']->subTotal : 0}}</td>
 
-                          <td>{{$membershipUser['paymentInfo']->gst18}}</td>
+                                                    <td>{{isset($membershipUser['paymentInfo']) && $membershipUser['paymentInfo']->gst18 ? $membershipUser['paymentInfo']->gst18 : 0}}</td>
 
-                          <td>{{$membershipUser->amount}}</td>
-						  <td>{{$membershipUser->payment_method}}</td>
-												</tr>
-												@php
-                          $subtotal += $membershipUser['paymentInfo']->subTotal;
-                          $gst18 += $membershipUser['paymentInfo']->gst18;
+                                                    <td>{{$membershipUser->amount}}</td>
+                                                    <td>{{$membershipUser->payment_method}}</td>
+                                                    <td>{{optional($membershipUser['branch'])->name ?? ''}}</td>
+                                                </tr>
+                                                    @php
+                                                    $subtotal += optional($membershipUser['paymentInfo'])->subTotal ?? 0;
+                                                    $gst18 += optional($membershipUser['paymentInfo'])->gst18 ?? 0;
+                                                    $total += $membershipUser->amount;
 
-                          $total += $membershipUser->amount;
-
-                          @endphp
+                                                    @endphp
 
 
 												@endforeach
@@ -114,6 +115,7 @@
 														<td>{{$gst18}}</td>
 
 														<td>{{$total}}</td>
+														<td></td>
 														<td></td>
 
 												</tr>

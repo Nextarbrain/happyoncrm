@@ -31,7 +31,7 @@
                 <div class="menu-title">Dashboard</div>
             </a>
         </li>
-        @if (auth('admin')->user()->branch_id != null && auth('admin')->user()->isSuperAdmin == 1 && auth('admin')->user()->branch->type == 'Branch')
+        @if (auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
             <li>
                 <a href="{{ url('/branch') }}"
                     class="{{ in_array(Route::currentRouteName(), ['branch', 'create-branch']) ? 'active' : '' }}">

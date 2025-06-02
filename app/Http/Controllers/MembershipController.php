@@ -31,26 +31,25 @@ class MembershipController extends Controller
     {
 
         hasPermission('reports-membership');
-        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        $branchId = !empty($request->branch_id) && count($request->branch_id) > 0 ? $request->branch_id : (auth('admin')->user()->branch_id ? [strval(auth('admin')->user()->branch_id)]: null);
         if (isset($request->daterange) && $request->daterange != "") {
             $daterange = explode("-", $request->daterange);
             $daterange[0] = date('y-m-d', strtotime($daterange[0]));
             $daterange[1] = date('y-m-d', strtotime($daterange[1]));
 
             if ($daterange[0] == $daterange[1]) {
-                $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo')->whereDate('created_at', $daterange[0]);
+                $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo','branch')->whereDate('created_at', $daterange[0]);
                 if ($branchId) {
-                    $membershipUsers->where('branch_id', $branchId);
+                    $membershipUsers->whereIn('branch_id', $branchId);
                 }
                 $membershipUsers = $membershipUsers->get();
             } else {
-                $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo')->whereBetween('created_at', [$daterange[0], $daterange[1]]);
+                $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo','branch')->whereBetween('created_at', [$daterange[0], $daterange[1]]);
                 if ($branchId) {
-                    $membershipUsers->where('branch_id', $branchId);
+                    $membershipUsers->whereIn('branch_id', $branchId);
                 }
                 $membershipUsers = $membershipUsers->get();
             }
-
             return view('happyView.membership-booking-reports', compact('membershipUsers'));
         }
     }
@@ -154,9 +153,11 @@ class MembershipController extends Controller
             $coupon = $coupon->first();
         }
         if (isset($coupon) && !is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
-            $data->price = $price - $coupon->discount;
+            $finalCoupanPrice = $price - $coupon->discount;
+            $data->price = $finalCoupanPrice;
         } elseif (isset($coupon) && !is_null($coupon) && $coupon->discount_type === 'percent') {
-            $data->price = ($coupon->discount / 100) * $price;
+            $finalCoupanPrice = ($coupon->discount / 100) * $price;
+            $data->price = $finalCoupanPrice;
         }
         return response()->json($data);
     }

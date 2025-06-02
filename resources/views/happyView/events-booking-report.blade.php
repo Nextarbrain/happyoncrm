@@ -73,6 +73,7 @@
 													<th>Total</th>
 													<th>Payment Method</th>
 													<th>Status</th>
+                                                    <th>Branch</th>
 												</tr>
 											</thead>
 											<tbody>
@@ -89,25 +90,26 @@
 												<tr>
 													<td>{{++$key}}</td>
 													<td>{{date("d M, Y",strtotime($event_booking->booking_date))}}</td>
-                          <td>EVT{{$event_booking->id}}</td>
-                          <td style="text-transform: capitalize;">{{$event_booking->bill_name}}</td>
-                          <td>{{$event_booking->subtotal}}</td>
+                                                    <td>EVT{{$event_booking->id}}</td>
+                                                    <td style="text-transform: capitalize;">{{$event_booking->bill_name}}</td>
+                                                    <td>{{$event_booking->subtotal}}</td>
 
-                          <td>{{$event_booking->gst18}}</td>
-                          <td>{{$event_booking->gst12}}</td>
-                          <td>{{$event_booking->gst5}}</td>
-                          <td>{{$event_booking->totalamount}}</td>
-						  <td>{{$event_booking->payment_method}}</td>
-						  <td>{{$event_booking->payment_status}}</td>
-                        </tr>
-                        @php
-                        $subtotal += $event_booking->subtotal;
-                        $gst18 += $event_booking->gst18;
-                        $gst12 += $event_booking->gst12;
-                        $gst5 += $event_booking->gst5;
-                        $total += $event_booking->totalamount;
+                                                    <td>{{$event_booking->gst18}}</td>
+                                                    <td>{{$event_booking->gst12}}</td>
+                                                    <td>{{$event_booking->gst5}}</td>
+                                                    <td>{{$event_booking->totalamount}}</td>
+                                                    <td>{{$event_booking->payment_method}}</td>
+                                                    <td>{{$event_booking->payment_status}}</td>
+                                                    <td>{{optional($event_booking['branch'])->name ?? ''}}</td>
+                                                    </tr>
+                                                    @php
+                                                    $subtotal += $event_booking->subtotal;
+                                                    $gst18 += $event_booking->gst18;
+                                                    $gst12 += $event_booking->gst12;
+                                                    $gst5 += $event_booking->gst5;
+                                                    $total += $event_booking->totalamount;
 
-                        @endphp
+                                                    @endphp
 
 
 												@endforeach
