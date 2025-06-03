@@ -1456,7 +1456,7 @@ class AdminController extends Controller
 
     public function getCoupon(Request $request)
     {
-        $branchId = auth('admin')->user()->branch_id ?? null;
+        $branchId = (int)$request->get('branch') ? (int)$request->get('branch') : auth('admin')->user()->branch_id;
         $todayDate = \Carbon\Carbon::now('Asia/Kolkata')->format('Y-m-d');
         $coupon = Coupon::where('coupon_name', $request->input('option'));
         if ($branchId) {

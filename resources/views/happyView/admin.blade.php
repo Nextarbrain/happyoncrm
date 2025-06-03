@@ -68,11 +68,13 @@
                                                         <div id="paid" class="container tab-pane active show"
                                                             role="tabpanel"><br>
                                                             <div class="data_table admin_table table-responsive">
-                                                                @if (can('admin-hours-edit'))
-                                                                    <div class="count" id="day_price_edit"
-                                                                        style="text-align: right">
-                                                                        <i class="fa fa-pencil" aria-hidden="true"></i>
-                                                                    </div>
+                                                                @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                                    @if (can('admin-hours-edit'))
+                                                                        <div class="count" id="day_price_edit"
+                                                                            style="text-align: right">
+                                                                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                                                                        </div>
+                                                                    @endif
                                                                 @endif
                                                                 <div class="modal fade" id="editDayPriceModal"
                                                                     tabindex="-1" role="dialog"
@@ -279,10 +281,12 @@
                                         <div class="data_table admin_table table-responsive">
                                             <div class="table_header">
                                                 <div class="a_add_btn">
+                                                @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
                                                     @if(can('admin-membership-add'))
                                                     <button type="button" class="btn" data-toggle="modal"
                                                         data-target="#membershipModal">Add Membership Plan +</button>
                                                     @endif
+                                                @endif
                                                     <!-- Modal -->
                                                     <div class="modal fade" id="membershipModal" tabindex="-1"
                                                         role="dialog" aria-labelledby="membershipModalLabel"
@@ -327,15 +331,19 @@
                                                     </div>
 
                                                 </div>
-                                                @if(can('admin-membership-delete'))
-                                                <div class="count" id="membership_div">
-                                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
-                                                </div>
+                                                 @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                    @if(can('admin-membership-delete'))
+                                                    <div class="count" id="membership_div">
+                                                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                                    </div>
+                                                    @endif
                                                 @endif
-                                                @if(can('admin-membership-edit'))
-                                                <div class="count" id="membership_edit">
-                                                    <i class="fa fa-pencil" aria-hidden="true"></i>
-                                                </div>
+                                                 @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                    @if(can('admin-membership-edit'))
+                                                    <div class="count" id="membership_edit">
+                                                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                                                    </div>
+                                                    @endif
                                                 @endif
                                                 <div class="modal fade" id="editMemberModal" tabindex="-1"
                                                     role="dialog" aria-labelledby="editMemberModalLabel"

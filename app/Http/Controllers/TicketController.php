@@ -27,10 +27,13 @@ use Illuminate\Support\Facades\Hash;
 
 class TicketController extends Controller
 {
-    public function ticketsView()
+    public function ticketsView(Request $request)
     {
-        $branchId = auth('admin')->user()->branch_id ?? null;
         $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
+        $branchId = $request->get('branch_id') ? (int) $request->get('branch_id') : auth('admin')->user()->branch_id;
+        if($branchId === null) {
+            $branchId = $branches[0]['id'];
+        }
         if (can('tickets') || can('tickets-add') || can('customers')) {
             $product = Product::select('product_name', 'product_price', 'product_tax');
             if ($branchId) {
@@ -43,7 +46,7 @@ class TicketController extends Controller
                 $data[$products->product_name] = $products->product_price;
             }
             $result[] = $data;
-            return view('happyView.tickets', compact('product', 'result', 'branches'));
+            return view('happyView.tickets', compact('product', 'result', 'branches', 'branchId'));
         } else {
 
             abort(401);
