@@ -10,6 +10,7 @@ use App\Models\Event;
 use App\Models\Product;
 use App\Models\DayPrice;
 use App\Models\UserDetail;
+use App\Models\Branch;
 use App\Models\UserProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -29,6 +30,7 @@ class TicketController extends Controller
     public function ticketsView()
     {
         $branchId = auth('admin')->user()->branch_id ?? null;
+        $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
         if (can('tickets') || can('tickets-add') || can('customers')) {
             $product = Product::select('product_name', 'product_price', 'product_tax');
             if ($branchId) {
@@ -41,7 +43,7 @@ class TicketController extends Controller
                 $data[$products->product_name] = $products->product_price;
             }
             $result[] = $data;
-            return view('happyView.tickets', compact('product', 'result'));
+            return view('happyView.tickets', compact('product', 'result', 'branches'));
         } else {
 
             abort(401);
@@ -99,9 +101,7 @@ class TicketController extends Controller
 
     public function addTickets(Request $request)
     {
-
-        // dd($request->tax, $request->price, $request->all());
-        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
         $userSave = new User();
         $userSave->name = ucfirst($request->input('name_of_kid'));
         $userSave->branch_id = $branchId;
@@ -418,6 +418,7 @@ class TicketController extends Controller
     public function ticketEdit(Request $request)
     {
         $branchId = auth('admin')->user()->branch_id ?? null;
+        $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
         if (can('tickets-edit')) {
             $id = $request->id;
             $user = User::with('membership', 'userDetails', 'event', 'paymentInfo')->where('id', $id)->first();
@@ -443,7 +444,7 @@ class TicketController extends Controller
             }
             $extraItems = $extraItems->first();
             $paymentMethod = PaymentMethod::where('user_id', $id)->first();
-            return view('happyView.tickets-edit', compact('user', 'kid', 'product', 'paymentMethod', 'extraItems', 'extraAdded', 'result', 'productData'));
+            return view('happyView.tickets-edit', compact('user', 'kid', 'product', 'paymentMethod', 'extraItems', 'extraAdded', 'result', 'productData', 'branches'));
         } else {
             abort(401);
         }
@@ -453,7 +454,8 @@ class TicketController extends Controller
     {
 
         hasPermission('tickets-edit');
-        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        // $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
         $id = $request->input('id');
         $user = User::where('id', $id)->first();
         $userDetail = UserDetail::where('user_id', $id)->first();

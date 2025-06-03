@@ -11,6 +11,7 @@ use App\Models\Admin;
 use App\Models\Coupon;
 use App\Models\Event;
 use App\Models\UserDetail;
+use App\Models\Branch;
 use Illuminate\Http\Request;
 use App\Models\MembershipBuy;
 use App\Models\PaymentMethod;
@@ -111,6 +112,7 @@ class MembershipController extends Controller
     public function membershipView()
     {
         hasPermission('membership');
+        $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
         $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $membership = MembershipPlan::get();
         $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo', 'branch');
@@ -118,7 +120,7 @@ class MembershipController extends Controller
             $membershipUsers->where('branch_id', $branchId);
         }
         $membershipUsers = $membershipUsers->latest()->get();
-        return view('happyView.memberships', compact('membership', 'membershipUsers'));
+        return view('happyView.memberships', compact('membership', 'membershipUsers', 'branches'));
     }
 
     public function membershipHistory()
@@ -167,7 +169,7 @@ class MembershipController extends Controller
         hasPermission('membership-add');
         $userdetail = UserDetail::where('phone_no', $request->input('phone'))->where('membership_plan', 1)->first();
         $getPlan = MembershipPlan::where('id', $request->input('membershipPlan'))->first();
-        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
 
         if (isset($userdetail)) {
 
@@ -553,7 +555,8 @@ class MembershipController extends Controller
     public function updateMembership(Request $request)
     {
         hasPermission('membership-edit');
-        $branchId = auth('admin')->user()->branch_id ?? null;
+        // $branchId = auth('admin')->user()->branch_id ?? null;
+        $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
         if ($request->input('response_otp') > 0) {
             $user = User::where('id', $request->input('user_id'))->where('otp', $request->input('response_otp'))->first();
 

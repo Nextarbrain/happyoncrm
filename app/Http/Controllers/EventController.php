@@ -22,6 +22,7 @@ use App\Models\MembershipBuy;
 use App\Models\PaymentMethod;
 use App\Models\DeleteActivity;
 use App\Models\MembershipPlan;
+use App\Models\Branch;
 
 //import model admin
 use App\Models\MembershipHistory;
@@ -97,18 +98,16 @@ class EventController extends Controller
 
     public function addEventView(Request $request)
     {
-
-        return view('happyView.events-add');
+        $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
+        return view('happyView.events-add', compact('branches'));
     }
 
     public function editEventView(Request $request)
     {
-
+        $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
         $eventbooking = EventBooking::where('id', $request->id)->first();
         $eventitems = EventItem::where('event_booking_id', $request->id)->get();
-
-
-        return view('happyView.events-edit', compact('eventbooking', 'eventitems'));
+        return view('happyView.events-edit', compact('eventbooking', 'eventitems', 'branches'));
     }
 
     public function invoiceEvent(Request $request)
@@ -123,8 +122,7 @@ class EventController extends Controller
 
     public function editEventPost(Request $request)
     {
-        // dd(count($request->event_item_ids));
-        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
         $id = $request->id;
         $eventbooking = EventBooking::where('id', $id)->first();
         $eventbooking->booking_date = $request->booking_date;
@@ -196,7 +194,8 @@ class EventController extends Controller
 
     public function addEventPost(Request $request)
     {
-        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        // $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
         $eventbooking = new EventBooking();
         $eventbooking->booking_date = $request->booking_date;
         $eventbooking->booking_time_from = $request->booking_time_from;

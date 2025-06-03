@@ -63,6 +63,21 @@
                                                         name="id">
 
                                                     <div class="row">
+                                                        @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                            <div class="col-md-12">
+                                                                <div class="mb-4 input_wrap">
+                                                                    <label>Branch <span>*</span></label>
+                                                                    <select name="branch_id" id="branchId"
+                                                                        class="form-select" disabled>
+                                                                        @foreach ($branches as $branch)
+                                                                            <option value="{{ $branch['id'] }}" {{ isset($eventbooking['branch_id']) && $eventbooking['branch_id'] === $branch['id'] ? "selected" : '' }}>{{ $branch['name'] }}</option>
+                                                                        @endforeach
+
+                                                                    </select>
+                                                                    <input type="hidden" name="branch_id" value="{{ $eventbooking['branch_id'] }}">
+                                                                </div>
+                                                            </div>
+                                                        @endif
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap dark">
                                                                 <label>Booking Date </label>
