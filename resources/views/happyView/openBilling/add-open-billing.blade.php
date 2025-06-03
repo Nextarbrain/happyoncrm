@@ -66,6 +66,18 @@
                                                     id="my-form">
                                                     @csrf
                                                     <div class="row">
+                                                        @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                        <div class="col-md-12 ">
+                                                            <div class="mb-4 input_wrap">
+                                                                <label>Branch<span>*</span></label>
+                                                                <select name="branch_id" class="form-select" required>
+                                                                    @foreach ($branches as $branch)
+                                                                        <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        @endif
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap dark">
                                                                 <label>Current Date</label>

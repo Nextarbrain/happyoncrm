@@ -10,6 +10,7 @@ use App\Models\DeleteActivity;
 use App\Models\EventItem;
 
 use App\Models\OpenBillingItem;
+use App\Models\Branch;
 
 
 use Illuminate\Http\Request;
@@ -55,8 +56,8 @@ class OpenBillingController extends Controller
 
     public function addOpenBillingView(Request $request)
     {
-
-        return view('happyView.openBilling.add-open-billing');
+        $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
+        return view('happyView.openBilling.add-open-billing', compact('branches'));
     }
 
     public function editOpenBillingView(Request $request)
@@ -64,9 +65,9 @@ class OpenBillingController extends Controller
 
         $open_billing = OpenBilling::where('id', $request->id)->first();
         $open_billing_items = OpenBillingItem::where('open_billing_id', $request->id)->get();
+        $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
 
-
-        return view('happyView..openBilling.edit-open-billing', compact('open_billing', 'open_billing_items'));
+        return view('happyView..openBilling.edit-open-billing', compact('open_billing', 'open_billing_items','branches'));
     }
 
     public function invoiceOpenBilling(Request $request)
@@ -88,7 +89,7 @@ class OpenBillingController extends Controller
          $request->validate([
             'billing_name' => 'required',
         ]);
-        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
         $id = $request->id;
         $openbilling = OpenBilling::where('id', $id)->first();
 
@@ -152,7 +153,8 @@ class OpenBillingController extends Controller
          $request->validate([
             'billing_name' => 'required',
         ]);
-        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        // $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
         $openbilling = new OpenBilling();
 
 
