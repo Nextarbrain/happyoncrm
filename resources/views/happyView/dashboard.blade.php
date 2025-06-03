@@ -68,7 +68,7 @@
                                     <select name="branch_id" class="form-control" id="branch_id" onchange="document.getElementById('branchFilterForm').submit();">
                                         <option value="">-- All Branches --</option>
                                         @foreach ($branches as $branch)
-                                            <option value="{{ $branch['id'] }}" {{ $branchId == $branch['id'] ? 'selected' : '' }}>{{ $branch['name'] }}</option>
+                                            <option value="{{ $branch['id'] }}" {{ $branchId == $branch['id'] ? 'selected' : '' }}>{{ $branch['name'] - $branch['type'] }}</option>
                                         @endforeach
                                     </select>
                                 </div>
