@@ -117,7 +117,7 @@
                                                                     <div class="col-md-12 ">
                                                                         <div class="mb-4 input_wrap">
                                                                             <label>Branch<span>*</span></label>
-                                                                            <select name="branch_id" class="form-select" required>
+                                                                            <select name="branch_id" class="form-select" id="branchId" required>
                                                                                 @foreach ($branches as $branch)
                                                                                     <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
                                                                                 @endforeach
@@ -201,6 +201,7 @@
                                                                                     class="btn btn-primary"
                                                                                     id="apply-coupon">Apply</button>
                                                                             </div>
+                                                                            <p id="couponmsg"></p>
                                                                             <input type="hidden" id="plan_value">
                                                                         </div>
                                                                     </div>
@@ -428,6 +429,7 @@
 
         function getMembershipPlan() {
             var membershipId = $('#membershipPlan').val();
+            var branchId = $('#branchId').val();
             var couponcode = $('input[name="coupon_code"]').val();
             console.log(membershipId);
             var baseUrl = "{{ URL::to('/') }}";
@@ -439,11 +441,15 @@
                 type: 'POST',
                 data: {
                     id: membershipId,
-                    coupon: couponcode
+                    coupon: couponcode,
+                    branch_id: branchId
                 },
                 success: function(response) {
-                    console.log("response => ", response);
-
+                    if(response.status == false) {
+                        $('#couponmsg').html( "<p style='color:red;'>"+response.message+"</p>");
+                        return false;
+                    }
+                     $('#couponmsg').html('<p style="color:#0A5F59;">Apply Coupon Successful!</p>');
                     if(response && response.price) {
                         $('#plan_value').val(response.price);
                         var fullPrice = '₹ ' + parseFloat(response.price);

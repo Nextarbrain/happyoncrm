@@ -140,11 +140,11 @@ class MembershipController extends Controller
     public function getMembershipPlan(Request $request)
     {
         hasPermission('membership');
-        $branchId = auth('admin')->user()->branch_id ??  auth('admin')->user()->branch_id;
+        $branchId = $request->get('branch_id') ? (int) $request->get('branch_id') : auth('admin')->user()->branch_id;
         $id = $request->input('id');
         $data = MembershipPlan::where('id', $id)->first();
         if(!$data) {
-            return response()->json([]);
+            return response()->json([ "status" => false, "message" => "Please Choose Membership Plan "]);
         }
         $price = $data->price;
         if ($request->coupon) {
@@ -153,7 +153,13 @@ class MembershipController extends Controller
                 $coupon->where('branch_id', $branchId);
             }
             $coupon = $coupon->first();
+            if($coupon == null) {
+                return response()->json([ "status" => false, "message" => "Please enter a valid coupon code"]);
+            }
+        } else {
+            return response()->json([ "status" => false, "message" => "Please enter a valid coupon"]);
         }
+
         if (isset($coupon) && !is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
             $finalCoupanPrice = $price - $coupon->discount;
             $data->price = $finalCoupanPrice;
@@ -162,6 +168,7 @@ class MembershipController extends Controller
             $data->price = $finalCoupanPrice;
         }
         return response()->json($data);
+
     }
 
     public function addMembershipPlan(Request $request)
