@@ -73,23 +73,26 @@
                                                 }
                                             </style>
                                             <div id="paid" class="container tab-pane active" role="tabpanel"><br>
+                                                @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                    <form method="GET" action="{{ route('tickets') }}">
+                                                        <div class="col-md-12">
+                                                            <div class="mb-4 input_wrap">
+                                                                <label>Branch <span>*</span></label>
+                                                                <select name="branch_id" id="branchId"
+                                                                    class="form-select" onchange="this.form.submit()" disabled>
+                                                                    @foreach ($branches as $branch)
+                                                                        <option value="{{ $branch['id'] }}" {{ $branch['id'] == $user['branch_id']  ? 'selected' : ""}}>{{ $branch['name'] }}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                @endif
                                                 <form action="{{ url('/update-tickets') }}" method="post">
                                                     @csrf
                                                     <div class="row">
                                                         @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
-                                                            <div class="col-md-12">
-                                                                <div class="mb-4 input_wrap">
-                                                                    <label>Branch <span>*</span></label>
-                                                                    <select name="branch_id" id="branchId"
-                                                                        class="form-select" disabled>
-                                                                        @foreach ($branches as $branch)
-                                                                            <option value="{{ $branch['id'] }}" {{ isset($user['branch_id']) && $user['branch_id'] === $branch['id'] ? "selected" : '' }}>{{ $branch['name'] }}</option>
-                                                                        @endforeach
-
-                                                                    </select>
-                                                                    <input type="hidden" name="branch_id" value="{{ $user['branch_id'] }}">
-                                                                </div>
-                                                            </div>
+                                                            <input type="hidden" name="branch_id" value="{{ $user['branch_id'] }}" id="hiddenBranchId">
                                                         @endif
                                                         <input type="hidden" value="{{ $user->id }}"
                                                             name="id">
@@ -902,12 +905,13 @@
     <script>
         //Coupon Apply code
         $("#couponCodebutton").on("click", function() {
-
+            var branchId = $("#hiddenBranchId").val();
             $.ajax({
                 url: baseUrl + '/get-coupon',
                 type: 'GET',
                 data: {
-                    option: $("#couponCode").val()
+                    option: $("#couponCode").val(),
+                    branch: branchId
                 },
                 success: function(data) {
 

@@ -425,6 +425,9 @@ class TicketController extends Controller
         if (can('tickets-edit')) {
             $id = $request->id;
             $user = User::with('membership', 'userDetails', 'event', 'paymentInfo')->where('id', $id)->first();
+            if($branchId === null) {
+                $branchId = $user['branch_id'];
+            }
             $kid = Kid::where('user_id', $id)->get();
             $product = UserProduct::where('user_id', $id)->get();
 
@@ -447,7 +450,7 @@ class TicketController extends Controller
             }
             $extraItems = $extraItems->first();
             $paymentMethod = PaymentMethod::where('user_id', $id)->first();
-            return view('happyView.tickets-edit', compact('user', 'kid', 'product', 'paymentMethod', 'extraItems', 'extraAdded', 'result', 'productData', 'branches'));
+            return view('happyView.tickets-edit', compact('user', 'kid', 'product', 'paymentMethod', 'extraItems', 'extraAdded', 'result', 'productData', 'branches', 'branchId'));
         } else {
             abort(401);
         }
