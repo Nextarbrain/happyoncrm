@@ -449,7 +449,7 @@
                         $('#couponmsg').html( "<p style='color:red;'>"+response.message+"</p>");
                         return false;
                     }
-                     $('#couponmsg').html('<p style="color:#0A5F59;">Apply Coupon Successful!</p>');
+                    //  $('#couponmsg').html('<p style="color:#0A5F59;">Apply Coupon Successful!</p>');
                     if(response && response.price) {
                         $('#plan_value').val(response.price);
                         var fullPrice = '₹ ' + parseFloat(response.price);
