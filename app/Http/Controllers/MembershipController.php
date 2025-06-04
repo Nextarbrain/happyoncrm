@@ -156,8 +156,6 @@ class MembershipController extends Controller
             if($coupon == null) {
                 return response()->json([ "status" => false, "message" => "Please enter a valid coupon code"]);
             }
-        } else {
-            return response()->json([ "status" => false, "message" => "Please enter a valid coupon"]);
         }
 
         if (isset($coupon) && !is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
