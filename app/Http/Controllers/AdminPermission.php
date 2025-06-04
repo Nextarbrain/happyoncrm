@@ -51,7 +51,7 @@ class AdminPermission extends Controller
     private function createAdminIndex()
     {
         $branchId = auth('admin')->user()->branch_id ?? null;
-        $users = Admin::query();
+        $users = Admin::whereNotNull('branch_id');
         if ($branchId) {
             $users->where('branch_id', $branchId);
         }

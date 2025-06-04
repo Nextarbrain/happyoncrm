@@ -67,6 +67,7 @@
                                                     <th>Email</th>
                                                     <th>Created</th>
                                                     <th>Last Updated</th>
+                                                    <th>Branch</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -81,6 +82,7 @@
                                                         <td>{{ $user->email }}</td>
                                                         <td>{{ $user->created_at }}</td>
                                                         <td>{{ $user->updated_at }}</td>
+                                                         <td>{{ optional($user['branch'])->name ?? '' }}</td>
                                                         <td>
                                                        <a href="{{ route('admin.admin.edit', ['id' => $user->id]) }}"
                                                                     class="btn-info text-dark rounded-btn"><i
