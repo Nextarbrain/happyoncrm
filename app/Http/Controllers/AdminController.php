@@ -1226,6 +1226,7 @@ class AdminController extends Controller
     {
         $applydate = base64_decode($request->date);
         $branchId = $request->branch_id ?? auth('admin')->user()->branch_id ?? null;
+        $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
         if ($applydate == "Today") {
 
             $today = Carbon\Carbon::today();
@@ -1238,7 +1239,7 @@ class AdminController extends Controller
                     $membershipUsers->where('branch_id', $branchId);
                 }
                 $membershipUsers = $membershipUsers->get();
-                return view('happyView.memberships', compact('membership', 'membershipUsers', 'applydate'));
+                return view('happyView.memberships', compact('membership', 'membershipUsers', 'applydate', 'branches'));
             }
 
             if ($request->key == "event_booking") {
@@ -1300,7 +1301,7 @@ class AdminController extends Controller
                 }
                 $membershipUsers = $membershipUsers->get();
 
-                return view('happyView.memberships', compact('membership', 'membershipUsers', 'applydate'));
+                return view('happyView.memberships', compact('membership', 'membershipUsers', 'applydate', 'branches'));
             }
 
             if ($request->key == "event_booking") {

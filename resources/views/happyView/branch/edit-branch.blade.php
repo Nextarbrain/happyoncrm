@@ -65,9 +65,9 @@
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap">
-                                                                <label>Name <span>*</span></label>
+                                                                <label>Branch Name <span>*</span></label>
                                                                 <input type="text" class="form-control"
-                                                                    placeholder="Brnach Name" name="name" value="{{ $branch->name }}" required>
+                                                                    placeholder="Branch Name" name="name" value="{{ $branch->name }}" required>
 
                                                             </div>
                                                         </div>
