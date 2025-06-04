@@ -444,13 +444,15 @@
                                                                     method="post">
                                                                     @csrf
                                                                     <div class="modal-body">
-                                                                        <label>Branch <span style="color: red">*</span></label>
-                                                                        <select name="branch_id" id="addProductBranchId"
-                                                                            class="form-select" required>
-                                                                            @foreach ($branches as $branch)
-                                                                                <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
-                                                                            @endforeach
-                                                                        </select>
+                                                                        @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                                            <label>Branch <span style="color: red">*</span></label>
+                                                                            <select name="branch_id" id="addProductBranchId"
+                                                                                class="form-select" required>
+                                                                                @foreach ($branches as $branch)
+                                                                                    <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                        @endif
                                                                         <label for="productNameModalForm">Product
                                                                             Name</label>
                                                                         <input type="text" class="form-control"
@@ -509,13 +511,15 @@
                                                                 method="post">
                                                                 @csrf
                                                                 <div class="modal-body">
-                                                                    <label>Branch <span style="color: red">*</span></label>
-                                                                    <select name="branch_id" id="editProductBranchId"
-                                                                        class="form-select" required>
-                                                                        @foreach ($branches as $branch)
-                                                                            <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
-                                                                        @endforeach
-                                                                    </select>
+                                                                    @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                                        <label>Branch <span style="color: red">*</span></label>
+                                                                        <select name="branch_id" id="editProductBranchId"
+                                                                            class="form-select" required>
+                                                                            @foreach ($branches as $branch)
+                                                                                <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    @endif
                                                                     <label for="editProductName">Product Name</label>
                                                                     <input type="text" class="form-control"
                                                                         id="editProductName"
@@ -603,13 +607,15 @@
                                                                     method="post">
                                                                     @csrf
                                                                     <div class="modal-body">
-                                                                        <label>Branch <span style="color: red">*</span></label>
-                                                                        <select name="branch_id" id="addCoupanBranchId"
-                                                                            class="form-select" required>
-                                                                            @foreach ($branches as $branch)
-                                                                                <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
-                                                                            @endforeach
-                                                                        </select>
+                                                                         @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                                            <label>Branch <span style="color: red">*</span></label>
+                                                                            <select name="branch_id" id="addCoupanBranchId"
+                                                                                class="form-select" required>
+                                                                                @foreach ($branches as $branch)
+                                                                                    <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                        @endif
                                                                         <label for="couponModalFormName">Coupon
                                                                             Name</label>
                                                                         <input type="text" class="form-control"
@@ -684,13 +690,15 @@
                                                                 method="post">
                                                                 @csrf
                                                                 <div class="modal-body">
-                                                                    <label>Branch <span style="color: red">*</span></label>
-                                                                    <select name="branch_id" id="editCoupanBranchId"
-                                                                        class="form-select" required>
-                                                                        @foreach ($branches as $branch)
-                                                                            <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
-                                                                        @endforeach
-                                                                    </select>
+                                                                     @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                                        <label>Branch <span style="color: red">*</span></label>
+                                                                        <select name="branch_id" id="editCoupanBranchId"
+                                                                            class="form-select" required>
+                                                                            @foreach ($branches as $branch)
+                                                                                <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    @endif
                                                                     <label for="couponName">Coupon Name</label>
                                                                     <input type="text" class="form-control"
                                                                         id="couponName" placeholder="Coupon Name"
