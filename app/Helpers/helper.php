@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Coupon;
 use Illuminate\Support\Carbon;
 use App\Models\UserProduct;
+use App\Models\Branch;
 
 function sendsms($phone, $msg, $template_id)
 {
@@ -150,6 +151,12 @@ function parseDateInHuman($date)
 
     $createdAt = Carbon::parse($date);
     return $createdAt->diffForHumans();
+}
+
+function branchName($branchId)
+{
+    $branchName = Branch::where('id', $branchId)->first();
+    return $branchName != null ? $branchName->name : '';
 }
     // $msg = "Thank you for visiting HappyOn Party & Play. We hope you had a great time. Please spare 2 mins for your valuable review: https://rb.gy/pvkwg";
     // $template_id = "1707168821233182292";

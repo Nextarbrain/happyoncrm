@@ -101,19 +101,33 @@
                                         aria-hidden="true">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
-                                                {{ Form::open(['route' => 'admin.admin.permission', 'files' => false, 'method' => 'post']) }}
                                                 <div class="modal-header">
                                                     <h5 class="modal-title" id="exampleModalLabel">Create User</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                         aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
+                                                    @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                        <form method="GET" action="{{ route('admin.admin.role') }}">
+                                                            <label>Branch <span style="color: red">*</span></label>
+                                                            <select name="branch_id" id="branchId"
+                                                                class="form-select" onchange="this.form.submit()" required>
+                                                                @foreach ($branches as $branch)
+                                                                    <option value="{{ $branch['id'] }}" {{ $branch['id'] == $branchId  ? 'selected' : ""}}>{{ $branch['name'] }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </form>
+                                                    @endif
+                                                    {{ Form::open(['route' => 'admin.admin.permission', 'files' => false, 'method' => 'post']) }}
                                                     {{ Form::label('name', ucwords('name')) }}
                                                     {!! Form::text('name', null, ['class' => 'form-control' . ($errors->has('name') ? ' form-error' : null)]) !!}
                                                     @error('name')
                                                         <span
                                                             class="text-danger font-weight-bold text-capitalize d-block">{{ $message }}</span>
                                                     @enderror
+                                                    @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                        <input type="hidden" name="branch_id" value="{{ $branchId }}" id="hiddenBranchId">
+                                                    @endif
                                                     {{ Form::label('email', ucwords('email')) }}
                                                     {!! Form::email('email', null, ['class' => 'form-control' . ($errors->has('email') ? ' form-error' : null)]) !!}
                                                     @error('email')
@@ -134,7 +148,7 @@
                                                         <span
                                                             class="text-danger font-weight-bold text-capitalize d-block">{{ $message }}</span>
                                                     @enderror
-                                                    @if(!auth('admin')->user()->branch_id != null)
+                                                    {{-- @if(!auth('admin')->user()->branch_id != null)
                                                         {{ Form::label('branch_id', 'Branch') }}
                                                         {!! Form::select('branch_id', $branches, null, ['class' => 'form-control']) !!}
                                                         @error('branch_id')
@@ -142,7 +156,7 @@
                                                         @enderror
                                                     @else
                                                         {!! Form::hidden('branch_id', auth('admin')->user()->branch_id ?? null) !!}
-                                                    @endif
+                                                    @endif --}}
                                                     {{ Form::label('roles', ucwords('Assign Role')) }}
                                                     {!! Form::select('roles', $roles, null, [
                                                         'class' => 'form-control' . ($errors->has('roles') ? ' form-error' : null),

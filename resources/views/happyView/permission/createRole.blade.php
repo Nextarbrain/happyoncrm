@@ -69,6 +69,7 @@
                                                     {{-- <th>Guard</th> --}}
                                                     <th>Created</th>
                                                     <th>Last Updated</th>
+                                                    <th>Branch</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -88,6 +89,7 @@
                                                         {{-- <td>{{ $role->guard_name }}</td> --}}
                                                         <td>{{ $role->created_at }}</td>
                                                         <td>{{ $role->updated_at }}</td>
+                                                         <td>{{ branchName($role->branch_id); }}</td>
                                                         <td>
                                                             <a href="{{ route('admin.admin.role.edit', ['id' => $role->id]) }}"
                                                                 class="btn btn-info text-light rounded-btn"><i

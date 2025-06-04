@@ -20,7 +20,8 @@ class AdminPermission extends Controller
         if ($req->isMethod('POST')) {
             return $this->createUser($req);
         } elseif ($req->isMethod('GET')) {
-            return $this->createAdminIndex();
+            $branchId = $req->get('branch_id') ? (int) $req->get('branch_id') : auth('admin')->user()->branch_id;
+            return $this->createAdminIndex($branchId);
         }
     }
     private function createUser($req)
@@ -48,9 +49,13 @@ class AdminPermission extends Controller
         $admin->assignRole($req->roles);
         return redirect()->back()->with(bindMsg("Last Created User: $req->name", 'success'));
     }
-    private function createAdminIndex()
+    private function createAdminIndex($branchId)
     {
-        $branchId = auth('admin')->user()->branch_id ?? null;
+        $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
+        if($branchId === null) {
+            $branchId = $branches[0]['id'];
+        }
+
         $users = Admin::whereNotNull('branch_id');
         if ($branchId) {
             $users->where('branch_id', $branchId);
@@ -76,8 +81,7 @@ class AdminPermission extends Controller
                 }
             }
         }
-        $branches = Branch::pluck('name', 'id')->all();
-        return view('happyView.permission.manageAdmin', compact('roles', 'users','branches'));
+        return view('happyView.permission.manageAdmin', compact('roles', 'users','branches', 'branchId'));
     }
 
     public function role(Request $req)
