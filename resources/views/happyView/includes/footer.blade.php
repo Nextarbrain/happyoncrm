@@ -176,7 +176,7 @@
                         $('#editquantityModalForm').val(response.product_qty);
                         $('#edittaxModalForm').val(response.product_tax);
                         $('#productId').val(response.id);
-                        console.log(response);
+                        $('#editProductBranchId').val(response.branch_id.toString());
                     },
                     error: function(xhr,status, error){
 
@@ -213,7 +213,6 @@
                             $('#editPlanPrice').val(response.price);
                             $('#editPlanEntry').val(response.credits);
                             $('#memberId').val(response.id);
-                            console.log(response);
                         },
                         error: function(xhr,status, error){
 
@@ -253,7 +252,7 @@
                         $('#couponValid').val(response.valid_till);
                         $('#couponType').val(response.discount_type);
                         $('#couponId').val(response.id);
-                        console.log(response);
+                        $('#editCoupanBranchId').val(response.branch_id);
                     },
                     error: function(xhr,status, error){
 

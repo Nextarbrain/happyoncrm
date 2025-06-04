@@ -83,7 +83,7 @@
 
                                                     <th>Pay Method</th>
 
-
+                                                    <th>Branch</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -115,7 +115,7 @@
                                                         </td>
 
                                                         <td>{{ $item['payment_method'] }}</td>
-
+                                                        <td>{{ optional($item['branch'])->name ?? '' }}</td>
                                                         <td><a  class="btn btn-sm btn-primary"  href="{{ url('/edit-open-billing', $item['id']) }}""><i
                                                                     class="fa fa-pencil" aria-hidden="true"></i></a>
                                                             <i class="fa fa-eye" aria-hidden="true"></i>

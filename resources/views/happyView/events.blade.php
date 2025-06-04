@@ -107,6 +107,7 @@
                                                     <th>Pay Method</th>
                                                     <th>Due Amount</th>
                                                     <th>Pay Status</th>
+                                                    <th>Branch</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -146,6 +147,7 @@
                                                         <td>{{ $item['payment_method'] }}</td>
                                                         <td>{{ round($item['due_amount']) }}</td>
                                                         <td>{{ $item['payment_status'] }}</td>
+                                                        <td class="text-capitalize">{{ optional($item['branch'])->name ?? '' }} </td>
                                                         <td><a href="{{ url('/edit-event', $item['id']) }}""><i
                                                                     class="fa fa-pencil" aria-hidden="true"></i></a>
                                                             <i class="fa fa-eye" aria-hidden="true"></i>

@@ -444,6 +444,13 @@
                                                                     method="post">
                                                                     @csrf
                                                                     <div class="modal-body">
+                                                                        <label>Branch <span style="color: red">*</span></label>
+                                                                        <select name="branch_id" id="addProductBranchId"
+                                                                            class="form-select" required>
+                                                                            @foreach ($branches as $branch)
+                                                                                <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
+                                                                            @endforeach
+                                                                        </select>
                                                                         <label for="productNameModalForm">Product
                                                                             Name</label>
                                                                         <input type="text" class="form-control"
@@ -502,6 +509,13 @@
                                                                 method="post">
                                                                 @csrf
                                                                 <div class="modal-body">
+                                                                    <label>Branch <span style="color: red">*</span></label>
+                                                                    <select name="branch_id" id="editProductBranchId"
+                                                                        class="form-select" required>
+                                                                        @foreach ($branches as $branch)
+                                                                            <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
+                                                                        @endforeach
+                                                                    </select>
                                                                     <label for="editProductName">Product Name</label>
                                                                     <input type="text" class="form-control"
                                                                         id="editProductName"
@@ -540,6 +554,7 @@
                                                         <th>Price</th>
                                                         <th>Qty</th>
                                                         <th>Tax</th>
+                                                        <th>Branch</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -553,6 +568,7 @@
                                                             <td>{{ $productList->product_price }}</td>
                                                             <td>{{ $productList->product_qty }}</td>
                                                             <td>{{ $productList->product_tax }} %</td>
+                                                            <td>{{ optional($productList['branch'])->name ?? '' }}</td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
@@ -587,6 +603,13 @@
                                                                     method="post">
                                                                     @csrf
                                                                     <div class="modal-body">
+                                                                        <label>Branch <span style="color: red">*</span></label>
+                                                                        <select name="branch_id" id="addCoupanBranchId"
+                                                                            class="form-select" required>
+                                                                            @foreach ($branches as $branch)
+                                                                                <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
+                                                                            @endforeach
+                                                                        </select>
                                                                         <label for="couponModalFormName">Coupon
                                                                             Name</label>
                                                                         <input type="text" class="form-control"
@@ -661,6 +684,13 @@
                                                                 method="post">
                                                                 @csrf
                                                                 <div class="modal-body">
+                                                                    <label>Branch <span style="color: red">*</span></label>
+                                                                    <select name="branch_id" id="editCoupanBranchId"
+                                                                        class="form-select" required>
+                                                                        @foreach ($branches as $branch)
+                                                                            <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
+                                                                        @endforeach
+                                                                    </select>
                                                                     <label for="couponName">Coupon Name</label>
                                                                     <input type="text" class="form-control"
                                                                         id="couponName" placeholder="Coupon Name"
@@ -710,6 +740,7 @@
                                                         <th>Coupon Use</th>
                                                         <th>Start From</th>
                                                         <th>Valid Till</th>
+                                                        <th>Branch</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -725,6 +756,7 @@
                                                             <td>{{ $coupons->coupon_count }}</td>
                                                             <td>{{ $coupons->start_from }} </td>
                                                             <td>{{ $coupons->valid_till }}</td>
+                                                            <td>{{ optional($coupons['branch'])->name ?? '' }}</td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>

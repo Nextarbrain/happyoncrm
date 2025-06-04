@@ -63,32 +63,31 @@ class EventController extends Controller
     {
         $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         if($req->fromDate && $req->toDate){
-            $event_bookings = EventBooking::whereBetween('booking_date', [$req->fromDate, $req->toDate]);
+            $event_bookings = EventBooking::with('branch')->whereBetween('booking_date', [$req->fromDate, $req->toDate]);
             if ($branchId) {
                 $event_bookings->where('branch_id', $branchId);
             }
             $event_bookings = $event_bookings->get();
         }else{
-            $event_bookings = EventBooking::query();
+            $event_bookings = EventBooking::with('branch');
             if($branchId) {
                 $event_bookings->where('branch_id', $branchId);
             }
             $event_bookings = $event_bookings->latest()->get();
-
         }
 
         return view('happyView.events', ['event_bookings' => $event_bookings]);
     }
     public function eventsbookingmonthView()
     {
-        $event_booking_month = EventBooking::whereMonth('booking_date', '=', Carbon\Carbon::now())->get();
+        $event_booking_month = EventBooking::with('branch')->whereMonth('booking_date', '=', Carbon\Carbon::now())->get();
         return view('happyView.events', ['event_bookings' => $event_booking_month]);
     }
     public function upcomingeventsbookingView()
     {
         $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $today = Carbon\Carbon::today();
-        $event_bookings = EventBooking::whereDate('booking_date', '>=', $today);
+        $event_bookings = EventBooking::with('branch')->whereDate('booking_date', '>=', $today);
         if($branchId) {
             $event_bookings->where('branch_id', $branchId);
         }

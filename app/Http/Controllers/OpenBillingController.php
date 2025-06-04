@@ -44,7 +44,7 @@ class OpenBillingController extends Controller
     public function openBilling()
     {
         $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
-        $open_billings = OpenBilling::query();
+        $open_billings = OpenBilling::with('branch');
         if ($branchId) {
             $open_billings->where('branch_id', $branchId);
         }

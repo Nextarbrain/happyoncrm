@@ -156,7 +156,8 @@ class AdminController extends Controller
     {
         hasPermission('admin');
         $branchId = auth('admin')->user()->branch_id ?? null;
-        $product = Product::query();
+        $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
+        $product = Product::with('branch');
         if ($branchId) {
             $product->where('branch_id', $branchId);
         }
@@ -181,7 +182,7 @@ class AdminController extends Controller
             $users->where('branch_id', $branchId);
         }
         $users = $users->get();
-        return view('happyView.admin', compact('product', 'eventitem', 'coupon', 'membership', 'hourPlan', 'users'));
+        return view('happyView.admin', compact('product', 'eventitem', 'coupon', 'membership', 'hourPlan', 'users', 'branches'));
     }
 
     public function dashboard(Request $request)
@@ -1244,7 +1245,7 @@ class AdminController extends Controller
 
             if ($request->key == "event_booking") {
 
-                $event_bookings = EventBooking::whereDate('booking_date', Carbon\Carbon::now());
+                $event_bookings = EventBooking::with('branch')->whereDate('booking_date', Carbon\Carbon::now());
                 if ($branchId) {
                     $event_bookings->where('branch_id', $branchId);
                 }
@@ -1255,7 +1256,7 @@ class AdminController extends Controller
 
             if ($request->key == "openbillings") {
 
-                $openbillings = OpenBilling::whereDate('created_at', $today);
+                $openbillings = OpenBilling::with('branch')->whereDate('created_at', $today);
                 if ($branchId) {
                     $openbillings->where('branch_id', $branchId);
                 }
@@ -1306,13 +1307,13 @@ class AdminController extends Controller
 
             if ($request->key == "event_booking") {
                 if ($daterange[0] == $daterange[1]) {
-                    $event_bookings = EventBooking::whereDate('booking_date', $daterange[0]);
+                    $event_bookings = EventBooking::with('branch')->whereDate('booking_date', $daterange[0]);
                     if ($branchId) {
                         $event_bookings->where('branch_id', $branchId);
                     }
                     $event_bookings = $event_bookings->get();
                 } else {
-                    $event_bookings = EventBooking::whereBetween('booking_date', [$daterange[0], $daterange[1]]);
+                    $event_bookings = EventBooking::with('branch')->whereBetween('booking_date', [$daterange[0], $daterange[1]]);
                     if ($branchId) {
                         $event_bookings->where('branch_id', $branchId);
                     }
@@ -1324,7 +1325,7 @@ class AdminController extends Controller
 
             if ($request->key == "openbillings") {
 
-                $openbillings = OpenBilling::whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
+                $openbillings = OpenBilling::with('branch')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
                 if ($branchId) {
                     $openbillings->where('branch_id', $branchId);
                 }
@@ -1384,7 +1385,7 @@ class AdminController extends Controller
     public function editOpenModel(Request $request)
     {
         $selectedItems = $request->input('selectedItems');
-        $product = Product::where('id', $selectedItems)->first();
+        $product = Product::with('branch')->where('id', $selectedItems)->first();
         return response()->json($product);
     }
 
@@ -1404,7 +1405,7 @@ class AdminController extends Controller
         if ($request->input('product_name') == null) {
             return back()->with('error', 'Please Provide Product Name');
         }
-        $branchId = auth('admin')->user()->branch_id ?? null;
+        $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
         $product = new Product();
         $product->product_name = $request->input('product_name');
         $product->product_price = $request->input('price');
@@ -1424,7 +1425,7 @@ class AdminController extends Controller
         if ($request->input('name') == null) {
             return back()->with('error', 'Please Provide coupon name');
         }
-        $branchId = auth('admin')->user()->branch_id ?? null;
+        $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
         $coupon = new Coupon();
         $coupon->coupon_name = $request->input('name');
         $coupon->discount_type = $request->input('type');
@@ -1507,7 +1508,7 @@ class AdminController extends Controller
     public function editProductPost(Request $request)
     {
         hasPermission('admin-products-edit');
-        $branchId = auth('admin')->user()->branch_id ?? null;
+        $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
         $product = Product::where('id', $request->productId)->first();
         $product->product_price = $request->editprice;
         $product->product_qty = $request->editqty;
@@ -1521,7 +1522,7 @@ class AdminController extends Controller
     public function editCouponPost(Request $request)
     {
         hasPermission('admin-coupon-edit');
-        $branchId = auth('admin')->user()->branch_id ?? null;
+        $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
         $coupon = Coupon::where('id', $request->couponId)->first();
         $coupon->coupon_name = $request->couponName;
         $coupon->discount_type = $request->couponType;
