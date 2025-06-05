@@ -38,6 +38,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
 
 
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/get-branch-role', [AdminPermission::class, 'getBranchRole'])->name('getBranchRole');
 
 
     Route::post('/datawise-record-show', [AdminController::class, 'dashboard'])->name('datawiseRecordShow');

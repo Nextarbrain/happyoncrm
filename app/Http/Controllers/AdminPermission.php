@@ -57,7 +57,7 @@ class AdminPermission extends Controller
         }
 
         $users = Admin::whereNotNull('branch_id');
-        if ($branchId) {
+        if (!$branchId) {
             $users->where('branch_id', $branchId);
         }
         $users = $users->get();
@@ -104,6 +104,18 @@ class AdminPermission extends Controller
             return view('happyView.permission.createRole', compact('permissions', 'roles', 'branches'));
         }
     }
+
+    public function getBranchRole(Request $request)
+    {
+        $branchId = $request->input('branch_id');
+        if($branchId) {
+            $role = Role::where('branch_id', $branchId)->get();
+        } else {
+            $role = Role::all();
+        }
+        return response()->json(['success' => true, 'data' => $role]);
+    }
+
     public function edit(Request $req, $id)
     {
         $permission = Permission::get();
@@ -172,20 +184,20 @@ class AdminPermission extends Controller
             $role = $req->role;
             $admin = Admin::findOrFail($id);
             $admin->name = $req->name;
-            $admin->branch_id = $branchId;
+            // $admin->branch_id = $branchId;
             $admin->email = $req->email;
-            if($req->roles) {
-                $admin->role = $req->roles;
-            }
+            // if($req->roles) {
+            //     $admin->role = $req->roles;
+            // }
 
             if (isset($req->password)) {
                 $admin->password =  Hash::make($req->password);
             }
             $admin->save();
-            if ($req->roles && $admin->role != $role) {
-                $admin->removeRole($req->roles);
-                $admin->assignRole($req->roles);
-            }
+            // if ($req->roles && $admin->role != $role) {
+            //     $admin->removeRole($req->roles);
+            //     $admin->assignRole($req->roles);
+            // }
             return redirect()->route('admin.admin.permission')->with(bindMsg("Role and Profile Updated", 'success'));
         }
     }

@@ -110,8 +110,8 @@
                                                     @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
                                                         <form method="GET" action="{{ route('admin.admin.role') }}">
                                                             <label>Branch <span style="color: red">*</span></label>
-                                                            <select name="branch_id" id="branchId"
-                                                                class="form-select" onchange="this.form.submit()" required>
+                                                            <select name="branch_id" id="manageBranchId"
+                                                                class="form-select" required>
                                                                 @foreach ($branches as $branch)
                                                                     <option value="{{ $branch['id'] }}" {{ $branch['id'] == $branchId  ? 'selected' : ""}}>{{ $branch['name'] }}</option>
                                                                 @endforeach
@@ -126,7 +126,7 @@
                                                             class="text-danger font-weight-bold text-capitalize d-block">{{ $message }}</span>
                                                     @enderror
                                                     @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
-                                                        <input type="hidden" name="branch_id" value="{{ $branchId }}" id="hiddenBranchId">
+                                                        <input type="hidden" name="branch_id" id="hiddenBranchId">
                                                     @endif
                                                     {{ Form::label('email', ucwords('email')) }}
                                                     {!! Form::email('email', null, ['class' => 'form-control' . ($errors->has('email') ? ' form-error' : null)]) !!}
@@ -214,4 +214,30 @@
             });
             permission.show();
         </script>
+
     @enderror
+     <script>
+            $(document).ready(function () {
+                $('#manageBranchId').on('change', function () {
+                    let branchId = $(this).val();
+                    if (!branchId) return;
+                    $('#hiddenBranchId').val(branchId);
+                    $.ajax({
+                        url: '{{ route("getBranchRole") }}', // Replace with your route
+                        type: 'GET',
+                        data: { branch_id: branchId },
+                        success: function (res) {
+                            let rolesSelect = $('select[name="roles"]');
+                            rolesSelect.empty();
+                            rolesSelect.append('<option value="">Select Role</option>');
+                            $.each(res.data, function (key, value) {
+                                rolesSelect.append(`<option value="${value.name}">${value.name}</option>`);
+                            });
+                        },
+                        error: function (err) {
+                            console.error("AJAX error:", err);
+                        }
+                    });
+                });
+            });
+        </script>

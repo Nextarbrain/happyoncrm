@@ -86,7 +86,7 @@
                                 <span class="text-danger font-weight-bold text-capitalize d-block">{{ $message }}</span>
                             @enderror
 
-                            @if(!auth('admin')->user()->branch_id != null)
+                            {{-- @if(!auth('admin')->user()->branch_id != null)
                                 {{ Form::label('branch_id', 'Branch') }}
                                 {!! Form::select('branch_id', $branches, $user->branch_id ?? $user->branch_id , ['class' => 'form-control']) !!}
                                 @error('branch_id')
@@ -104,7 +104,7 @@
                                     <span class="text-danger font-weight-bold text-capitalize d-block">{{ $message }}</span>
                                     @enderrorger font-weight-bold text-capitalize">{{ $message }}</span>
                                 @enderror
-                            @endif
+                            @endif --}}
                             <div class="d-flex gap-2 my-3">
                                 <button type="submit" class="btn btn-primary">Update</button>
 
