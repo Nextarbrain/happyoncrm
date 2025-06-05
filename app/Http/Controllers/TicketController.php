@@ -92,7 +92,7 @@ class TicketController extends Controller
         }
 
 
-        return view('happyView.customers', compact('user'));
+        return view('happyView.customerfilter', compact('user'));
     }
 
 

@@ -531,7 +531,6 @@
                         selectedItems: selectedItems
                     },
                     success: function(response) {
-                        console.log(response);
                         toastr.success('Membership deleted successfully');
                         location.reload();
                         $('#message_container').text('Membership deleted successfully');

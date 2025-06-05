@@ -289,9 +289,7 @@
                             $('#tuesday').val(response.tuesday);
                             $('#wednesday').val(response.wednesday);
                             $('#thursday').val(response.thursday);
-
                             $('#dayPriceId').val(response.id);
-                            console.log(response);
                         },
                         error: function(xhr,status, error){
 
@@ -328,9 +326,7 @@
                         $('#friday').val(response.friday);
                         $('#saturday').val(response.saturday);
                         $('#sunday').val(response.sunday);
-
                         $('#weekendId').val(response.id);
-                        console.log(response);
                     },
                     error: function(xhr,status, error){
 

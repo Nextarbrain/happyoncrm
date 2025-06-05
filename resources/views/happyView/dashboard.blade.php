@@ -652,7 +652,6 @@
                         _token: "{{ csrf_token() }}"
                     },
                     success: function(response) {
-                        console.log(response);
 
                     },
                     error: function(xhr) {
