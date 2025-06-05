@@ -113,14 +113,6 @@
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap">
-                                                                <label>Guardian Name <span>*</span></label>
-                                                                <input type="text" class="form-control"
-                                                                    placeholder="Name of Guardian" name="name_of_kid"
-                                                                    id="nameOfKid" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="mb-4 input_wrap">
                                                                 <label for="phone">Phone <span>*</span></label>
                                                                 <input type="tel" class="form-control"
                                                                     placeholder="Phone" name="phone" id="phone"
@@ -128,8 +120,14 @@
                                                                 <div id="result" class="shadow phone-list"></div>
                                                             </div>
                                                         </div>
-
-
+                                                        <div class="col-md-6">
+                                                            <div class="mb-4 input_wrap">
+                                                                <label>Guardian Name <span>*</span></label>
+                                                                <input type="text" class="form-control"
+                                                                    placeholder="Name of Guardian" name="name_of_kid"
+                                                                    id="nameOfKid" required>
+                                                            </div>
+                                                        </div>
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap">
                                                                 <label>Number of kids <span>*</span></label>
