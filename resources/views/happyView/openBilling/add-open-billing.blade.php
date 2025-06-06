@@ -342,7 +342,9 @@
                     option: $("#couponCode").val()
                 },
                 success: function(data) {
-
+                     if(data.status==400){
+                        $('#couponmsg').html(`<p class="text-danger">${data.msg}</p>`);
+                    }
                     var discount = 0;
                     if (data != '') {
                         if (data.discount_type == 'flat') {
