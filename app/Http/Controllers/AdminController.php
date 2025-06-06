@@ -36,7 +36,7 @@ class AdminController extends Controller
 
     public function index(Request $request)
     {
-        if (auth('admin')->check() && auth('admin')->user()->branch && !auth('admin')->user()->branch->status === "Inactive") {
+        if (auth('admin')->check() && optional(auth('admin')->user()->branch)->status !== "Inactive") {
             return redirect('dashboard');
         } else {
             return view('happyView.login');
