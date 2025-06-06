@@ -66,7 +66,7 @@
                                         @csrf
                                          @if (auth('admin')->user()->branch_id == null)
                                             <label>Branches:</label>
-                                             <select name="branch_id[]" class="selectpicker form-control" style="margin-bottom: 15px;" title="Select Branch" id="branchMembershipUser" multiple>
+                                             <select name="branch_id[]" class="selectpicker form-control" style="margin-bottom: 15px;" title="Select Branch" id="branchMembershipUser" required multiple>
                                                 @foreach ($branches as $branch)
                                                     <option value="{{ $branch['id'] }}">{{ $branch['name'] }}
                                                     </option>
@@ -76,7 +76,7 @@
                                      @if (auth('admin')->user()->branch_id != null)
                                         <label>Membership User:</label>
                                         <div class="d-flex">
-                                            <select name="membership_user" class="form-control selectpicker" data-live-search="true">
+                                            <select name="membership_user" class="form-control selectpicker" data-live-search="true" required>
                                                 <option value="">-- Select Membership User --</option>
                                                 @foreach ($membershipUsers as $user)
                                                     <option value="{{ $user->user->id }}">{{ $user->user->name }}</option>
@@ -88,7 +88,7 @@
                                         @csrf
                                         @if (auth('admin')->user()->branch_id == null)
                                             <label>Branches:</label>
-                                            <select name="branch_id[]" class="selectpicker form-control" style="margin-bottom: 15px;" data-live-search="true" title="Select Branch" multiple>
+                                            <select name="branch_id[]" class="selectpicker form-control" style="margin-bottom: 15px;" data-live-search="true" title="Select Branch" required multiple>
                                                 @foreach ($branches as $branch)
                                                     <option value="{{ $branch['id'] }}">{{ $branch['name'] }}
                                                     </option>

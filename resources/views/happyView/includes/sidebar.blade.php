@@ -214,8 +214,7 @@
                     style="border:none; background:none;  ">
                     @if (can('reports-ticket'))
                         <li><a href="{{ url('/reports?key=Ticket') }}"
-                                class="menu-title {{ request('key') === 'Ticket' ? 'active' : '' }}">Ticket
-                                Report</a></li>
+                                class="menu-title {{ request('key') === 'Ticket' ? 'active' : '' }}">Ticket Report</a></li>
                     @endif
                     @if (can('reports-membership'))
                         <li><a href="{{ url('/reports?key=Membership') }}" class="menu-title {{ request('key') === 'Membership' ? 'active' : '' }}">Membership Report</a>
@@ -396,16 +395,13 @@
                     style="border:none; background:none;">
                     @if (can('permission-manage'))
                         <li><a href="{{ route('permission.index') }}" class="nav-link {{ request()->is('permission') ? 'active' : '' }}"><i
-                                    class="fa fa-lock me-3"></i>Add
-                                Permission</a>
+                                    class="fa fa-lock me-3"></i>Add Permission</a>
                         </li>
                         <li><a href="{{ route('admin.admin.role') }}" class="nav-link {{ request()->is('users/role') ? 'active' : '' }}"><i
-                                    class="fa fa-lock me-3"></i>Manage
-                                Role</a>
+                                    class="fa fa-lock me-3"></i>Manage Role</a>
                         </li>
                         <li><a href="{{ route('admin.admin.permission') }}" class="nav-link {{ request()->is('users/admin') ? 'active' : '' }}"><i
-                                    class="fa fa-users me-3"></i>Manage
-                                Admin</a>
+                                    class="fa fa-users me-3"></i>Manage Admin</a>
                         </li>
                     @endif
                     @if (can('admin'))
