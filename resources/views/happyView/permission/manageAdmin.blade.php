@@ -216,28 +216,28 @@
         </script>
 
     @enderror
-     <script>
-            $(document).ready(function () {
-                $('#manageBranchId').on('change', function () {
-                    let branchId = $(this).val();
-                    if (!branchId) return;
-                    $('#hiddenBranchId').val(branchId);
-                    $.ajax({
-                        url: '{{ route("getBranchRole") }}', // Replace with your route
-                        type: 'GET',
-                        data: { branch_id: branchId },
-                        success: function (res) {
-                            let rolesSelect = $('select[name="roles"]');
-                            rolesSelect.empty();
-                            rolesSelect.append('<option value="">Select Role</option>');
-                            $.each(res.data, function (key, value) {
-                                rolesSelect.append(`<option value="${value.name}">${value.name}</option>`);
-                            });
-                        },
-                        error: function (err) {
-                            console.error("AJAX error:", err);
-                        }
-                    });
+    <script>
+        $(document).ready(function () {
+            $('#manageBranchId').on('change', function () {
+                let branchId = $(this).val();
+                if (!branchId) return;
+                $('#hiddenBranchId').val(branchId);
+                $.ajax({
+                    url: '{{ route("getBranchRole") }}',
+                    type: 'GET',
+                    data: { branch_id: branchId },
+                    success: function (res) {
+                        let rolesSelect = $('select[name="roles"]');
+                        rolesSelect.empty();
+                        rolesSelect.append('<option value="">Select Role</option>');
+                        $.each(res.data, function (key, value) {
+                            rolesSelect.append(`<option value="${value.name}">${value.name}</option>`);
+                        });
+                    },
+                    error: function (err) {
+                        console.error("AJAX error:", err);
+                    }
                 });
             });
-        </script>
+        });
+    </script>

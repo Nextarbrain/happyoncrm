@@ -148,10 +148,13 @@
                 </a>
             </li>
         @endif --}}
+        @php
+            $isMembershipRoute = request()->is('memberships*') || request()->is('membership-history*');
+        @endphp
         @if (can('membership') || can('member-history'))
-            <li onclick="showMembershipSystemMenu()">
+            <li onclick="showMembershipSystemMenu()" class="{{ $isMembershipRoute ? 'mm-active' : '' }}">
 
-                <a href="javascript:void(0);" aria-expanded="false" style="justify-content: space-between;">
+                <a href="javascript:void(0);" aria-expanded="{{ $isMembershipRoute ? 'true' : 'false' }}" style="justify-content: space-between;">
                     <div class="parent-icon">
                         <svg width="15" height="16" viewBox="0 0 15 16" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
@@ -162,7 +165,7 @@
                     </div>Member Services<span class="fa arrow"></span>
                 </a>
 
-                <ul aria-expanded="false" id="membershipMenu" class="d-none ml-3"
+                <ul aria-expanded="false" id="membershipMenu" class="ml-3 {{ $isMembershipRoute ? '' : 'd-none' }}"
                     style="border:none; background:none;">
                     @if (can('membership'))
                         <li>
@@ -183,14 +186,17 @@
                 </ul>
             </li>
         @endif
+        @php
+            $isReportRoute = request('key') === "Ticket" || request('key') === "Membership" || request('key') === "MembershipUser" || request('key') === "Event" || request('key') === "Billing";
+        @endphp
         @if (can('reports-ticket') ||
                 can('reports-membership') ||
                 can('reports-event') ||
                 can('reports-openbilling') ||
                 can('report-membership-user'))
-            <li onclick="showReportMenu()">
+            <li onclick="showReportMenu()" class="{{ $isReportRoute ? 'mm-active' : '' }}">
 
-                <a href="javascript:void(0);" aria-expanded="false" style="justify-content: space-between;">
+                <a href="javascript:void(0);" aria-expanded="{{ $isReportRoute ? 'true' : 'false' }}" style="justify-content: space-between;">
                     <div class="parent-icon">
                         <svg width="21" height="21" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path
@@ -204,27 +210,26 @@
                     Reports <span class="fa arrow"></span>
 
                 </a>
-
-                <ul aria-expanded="false" id="reportMenu" class="d-none ml-3"
+                <ul aria-expanded="false" id="reportMenu" class="ml-3 {{ $isReportRoute ? '' : 'd-none' }}"
                     style="border:none; background:none;  ">
                     @if (can('reports-ticket'))
                         <li><a href="{{ url('/reports?key=Ticket') }}"
-                                class="menu-title {{ Route::currentRouteName() == 'reports' ? 'active' : '' }}">Ticket
+                                class="menu-title {{ request('key') === 'Ticket' ? 'active' : '' }}">Ticket
                                 Report</a></li>
                     @endif
                     @if (can('reports-membership'))
-                        <li><a href="{{ url('/reports?key=Membership') }}" class="menu-title">Membership Report</a>
+                        <li><a href="{{ url('/reports?key=Membership') }}" class="menu-title {{ request('key') === 'Membership' ? 'active' : '' }}">Membership Report</a>
                         </li>
                     @endif
                     @if (can('report-membership-user'))
-                        <li><a href="{{ url('/reports?key=MembershipUser') }}" class="menu-title">Membership User</a>
+                        <li><a href="{{ url('/reports?key=MembershipUser') }}" class="menu-title {{ request('key') === 'MembershipUser' ? 'active' : '' }}">Membership User</a>
                         </li>
                     @endif
                     @if (can('reports-event'))
-                        <li><a href="{{ url('/reports?key=Event') }}" class="menu-title">Event Report</a></li>
+                        <li><a href="{{ url('/reports?key=Event') }}" class="menu-title {{ request('key') === 'Event' ? 'active' : '' }}">Event Report</a></li>
                     @endif
                     @if (can('reports-openbilling'))
-                        <li><a href="{{ url('/reports?key=Billing') }}" class="menu-title">Open Billing Report</a>
+                        <li><a href="{{ url('/reports?key=Billing') }}" class="menu-title {{ request('key') === 'Billing' ? 'active' : '' }}">Open Billing Report</a>
                         </li>
                     @endif
                 </ul>
@@ -366,10 +371,15 @@
                     Admin</a>
             </li>
         @endif --}}
-        @if (can('permission-manage') || auth('admin')->user()->isSuperAdmin || can('admin'))
-            <li onclick="showReportSystemMenu()">
+        @php
+            $isSystemRoute = request()->is('permission*') || request()->is('users/role*') || request()->is('users/admin*') || request()->is('admin*');
+        @endphp
 
-                <a href="javascript:void(0);" aria-expanded="false" style="justify-content: space-between;">
+
+        @if (can('permission-manage') || auth('admin')->user()->isSuperAdmin || can('admin'))
+            <li onclick="showReportSystemMenu()" class="{{ $isSystemRoute ? 'mm-active' : '' }}">
+
+                <a href="javascript:void(0);" aria-expanded="{{ $isSystemRoute ? 'true' : 'false' }}" style="justify-content: space-between;">
                     <div class="parent-icon">
                         <svg width="21" height="21" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -382,18 +392,18 @@
 
                 </a>
 
-                <ul aria-expanded="false" id="reportSystemMenu" class="d-none ml-3"
+                <ul aria-expanded="false" id="reportSystemMenu" class="ml-3 {{ $isSystemRoute ? '' : 'd-none' }}"
                     style="border:none; background:none;">
                     @if (can('permission-manage'))
-                        <li><a href="{{ route('permission.index') }}" class="nav-link"><i
+                        <li><a href="{{ route('permission.index') }}" class="nav-link {{ request()->is('permission') ? 'active' : '' }}"><i
                                     class="fa fa-lock me-3"></i>Add
                                 Permission</a>
                         </li>
-                        <li><a href="{{ route('admin.admin.role') }}" class="nav-link"><i
+                        <li><a href="{{ route('admin.admin.role') }}" class="nav-link {{ request()->is('users/role') ? 'active' : '' }}"><i
                                     class="fa fa-lock me-3"></i>Manage
                                 Role</a>
                         </li>
-                        <li><a href="{{ route('admin.admin.permission') }}" class="nav-link"><i
+                        <li><a href="{{ route('admin.admin.permission') }}" class="nav-link {{ request()->is('users/admin') ? 'active' : '' }}"><i
                                     class="fa fa-users me-3"></i>Manage
                                 Admin</a>
                         </li>
@@ -428,14 +438,17 @@
 <!--end sidebar wrapper -->
 <script>
     function showReportMenu() {
-        document.querySelector('#reportMenu').classList.toggle('d-none');
+        const menu = document.querySelector('#reportMenu');
+        menu?.classList.toggle('d-none');
     }
 
     function showReportSystemMenu() {
-        document.querySelector('#reportSystemMenu').classList.toggle('d-none');
+        const menu = document.querySelector('#reportSystemMenu');
+        menu?.classList.toggle('d-none');
     }
 
     function showMembershipSystemMenu() {
-        document.querySelector('#membershipMenu').classList.toggle('d-none');
+        const menu = document.querySelector('#membershipMenu');
+        menu?.classList.toggle('d-none');
     }
 </script>
