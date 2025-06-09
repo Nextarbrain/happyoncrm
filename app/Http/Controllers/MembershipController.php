@@ -101,7 +101,7 @@ class MembershipController extends Controller
     {
         hasPermission('membership-history');
         $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
-        $membershipUser = MembershipHistory::with('user', 'kid', 'userDetails', 'membershipBuy')->where('user_id', $request->id);
+        $membershipUser = MembershipHistory::with('user', 'kid', 'userDetails', 'membershipBuy', 'branch')->where('user_id', $request->id);
         if ($branchId) {
             $membershipUser->where('branch_id', $branchId);
         }
