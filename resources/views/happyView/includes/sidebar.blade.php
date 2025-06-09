@@ -13,6 +13,8 @@
         </div>
         <span class="text-white" style="display: block; text-align: center;">
             {{ auth('admin')->user()->name ?? 'No name' }}
+        </span>
+        <span class="text-white" style="display: block; text-align: center;">
             ({{ auth('admin')->user()->branch ? auth('admin')->user()->branch->name : 'Main SuperAdmin' }})
         </span>
     </div>
