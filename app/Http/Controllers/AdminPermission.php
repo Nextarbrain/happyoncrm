@@ -20,7 +20,7 @@ class AdminPermission extends Controller
         if ($req->isMethod('POST')) {
             return $this->createUser($req);
         } elseif ($req->isMethod('GET')) {
-            $branchId = $req->get('branch_id') ? (int) $req->get('branch_id') : auth('admin')->user()->branch_id;
+            $branchId = $req->get('branch_id') ? $req->get('branch_id') : auth('admin')->user()->branch_id;
             return $this->createAdminIndex($branchId);
         }
     }
@@ -51,16 +51,17 @@ class AdminPermission extends Controller
     }
     private function createAdminIndex($branchId)
     {
+        $users = Admin::whereNotNull('branch_id');
+        if ($branchId !== null) {
+            $users->where('branch_id', $branchId);
+        }
+        $users = $users->get();
+
         $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
         if($branchId === null) {
             $branchId = $branches[0]['id'];
         }
 
-        $users = Admin::whereNotNull('branch_id');
-        if (!$branchId) {
-            $users->where('branch_id', $branchId);
-        }
-        $users = $users->get();
         $role = [];
         $role = Role::query();
        if ($branchId) {
