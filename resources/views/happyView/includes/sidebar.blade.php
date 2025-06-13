@@ -9,7 +9,7 @@
             <img src="{{ asset('assets/images/happyon_logo.png') }}" class="logo-icon" alt="logo">
         </div>
         <div class="mail-admin">
-            <a href="mailto:contact@happyonplay.com" class="text-white">contact@happyonplay.com</a>
+            <a href="mailto:{{ auth('admin')->user()->email ?? 'contact@happyonplay.com' }}" class="text-white"> {{ auth('admin')->user()->email ?? 'contact@happyonplay.com' }}</a>
         </div>
         <span class="text-white" style="display: block; text-align: center;">
             {{ auth('admin')->user()->name ?? 'No name' }}
