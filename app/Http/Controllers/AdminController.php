@@ -1405,6 +1405,9 @@ class AdminController extends Controller
             return back()->with('error', 'Please Provide Product Name');
         }
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
+        if(!$branchId) {
+           return redirect()->back()->with('error', 'Please select a branch first.');
+        }
         $product = new Product();
         $product->product_name = $request->input('product_name');
         $product->product_price = $request->input('price');
@@ -1425,6 +1428,9 @@ class AdminController extends Controller
             return back()->with('error', 'Please Provide coupon name');
         }
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
+        if(!$branchId) {
+           return redirect()->back()->with('error', 'Please select a branch first.');
+        }
         $coupon = new Coupon();
         $coupon->coupon_name = $request->input('name');
         $coupon->discount_type = $request->input('type');
@@ -1508,6 +1514,9 @@ class AdminController extends Controller
     {
         hasPermission('admin-products-edit');
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
+        if(!$branchId) {
+           return redirect()->back()->with('error', 'Please select a branch first.');
+        }
         $product = Product::where('id', $request->productId)->first();
         $product->product_price = $request->editprice;
         $product->product_qty = $request->editqty;
@@ -1522,6 +1531,9 @@ class AdminController extends Controller
     {
         hasPermission('admin-coupon-edit');
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
+        if(!$branchId) {
+           return redirect()->back()->with('error', 'Please select a branch first.');
+        }
         $coupon = Coupon::where('id', $request->couponId)->first();
         $coupon->coupon_name = $request->couponName;
         $coupon->discount_type = $request->couponType;

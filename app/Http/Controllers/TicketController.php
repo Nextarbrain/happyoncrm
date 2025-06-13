@@ -32,7 +32,7 @@ class TicketController extends Controller
         $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
         $branchId = $request->get('branch_id') ? (int) $request->get('branch_id') : auth('admin')->user()->branch_id;
         if($branchId === null) {
-            $branchId = $branches[0]['id'];
+            $branchId = $branches[0]['id'] ?? null;
         }
         if (can('tickets') || can('tickets-add') || can('customers')) {
             $product = Product::select('product_name', 'product_price', 'product_tax');
@@ -105,6 +105,9 @@ class TicketController extends Controller
     public function addTickets(Request $request)
     {
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
+        if(!$branchId) {
+            return redirect()->back()->with('error', 'Please select a branch first.');
+        }
         $userSave = new User();
         $userSave->name = ucfirst($request->input('name_of_kid'));
         $userSave->branch_id = $branchId;
@@ -426,7 +429,7 @@ class TicketController extends Controller
             $id = $request->id;
             $user = User::with('membership', 'userDetails', 'event', 'paymentInfo')->where('id', $id)->first();
             if($branchId === null) {
-                $branchId = $user['branch_id'];
+                $branchId = $user['branch_id'] ?? null;
             }
             $kid = Kid::where('user_id', $id)->get();
             $product = UserProduct::where('user_id', $id)->get();
@@ -460,8 +463,10 @@ class TicketController extends Controller
     {
 
         hasPermission('tickets-edit');
-        // $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
+        if(!$branchId) {
+           return redirect()->back()->with('error', 'Please select a branch first.');
+        }
         $id = $request->input('id');
         $user = User::where('id', $id)->first();
         $userDetail = UserDetail::where('user_id', $id)->first();

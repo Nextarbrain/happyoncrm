@@ -175,6 +175,9 @@ class MembershipController extends Controller
         $userdetail = UserDetail::where('phone_no', $request->input('phone'))->where('membership_plan', 1)->first();
         $getPlan = MembershipPlan::where('id', $request->input('membershipPlan'))->first();
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
+        if(!$branchId) {
+           return redirect()->back()->with('error', 'Please select a branch first.');
+        }
 
         if (isset($userdetail)) {
 
@@ -562,6 +565,9 @@ class MembershipController extends Controller
         hasPermission('membership-edit');
         // $branchId = auth('admin')->user()->branch_id ?? null;
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
+        if(!$branchId) {
+           return redirect()->back()->with('error', 'Please select a branch first.');
+        }
         if ($request->input('response_otp') > 0) {
             $user = User::where('id', $request->input('user_id'))->where('otp', $request->input('response_otp'))->first();
 

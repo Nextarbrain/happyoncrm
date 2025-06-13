@@ -90,6 +90,9 @@ class OpenBillingController extends Controller
             'billing_name' => 'required',
         ]);
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
+        if(!$branchId) {
+            return redirect()->back()->with('error', 'Please select a branch first.');
+        }
         $id = $request->id;
         $openbilling = OpenBilling::where('id', $id)->first();
 
@@ -155,6 +158,9 @@ class OpenBillingController extends Controller
         ]);
         // $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
+        if(!$branchId) {
+            return redirect()->back()->with('error', 'Please select a branch first.');
+        }
         $openbilling = new OpenBilling();
 
 

@@ -122,6 +122,9 @@ class EventController extends Controller
     public function editEventPost(Request $request)
     {
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
+        if(!$branchId) {
+           return redirect()->back()->with('error', 'Please select a branch first.');
+        }
         $id = $request->id;
         $eventbooking = EventBooking::where('id', $id)->first();
         $eventbooking->booking_date = $request->booking_date;
@@ -195,6 +198,9 @@ class EventController extends Controller
     {
         // $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
+        if(!$branchId) {
+           return redirect()->back()->with('error', 'Please select a branch first.');
+        }
         $eventbooking = new EventBooking();
         $eventbooking->booking_date = $request->booking_date;
         $eventbooking->booking_time_from = $request->booking_time_from;

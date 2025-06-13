@@ -27,6 +27,9 @@ class AdminPermission extends Controller
     private function createUser($req)
     {
         $branchId = $req->branch_id ? $req->branch_id : auth('admin')->user()->branch_id;
+        if(!$branchId) {
+            return redirect()->back()->with('error', 'Please select a branch first.');
+        }
         $roles = Role::query();
         if($branchId) {
             $roles->where('branch_id', $branchId);
@@ -59,7 +62,7 @@ class AdminPermission extends Controller
 
         $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
         if($branchId === null) {
-            $branchId = $branches[0]['id'];
+            $branchId = $branches[0]['id'] ?? null;
         }
 
         $role = [];
@@ -151,6 +154,9 @@ class AdminPermission extends Controller
     public function editAdmin(Request $req, $id)
     {
         $branchId = $req->branch_id ? $req->branch_id : auth('admin')->user()->branch_id;
+        if(!$branchId) {
+            return redirect()->back()->with('error', 'Please select a branch first.');
+        }
         $branches = Branch::pluck('name', 'id')->all();
         if ($req->isMethod('GET')) {
             $user = Admin::find(intval($id));
