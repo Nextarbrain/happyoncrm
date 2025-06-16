@@ -192,7 +192,8 @@ class AdminController extends Controller
         ini_set('memory_limit', -1);
         ini_set('max_execution_time', 180);
         $branches = Branch::where('status', 'Active')->get()->toArray();
-        if(auth('admin')->user()->branch_id != null && auth('admin')->user()->isSuperAdmin == 1 && auth('admin')->user()->branch->type == 'Branch') {
+        //  if(auth('admin')->user()->branch_id != null && auth('admin')->user()->isSuperAdmin == 1 && auth('admin')->user()->branch->type == 'Branch')
+        if(isset($request->daterange) && $request->daterange != "") {
             $branchId = $request->branch_id ? $request->branch_id : null;
         } else {
             $branchId = $request->branch_id ?? auth('admin')->user()->branch_id ?? null;
