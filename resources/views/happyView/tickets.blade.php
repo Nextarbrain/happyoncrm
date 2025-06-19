@@ -958,7 +958,7 @@
                             '' + gstKid.toFixed(2);
                         var finalAmount = sumamount + gstKid;
 
-                        if(!isNaN(finalSocksPrice)) {
+                        if(finalSocksPrice > 0) {
                             var gstSocks = (socks_price * 5) / 100;
                             finalAmount+=gstSocks;
                         }
