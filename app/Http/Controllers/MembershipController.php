@@ -160,10 +160,10 @@ class MembershipController extends Controller
 
         if (isset($coupon) && !is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
             $finalCoupanPrice = $price - $coupon->discount;
-            $data->price = $finalCoupanPrice;
+            $data->price = number_format($finalCoupanPrice, 2, '.', '');
         } elseif (isset($coupon) && !is_null($coupon) && $coupon->discount_type === 'percent') {
             $finalCoupanPrice = ($coupon->discount / 100) * $price;
-            $data->price = $finalCoupanPrice;
+            $data->price = number_format($finalCoupanPrice, 2, '.', '');
         }
         return response()->json($data);
 

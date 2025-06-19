@@ -10,7 +10,7 @@ class ProductController extends Controller
 {
     public function index(Request $req)
     {
-        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        $branchId = $req->get('branchId') ?  $req->get('branchId') : auth('admin')->user()->branch_id;
         $query = $req->get('query');
         $product = Product::where('product_name', 'LIKE',  $query . '%');
         if ($branchId) {

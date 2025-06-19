@@ -64,13 +64,15 @@
                                                         <div class="col-md-12 ">
                                                             <div class="mb-4 input_wrap">
                                                                 <label>Branch<span>*</span></label>
-                                                                <select name="branch_id" class="form-select" required>
+                                                                <select name="branch_id" class="form-select" id="branchId" required>
                                                                     @foreach ($branches as $branch)
                                                                         <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
                                                                     @endforeach
                                                                 </select>
                                                             </div>
                                                         </div>
+                                                        @else
+                                                        <input type="hidden" name="branch_id" id="branchId" value="{{ auth('admin')->user()->branch_id }}">
                                                         @endif
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap dark">
@@ -1038,6 +1040,7 @@
 
         function searchProductData(event) {
             var search = event.target.value;
+            var branchId = $('#branchId').val();
             if (search.length > 0) {
                 if (loop_item_count > 1) {
                     $('#searchResult' + loop_item_count).css("display", "block");
@@ -1054,7 +1057,9 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     data: {
-                        query: search
+                        query: search,
+                        branchId: branchId,
+
                     },
 
                     success: function(data) {

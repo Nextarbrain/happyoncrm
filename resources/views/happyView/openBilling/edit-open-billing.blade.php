@@ -74,6 +74,8 @@
                                                                 <input type="hidden" name="branch_id" value="{{ $open_billing['branch_id'] }}">
                                                             </div>
                                                         </div>
+                                                    @else
+                                                        <input type="hidden" id="branchId" name="branch_id" value="{{ auth('admin')->user()->branch_id }}">
                                                     @endif
                                                     <div class="row">
                                                         <div class="col-md-6">
@@ -524,6 +526,7 @@
 
         function searchProductData(event) {
             var search = event.target.value;
+            var branchId = $('#branchId').val();
             if (search.length > 0) {
                 if (loop_item_count > 1) {
                     $('#searchResult' + loop_item_count).css("display", "block");
@@ -540,7 +543,8 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     data: {
-                        query: search
+                        query: search,
+                        branchId: branchId
                     },
 
                     success: function(data) {

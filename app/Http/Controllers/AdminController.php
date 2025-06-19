@@ -539,7 +539,7 @@ class AdminController extends Controller
                 ->where('role', 2)
                 ->whereHas('membership', function ($query) {
                     $query->where('credit_left', '>', 0)->where('credit_left', '<', 5)->whereBetween('date', [
-                  Carbon\Carbon::now()->subDays(360), Carbon\Carbon::now() ]);
+                  Carbon\Carbon::now()->subDays(365), Carbon\Carbon::now() ]);
                 });
 
             if ($branchId) {
@@ -804,6 +804,7 @@ class AdminController extends Controller
                 $cash->where('branch_id', $branchId);
             }
             $cash = $cash->sum('amounts');
+            // dd($cash, $cash_membership, $cash_event, $cash_open);
             $card = PaymentMethod::select('amounts')->where('payment_method', 'Debit/Credit')->whereDate('created_at', $today);
             if ($branchId) {
                 $card->where('branch_id', $branchId);
@@ -830,8 +831,9 @@ class AdminController extends Controller
             $member = User::with('membership', 'userDetails')
                 ->where('role', 2)
                 ->whereHas('membership', function ($query) {
-                    $query->where('credit_left', '>', 0)->where('credit_left', '<', 5)->whereBetween('date', [
-                  Carbon\Carbon::now()->subDays(360), Carbon\Carbon::now() ]);
+                //     $query->where('credit_left', '>', 0)->where('credit_left', '<', 5)->whereBetween('renewal_date', [
+                //   Carbon\Carbon::now()->subDays(365), Carbon\Carbon::now() ]);
+                $query->whereBetween('credit_left', [1, 4])->whereBetween('date', [ Carbon\Carbon::now()->subDays(365),Carbon\Carbon::now()]);
             });
             if ($branchId) {
                 $member->where('branch_id', $branchId);
