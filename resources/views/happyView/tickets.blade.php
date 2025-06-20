@@ -957,8 +957,8 @@
                         document.getElementById('gstValue').innerHTML =
                             '' + gstKid.toFixed(2);
                         var finalAmount = sumamount + gstKid;
-
-                        if(!isNaN(finalSocksPrice)) {
+                        // In ticket view socks is not added
+                        if(finalSocksPrice > 0) {
                             var gstSocks = (socks_price * 5) / 100;
                             finalAmount+=gstSocks;
                         }

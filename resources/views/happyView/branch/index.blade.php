@@ -64,6 +64,7 @@
                                                     <th>Name</th>
                                                     <th>Location</th>
                                                     <th>Pincode</th>
+                                                    <th>Email</th>
                                                     <th>Phone</th>
                                                     <th>Type</th>
                                                     <th>Status</th>
@@ -83,12 +84,13 @@
                                                         <td class="text-capitalize">{{ $item['name'] }} </td>
                                                         <td class="text-capitalize">{{ $item['location'] }} </td>
                                                         <td class="text-capitalize">{{ $item['pincode'] }} </td>
+                                                        <td>{{ optional($item->admin)->email }}</td>
                                                         <td>{{ $item['phone'] }}</td>
                                                         <td class="text-capitalize">{{ $item['type'] }} </td>
                                                         <td class="text-capitalize">{{ $item['status'] }} </td>
-                                                        <td><a  class="btn btn-sm btn-primary"  href="{{ url('/edit-branch', $item['id']) }}"><i
+                                                        <td><a class="btn btn-sm btn-primary"
+                                                                href="{{ url('/edit-branch', $item['id']) }}"><i
                                                                     class="fa fa-pencil" aria-hidden="true"></i></a>
-
                                                         </td>
                                                     </tr>
                                                     @php
