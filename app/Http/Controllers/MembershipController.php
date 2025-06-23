@@ -122,8 +122,8 @@ class MembershipController extends Controller
             if ($branchPlans->count() === 3) {
                 $membership = $branchPlans->values();
             } else {
-                // Fill missing plan from default
-                $requiredPlans = ['Happy Star', 'Bright Star', 'Shooting Star'];
+                // Fill missing plan from default                
+                $requiredPlans = $membership->pluck('plan_name')->toArray();
                 foreach ($requiredPlans as $plan) {
                     $reqPlan = MembershipPlan::where('branch_id', session('branch_id'))->where('plan_name', $plan)->get();
                     if ($reqPlan->isEmpty()) {
