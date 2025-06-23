@@ -115,7 +115,25 @@ class MembershipController extends Controller
         hasPermission('membership');
         $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
         $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
-        $membership = MembershipPlan::get();
+        // $membership = MembershipPlan::get();
+        $membership = MembershipPlan::whereNull('branch_id')->get();
+        if (session('branch_id') > 0) {
+            $branchPlans = MembershipPlan::where('branch_id', session('branch_id'))->get();
+            if ($branchPlans->count() === 3) {
+                $membership = $branchPlans->values();
+            } else {
+                // Fill missing plan from default
+                $requiredPlans = ['Happy Star', 'Bright Star', 'Shooting Star'];
+                foreach ($requiredPlans as $plan) {
+                    $reqPlan = MembershipPlan::where('branch_id', session('branch_id'))->where('plan_name', $plan)->get();
+                    if ($reqPlan->isEmpty()) {
+                        $reqPlan = MembershipPlan::whereNull('branch_id')->where('plan_name', $plan)->get();
+                    }
+                    $branchPlans = $branchPlans->merge($reqPlan);
+                }
+                $membership = $branchPlans->values();
+            }
+        }
         $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo', 'branch');
         if ($branchId) {
             $membershipUsers->where('branch_id', $branchId);
@@ -724,11 +742,26 @@ class MembershipController extends Controller
 
     public function editMemberPost(Request $request)
     {
-        $member = MembershipPlan::where('id', $request->memberId)->first();
-        $member->price = $request->editPlanPrice;
-        $member->credits = $request->editPlanEntry;
-        $member->save();
-
+        hasPermission('admin-membership-edit');
+        $branch_id = session('branch_id');
+        if ($branch_id > 0) {
+            $memPlan = MembershipPlan::where([
+                ['id', '=', $request->memberId],
+                ['branch_id', '=', $branch_id],
+            ])->first();
+            if (!$memPlan) {
+                $adminPlan = MembershipPlan::where('id', $request->memberId)->first();
+                $memPlan = new MembershipPlan();
+                $memPlan->branch_id = $branch_id;
+                $memPlan->plan_name = $adminPlan->plan_name;
+                $memPlan->credits = $adminPlan->credits;
+            }
+        } else {
+            $memPlan = MembershipPlan::where('id', $request->memberId)->first();
+            $memPlan->credits = $request->editPlanEntry;
+        }
+        $memPlan->price = $request->editPlanPrice;
+        $memPlan->save();
         session()->flash('success', 'Membership Plan Updated Successfully!');
         return redirect()->back();
     }
@@ -801,5 +834,29 @@ class MembershipController extends Controller
         }
         $membershipUsers = $membershipUsers->latest()->get();
         return view('happyView.membership-booking-user', compact('membershipUsers'));
+    }
+    public function getBranchPlan(Request $request)
+    {
+        $branchId = $request->get('branch_id');        
+        $membership = MembershipPlan::whereNull('branch_id')->get();
+
+        if ($branchId) {
+            $branchPlans = MembershipPlan::where('branch_id', $branchId)->get();
+            if ($branchPlans->count() === 3) {
+                $membership = $branchPlans->values();
+            } else {
+                // Fill missing plan from default
+                $requiredPlans = ['Happy Star', 'Bright Star', 'Shooting Star'];
+                foreach ($requiredPlans as $plan) {
+                    $reqPlan = MembershipPlan::where('branch_id', $branchId)->where('plan_name', $plan)->get();
+                    if ($reqPlan->isEmpty()) {
+                        $reqPlan = MembershipPlan::whereNull('branch_id')->where('plan_name', $plan)->get();
+                    }
+                    $branchPlans = $branchPlans->merge($reqPlan);
+                }
+                $membership = $branchPlans->values();
+            }
+        }        
+        return response()->json($membership);
     }
 }

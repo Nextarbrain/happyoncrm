@@ -31,7 +31,7 @@ class TicketController extends Controller
     {
         $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
         $branchId = $request->get('branch_id') ? (int) $request->get('branch_id') : auth('admin')->user()->branch_id;
-        if($branchId === null) {
+        if ($branchId === null) {
             $branchId = $branches[0]['id'] ?? null;
         }
         if (can('tickets') || can('tickets-add') || can('customers')) {
@@ -105,7 +105,7 @@ class TicketController extends Controller
     public function addTickets(Request $request)
     {
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
-        if(!$branchId) {
+        if (!$branchId) {
             return redirect()->back()->with('error', 'Please select a branch first.');
         }
         $userSave = new User();
@@ -309,7 +309,7 @@ class TicketController extends Controller
             $customerKey = str_pad($user__id, 10, '0', STR_PAD_LEFT);
             $items = [];
 
-            if(isset($request->kidName)){
+            if (isset($request->kidName)) {
                 for ($i = 0; $i < count($request["kidName"]); $i++) {
                     $items[] = [
                         "name" => $request["kidName"][$i],
@@ -324,35 +324,35 @@ class TicketController extends Controller
             }
 
 
-            if(isset($request->product_name)){
-            for ($i = 0; $i < count($request["product_name"]); $i++) {
-                $items[] = [
-                    "name" => $request["product_name"][$i],
-                    "id" => uniqid(),
-                    "rate" => floatval($request["price"][$i]),
-                    "quantity" => intval($request["product_quantity"][$i]),
-                    "subtotal" => floatval($request["price"][$i]) * intval($request["product_quantity"][$i]),
-                    "category" => "",
-                    "addon" => []
-                ];
+            if (isset($request->product_name)) {
+                for ($i = 0; $i < count($request["product_name"]); $i++) {
+                    $items[] = [
+                        "name" => $request["product_name"][$i],
+                        "id" => uniqid(),
+                        "rate" => floatval($request["price"][$i]),
+                        "quantity" => intval($request["product_quantity"][$i]),
+                        "subtotal" => floatval($request["price"][$i]) * intval($request["product_quantity"][$i]),
+                        "category" => "",
+                        "addon" => []
+                    ];
+                }
             }
-        }
 
-            $taxes=[];
-            if(isset($request->product_name)){
-            for ($i = 0; $i < count($request["product_name"]); $i++) {
-                $tax_api=$request["tax"][$i] / 100;
-                $taxes[]=[
-                    "name" => "GST",
-                    "percentage" => $request['tax'][$i],
-                    "amount" => $request["price"][$i] * $tax_api,
-                ];
+            $taxes = [];
+            if (isset($request->product_name)) {
+                for ($i = 0; $i < count($request["product_name"]); $i++) {
+                    $tax_api = $request["tax"][$i] / 100;
+                    $taxes[] = [
+                        "name" => "GST",
+                        "percentage" => $request['tax'][$i],
+                        "amount" => $request["price"][$i] * $tax_api,
+                    ];
+                }
             }
-        }
 
-            $dob_api=date('d/m/Y',strtotime($request->dob));
+            $dob_api = date('d/m/Y', strtotime($request->dob));
             $postData = [
-                "customer_key" =>$paymentMethod->id,
+                "customer_key" => $paymentMethod->id,
                 "merchant_id" => env('MERCHANT_ID'),
                 "customer" => [
                     "name" =>  $user->name,
@@ -363,7 +363,7 @@ class TicketController extends Controller
                 ],
                 "transaction" => [
                     "id" =>  $paymentMethod->id,
-                    "number" =>$paymentMethod->id,
+                    "number" => $paymentMethod->id,
                     "type" => "dine_in",
                     "source" => "online",
                     "payment_type" => $paymentMethod->payment_method,
@@ -428,7 +428,7 @@ class TicketController extends Controller
         if (can('tickets-edit')) {
             $id = $request->id;
             $user = User::with('membership', 'userDetails', 'event', 'paymentInfo')->where('id', $id)->first();
-            if($branchId === null) {
+            if ($branchId === null) {
                 $branchId = $user['branch_id'] ?? null;
             }
             $kid = Kid::where('user_id', $id)->get();
@@ -448,7 +448,7 @@ class TicketController extends Controller
 
             $extraAdded = UserProduct::where('user_id', $id)->where('product_name', '=', "Extra Time",)->first();
             $extraItems = Product::where('product_name', "Extra Time");
-            if($branchId){
+            if ($branchId) {
                 $extraItems = $extraItems->where('branch_id', $branchId);
             }
             $extraItems = $extraItems->first();
@@ -464,8 +464,8 @@ class TicketController extends Controller
 
         hasPermission('tickets-edit');
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
-        if(!$branchId) {
-           return redirect()->back()->with('error', 'Please select a branch first.');
+        if (!$branchId) {
+            return redirect()->back()->with('error', 'Please select a branch first.');
         }
         $id = $request->input('id');
         $user = User::where('id', $id)->first();
@@ -675,7 +675,7 @@ class TicketController extends Controller
             }
         }
 
-        if(isset($request["kidName"]) && is_array($request["kidName"])){
+        if (isset($request["kidName"]) && is_array($request["kidName"])) {
             for ($i = 0; $i < count($request["kidName"]); $i++) {
                 $items[] = [
                     "name" => $request["kidName"][$i],
@@ -703,7 +703,7 @@ class TicketController extends Controller
                 "order_time" => $addExtra->updated_at,
                 "items" => $items,
                 "discount" => 0,
-                "table_number"=> '',
+                "table_number" => '',
                 "order_from" => "POS"
             ]
         ];
@@ -846,7 +846,7 @@ class TicketController extends Controller
     public function ticketsBookingReport(Request $request)
     {
         hasPermission('reports-ticket');
-        $branchId = !empty($request->branch_id) && count($request->branch_id) > 0 ? $request->branch_id : (auth('admin')->user()->branch_id ? [strval(auth('admin')->user()->branch_id)]: null);
+        $branchId = !empty($request->branch_id) && count($request->branch_id) > 0 ? $request->branch_id : (auth('admin')->user()->branch_id ? [strval(auth('admin')->user()->branch_id)] : null);
         if (isset($request->daterange) && $request->daterange != "") {
             $daterange = explode("-", $request->daterange);
             $daterange[0] = date('y-m-d', strtotime($daterange[0]));
@@ -869,7 +869,8 @@ class TicketController extends Controller
         }
     }
 
-    public function custmerView(Request $req,UserDataTable  $datatable){
+    public function custmerView(Request $req, UserDataTable  $datatable)
+    {
         return $datatable->with('data', $req)->render('happyView.customers');
     }
     // public function custmerView()
@@ -922,8 +923,13 @@ class TicketController extends Controller
     public function getPriceKids(Request $request)
     {
         $today = Carbon\Carbon::now('Asia/Kolkata')->format('l');
+        $branchId = $request->get('branch_id') ?? session('branch_id');
 
-        $value = DayPrice::where('Hour', $request->get('option'))->first();
+        $value = DayPrice::where('branch_id', $branchId)->where('Hour', $request->get('option'))->first();
+        if($value == null){
+            $value = DayPrice::whereNull('branch_id')->where('Hour', $request->get('option'))->first();
+        }
+
         if ($value != null) {
             if ($today == "Monday") {
                 $data = $value->monday;

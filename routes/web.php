@@ -133,6 +133,8 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::delete('/delete-membership-buy', [MembershipController::class, 'deleteMembershipBuyers']);
     Route::delete('/delete-membership-history', [MembershipController::class, 'deleteMembershipHistory']);
 
+    Route::get('/get-branch-plan', [MembershipController::class, 'getBranchPlan']);
+
     /******************* Event Routes **************/
 
     Route::post('/event-booking-report', [EventController::class, 'eventBookingReport'])->name('eventBookingReport');

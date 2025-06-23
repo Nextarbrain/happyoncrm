@@ -142,7 +142,7 @@
                                                             <div class="mb-4 input_wrap">
                                                                 <label>Type</label>
                                                                 <select name="type" id="type" class="form-select">
-                                                                    <option value="Branch">Branch</option>
+                                                                    <option value="Branch">Company-Owned</option>
                                                                     <option value="Franchise">Franchise</option>
                                                                 </select>
                                                             </div>

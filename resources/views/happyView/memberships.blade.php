@@ -74,7 +74,8 @@
                                             <div class="col-md-3 d-flex align-items-center justify-content-center">
                                                 <div class="pl-3">
                                                     @if (can('admin-membership-delete'))
-                                                        <div class="count" id="membership_div" style="cursor: pointer;">
+                                                        <div class="count" id="membership_div"
+                                                            style="cursor: pointer;">
                                                             <i class="fa fa-trash-o" aria-hidden="true"></i>
                                                         </div>
                                                     @endif
@@ -105,25 +106,30 @@
                                                     <div class="modal-content">
                                                         <div class="modal-body">
                                                             <div class="h_btn">
-                                                                <button type="button" class="btn" style="pointer-events: none;">Add New
+                                                                <button type="button" class="btn"
+                                                                    style="pointer-events: none;">Add New
                                                                     Membership</button>
                                                             </div>
-
                                                             <form action="{{ url('/add-membership-plan') }}"
                                                                 method="post">
                                                                 @csrf
                                                                 <div class="row">
-                                                                    @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
-                                                                    <div class="col-md-12 ">
-                                                                        <div class="mb-4 input_wrap">
-                                                                            <label>Branch<span>*</span></label>
-                                                                            <select name="branch_id" class="form-select" id="branchId" required>
-                                                                                @foreach ($branches as $branch)
-                                                                                    <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
-                                                                                @endforeach
-                                                                            </select>
+                                                                    @if (auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                                        <div class="col-md-12 ">
+                                                                            <div class="mb-4 input_wrap">
+                                                                                <label>Branch<span>*</span></label>
+                                                                                <select name="branch_id"
+                                                                                    class="form-select" id="branchId"
+                                                                                    required>
+                                                                                    @foreach ($branches as $branch)
+                                                                                        <option
+                                                                                            value="{{ $branch['id'] }}">
+                                                                                            {{ $branch['name'] }}
+                                                                                        </option>
+                                                                                    @endforeach
+                                                                                </select>
+                                                                            </div>
                                                                         </div>
-                                                                    </div>
                                                                     @endif
                                                                     <div class="col-md-6">
                                                                         <div class="mb-4 input_wrap dark">
@@ -153,16 +159,16 @@
                                                                         <div class="mb-4 input_wrap">
                                                                             <label>Phone <span>*</span></label>
                                                                             <input type="text" class="form-control"
-                                                                                placeholder="Phone" name="phone" maxlength="10"
-                                                                                required>
+                                                                                placeholder="Phone" name="phone"
+                                                                                maxlength="10" required>
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-md-12 ">
                                                                         <div class="mb-4 input_wrap">
                                                                             <label>Choose Plan <span>*</span></label>
                                                                             <select name="membershipPlan"
-                                                                                id="membershipPlan" class="form-select"
-                                                                                required>
+                                                                                id="membershipPlan"
+                                                                                class="form-select" required>
                                                                                 <option value="">Select Plan
                                                                                 </option>
                                                                                 @foreach ($membership as $memberships)
@@ -242,8 +248,12 @@
                                                                             of HappyOn</p>
                                                                     </div>
                                                                     <div class="s_btn d-flex gap-2 my-3">
-                                                                        <button type="submit" class="btn">Create Member and Add Credit</button>
-                                                                        <a href="javascript:void(0);" class="btn btn-secondary" style="padding-top: 12px;font-size: 18px;" onclick="handleCancel()" >Cancel</a>
+                                                                        <button type="submit" class="btn">Create
+                                                                            Member and Add Credit</button>
+                                                                        <a href="javascript:void(0);"
+                                                                            class="btn btn-secondary"
+                                                                            style="padding-top: 12px;font-size: 18px;"
+                                                                            onclick="handleCancel()">Cancel</a>
                                                                     </div>
 
                                                                 </div>
@@ -412,7 +422,7 @@
             }
         }
 
-        function handleCancel () {
+        function handleCancel() {
             const modal = bootstrap.Modal.getInstance(document.getElementById('Addnew'));
             modal.hide();
             setTimeout(() => {
@@ -421,6 +431,9 @@
         }
 
         $(document).ready(function() {
+            $('#branchId').change(function() {
+                getBranchPlan();
+            });
             $('#membershipPlan').change(function() {
                 getMembershipPlan();
             });
@@ -431,6 +444,39 @@
                 getMembershipPlan();
             });
         });
+
+        function getBranchPlan() {
+            var branchId = $('#branchId').val();
+            var baseUrl = "{{ URL::to('/') }}";
+            $.ajax({
+                url: baseUrl + '/get-branch-plan',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: 'GET',
+                data: {
+                    branch_id: branchId
+                },
+                success: function(response) {
+                    if (response) {                        
+                        $('#membershipPlan').empty();                        
+                        $('#membershipPlan').append('<option value="">Select Plan</option>');
+
+                        // Add new options
+                        $.each(response, function(index, plan) {
+                            $('#membershipPlan').append(
+                                '<option value="' + plan.id + '">' +
+                                plan.plan_name + ' - ' +
+                                plan.credits + ' Entry</option>'
+                            );
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    alert('Failed to load plans.');
+                }
+            });
+        }
 
         function getMembershipPlan() {
             var membershipId = $('#membershipPlan').val();
@@ -450,12 +496,12 @@
                     branch_id: branchId
                 },
                 success: function(response) {
-                    if(response.status == false) {
-                        $('#couponmsg').html( "<p style='color:red;'>"+response.message+"</p>");
+                    if (response.status == false) {
+                        $('#couponmsg').html("<p style='color:red;'>" + response.message + "</p>");
                         return false;
                     }
                     //  $('#couponmsg').html('<p style="color:#0A5F59;">Apply Coupon Successful!</p>');
-                    if(response && response.price) {
+                    if (response && response.price) {
                         $('#plan_value').val(response.price);
                         var fullPrice = parseFloat(response.price);
                         $('#subtotal').val(parseFloat(response.price));
