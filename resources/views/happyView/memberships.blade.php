@@ -219,6 +219,11 @@
                                                                                 name="subtotal">
                                                                         </div>
                                                                         <hr>
+                                                                        <div class="gst1">
+                                                                            <p id="couponCodeShow">Coupon </span></p>
+                                                                            <p id="couponValueShow"></p>
+                                                                        </div>
+                                                                        <hr>
                                                                         <div class="gst">
                                                                             <p id="gst">Includes Gst @ 18% on
                                                                             </p>
@@ -498,17 +503,21 @@
                     //  $('#couponmsg').html('<p style="color:#0A5F59;">Apply Coupon Successful!</p>');
                     if (response && response.price) {
                         $('#plan_value').val(response.price);
-                        var fullPrice = '₹ ' + parseFloat(response.price);
+                        var fullPrice = parseFloat(response.price);
                         $('#subtotal').val(parseFloat(response.price));
-                        $('#price').text(fullPrice);
-                        $('#gst').html("Includes Gst @18% on " + fullPrice);
-
+                        $('#price').text('₹ '+ fullPrice);
+                        $('#gst').html("Includes Gst @18% on ₹ " + fullPrice);
+                        if(response && response.coupan_name) {
+                            $('#couponCodeShow').html("Coupon Code (" + response.coupan_name + ")");
+                             $('#couponValueShow').html(response.coupan_price.toFixed(
+                                2));
+                        }
                         var total = (parseFloat(response.price) * 18) / 100;
                         $('#gstTotal').html(total);
                         $('#gst18').val(total);
                         var totalAmount = parseFloat(response.price) + total;
-                        $('#totalAmount').html('₹ ' + totalAmount);
-                        $('#wholeAMount').val(totalAmount);
+                        $('#totalAmount').html('₹ '+ fullPrice);
+                        $('#wholeAMount').val(fullPrice);
                     } else {
                         $('#plan_value').val(0);
                         $('#subtotal').val(0);

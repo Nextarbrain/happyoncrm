@@ -46,6 +46,7 @@ class BranchController extends Controller
         $branch->location = $request->location;
         $branch->pincode = $request->pincode;
         $branch->phone = $request->phone;
+        $branch->gstno = $request->gstno;
         $branch->address = $request->address ?? '';
         $branch->status = $request->status;
         $branch->type = $request->type;
@@ -73,6 +74,7 @@ class BranchController extends Controller
         $branch->location = $request->location;
         $branch->pincode = $request->pincode;
         $branch->phone = $request->phone;
+        $branch->gstno = $request->gstno;
         $branch->address = $request->address ?? '';
         $branch->user_id  = auth()->guard('admin')->user()->id;
         $branch->status = $request->status;

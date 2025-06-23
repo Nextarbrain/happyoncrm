@@ -123,6 +123,14 @@
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap">
+                                                                <label for="gstno">GST No<span>*</span></label>
+                                                                <input type="tel" class="form-control"
+                                                                    placeholder="GST No" name="gstno" id="gstno" value="{{ $branch->gstno }}" required>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="mb-4 input_wrap">
                                                                 <label for="address">Address </label>
                                                                 <textarea id="address" name="address" rows="4" cols="45">{{ $branch->address }}</textarea>
                                                             </div>

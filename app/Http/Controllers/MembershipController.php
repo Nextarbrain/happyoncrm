@@ -15,6 +15,7 @@ use App\Models\Branch;
 use Illuminate\Http\Request;
 use App\Models\MembershipBuy;
 use App\Models\PaymentMethod;
+use App\Models\MembershipBuyRenewable;
 use App\Models\DeleteActivity;
 use App\Models\MembershipPlan;
 use App\Models\MembershipHistory;
@@ -183,6 +184,8 @@ class MembershipController extends Controller
             $finalCoupanPrice = ($coupon->discount / 100) * $price;
             $data->price = number_format($finalCoupanPrice, 2, '.', '');
         }
+        $data->coupan_name = $coupon->coupon_name ?? '';
+        $data->coupan_price = $coupon->discount ?? '';
         return response()->json($data);
     }
 
@@ -235,6 +238,23 @@ class MembershipController extends Controller
                     // $member->time = $request->input('time');
                     $member->time = now()->format('H:i');
                     $member->save();
+
+                    $paymentMethod = '';
+                    if ($request->input('payment_mode') == 1) {
+                        $paymentMethod = "UPI";
+                    } elseif ($request->input('payment_mode') == 2) {
+                        $paymentMethod = "Cash";
+                    } else {
+                        $paymentMethod = "Debit/Credit";
+                    }
+
+                    $membershipRenewabel = new MembershipBuyRenewable();
+                    $membershipRenewabel->amount = $request->input('totalamount');
+                    $membershipRenewabel->branch_id = $branchId;
+                    $membershipRenewabel->user_id = $userdetail->user_id;
+                    $membershipRenewabel->payment_method = $paymentMethod;
+                    $membershipRenewabel->created_at = now();
+                    $membershipRenewabel->save();
 
                     $amount = new PaymentMethod();
                     $amount->user_id = $userdetail->user_id;
@@ -296,6 +316,7 @@ class MembershipController extends Controller
                         $userDetails->membership_plan = 1;
                         $userDetails->save();
 
+
                         $kidsDetails = new Kid();
                         $kidsDetails->user_id = $userSave->id;
                         $kidsDetails->branch_id = $branchId;
@@ -324,6 +345,23 @@ class MembershipController extends Controller
                         // $member->time = $request->input('time');
                         $member->time = now()->format('H:i');
                         $member->save();
+
+                        $paymentMethod = '';
+                        if ($request->input('payment_mode') == 1) {
+                            $paymentMethod = "UPI";
+                        } elseif ($request->input('payment_mode') == 2) {
+                            $paymentMethod = "Cash";
+                        } else {
+                            $paymentMethod = "Debit/Credit";
+                        }
+
+                        $membershipRenewabel = new MembershipBuyRenewable();
+                        $membershipRenewabel->amount = $request->input('totalamount');
+                        $membershipRenewabel->branch_id = $branchId;
+                        $membershipRenewabel->user_id = $userSave->id;
+                        $membershipRenewabel->payment_method = $paymentMethod;
+                        $membershipRenewabel->created_at = now();
+                        $membershipRenewabel->save();
 
                         $amount = new PaymentMethod();
                         $amount->user_id = $userSave->id;
@@ -413,6 +451,23 @@ class MembershipController extends Controller
                     $member->time = now()->format('H:i');
                     $member->save();
 
+                    $paymentMethod = '';
+                    if ($request->input('payment_mode') == 1) {
+                        $paymentMethod = "UPI";
+                    } elseif ($request->input('payment_mode') == 2) {
+                        $paymentMethod = "Cash";
+                    } else {
+                        $paymentMethod = "Debit/Credit";
+                    }
+
+                    $membershipRenewabel = new MembershipBuyRenewable();
+                    $membershipRenewabel->amount = $request->input('totalamount');
+                    $membershipRenewabel->branch_id = $branchId;
+                    $membershipRenewabel->user_id = $userSave->id;
+                    $membershipRenewabel->payment_method = $paymentMethod;
+                    $membershipRenewabel->created_at = now();
+                    $membershipRenewabel->save();
+
                     $amount = new PaymentMethod();
                     $amount->user_id = $userSave->id;
                     $amount->branch_id = $branchId;
@@ -500,6 +555,23 @@ class MembershipController extends Controller
                 // $member->time = $request->input('time');
                 $member->time = now()->format('H:i');
                 $member->save();
+
+                $paymentMethod = '';
+                if ($request->input('payment_mode') == 1) {
+                    $paymentMethod = "UPI";
+                } elseif ($request->input('payment_mode') == 2) {
+                    $paymentMethod = "Cash";
+                } else {
+                    $paymentMethod = "Debit/Credit";
+                }
+
+                $membershipRenewabel = new MembershipBuyRenewable();
+                $membershipRenewabel->amount = $request->input('totalamount');
+                $membershipRenewabel->branch_id = $branchId;
+                $membershipRenewabel->user_id = $userSave->id;
+                $membershipRenewabel->payment_method = $paymentMethod;
+                $membershipRenewabel->created_at = now();
+                $membershipRenewabel->save();
 
                 $amount = new PaymentMethod();
                 $amount->user_id = $userSave->id;

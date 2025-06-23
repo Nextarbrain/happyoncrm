@@ -20,6 +20,7 @@ class CreateBranchTable extends Migration
             $table->string('pincode')->nullable();
             $table->text('address')->nullable();
             $table->string('phone')->nullable();
+            $table->string('gstno')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('admins')->onDelete('cascade')->onUpdate('CASCADE');
             $table->enum('status', ['Active', 'Inactive'])->default('Active');
