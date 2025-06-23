@@ -123,9 +123,9 @@
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap">
-                                                                <label for="gstno">Gstno<span>*</span></label>
+                                                                <label for="gstno">GST No<span>*</span></label>
                                                                 <input type="tel" class="form-control"
-                                                                    placeholder="Gst No" name="gstno" id="gstno" value="{{ $branch->gstno }}" required>
+                                                                    placeholder="GST No" name="gstno" id="gstno" value="{{ $branch->gstno }}" required>
 
                                                             </div>
                                                         </div>

@@ -165,6 +165,8 @@ class MembershipController extends Controller
             $finalCoupanPrice = ($coupon->discount / 100) * $price;
             $data->price = number_format($finalCoupanPrice, 2, '.', '');
         }
+        $data->coupan_name = $coupon->coupon_name ?? '';
+        $data->coupan_price = $coupon->discount ?? '';
         return response()->json($data);
     }
 
