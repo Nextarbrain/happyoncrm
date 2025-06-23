@@ -310,7 +310,7 @@ class AdminController extends Controller
             }
             $totalMembershipBuy = $totalMembershipBuy->count();
 
-            $memberSale = User::has('membership')->with(['paymentInfo', 'membership'])
+            $memberSale = User::has('membership')->with(['paymentInfos', 'membership'])
                 ->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59'])
                 ->where('role', 2);
             if ($branchId) {
@@ -320,8 +320,12 @@ class AdminController extends Controller
             $memberSale = $memberSale->get();
             $amountMember = [];
             foreach ($memberSale as $memberTicket) {
-                $data = isset($memberTicket['paymentInfo']) ? $memberTicket['paymentInfo']->amounts : 0;
-                $amountMember[] = $data;
+                if(!empty($memberTicket['paymentInfos'])) {
+                    foreach($memberTicket['paymentInfos'] as $paymentInfo) {
+                        $data = isset($paymentInfo['amounts']) ? $paymentInfo['amounts']: 0;
+                        $amountMember[] = $data;
+                    }
+                }
             }
             $totalMemberAmount = array_sum($amountMember);
             $kid = Kid::whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
@@ -633,7 +637,7 @@ class AdminController extends Controller
             }
             $totalMembershipBuy = $totalMembershipBuy->count();
 
-            $memberSale = User::has('membership')->with(['paymentInfo', 'membership'])
+            $memberSale = User::has('membership')->with(['paymentInfos', 'membership'])
                 ->whereDate('created_at', $today)
                 ->where('role', 2);
             if ($branchId) {
@@ -642,8 +646,12 @@ class AdminController extends Controller
             $memberSale = $memberSale->get();
             $amountMember = [];
             foreach ($memberSale as $memberTicket) {
-                $data = isset($memberTicket['paymentInfo']) ? $memberTicket['paymentInfo']->amounts : 0;
-                $amountMember[] = $data;
+               if(!empty($memberTicket['paymentInfos'])) {
+                    foreach($memberTicket['paymentInfos'] as $paymentInfo) {
+                        $data = isset($paymentInfo['amounts']) ? $paymentInfo['amounts']: 0;
+                        $amountMember[] = $data;
+                    }
+                }
             }
 
 
