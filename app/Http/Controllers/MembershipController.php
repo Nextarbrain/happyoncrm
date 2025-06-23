@@ -444,7 +444,7 @@ class MembershipController extends Controller
 
                     $membershipRenewabel = new MembershipBuyRenewable();
                     $membershipRenewabel->amount = $request->input('totalamount');
-                    $$membershipRenewabel->branch_id = $branchId;
+                    $membershipRenewabel->branch_id = $branchId;
                     $membershipRenewabel->user_id = $userSave->id;
                     $membershipRenewabel->payment_method = $paymentMethod;
                     $membershipRenewabel->created_at = now();
