@@ -56,6 +56,8 @@ class AdminController extends Controller
                 Auth::guard('admin')->logout();
                 return redirect('/')->with('error', 'Invalid Credentials !');
             }
+            $branch_id = $result->branch_id ?? 0;
+            session(['branch_id' => $branch_id]);
             return redirect('dashboard')->with('success', 'Login Successfully!');
         } else {
             return redirect('/')->with('error', 'Invalid Credentials !');
@@ -175,7 +177,54 @@ class AdminController extends Controller
         $coupon = $coupon->get();
 
         $membership = MembershipPlan::get();
-        $hourPlan = DayPrice::get();
+        if ($branchId) {
+            $membership->where('branch_id', $branchId);
+        }
+
+        // Membership Plan data : membership_plans - start
+        $membership = MembershipPlan::whereNull('branch_id')->get();
+        if ($branchId) {
+            $branchPlans = MembershipPlan::where('branch_id', $branchId)->get();
+            if ($branchPlans->count() === 3) {
+                $membership = $branchPlans->values();
+            } else {
+                // Fill missing plan from default
+                $requiredPlans = ['Happy Star', 'Bright Star', 'Shooting Star'];
+                foreach ($requiredPlans as $plan) {
+                    $reqPlan = MembershipPlan::where('branch_id', $branchId)->where('plan_name', $plan)->get();
+                    if ($reqPlan->isEmpty()) {
+                        $reqPlan = MembershipPlan::whereNull('branch_id')->where('plan_name', $plan)->get();
+                    }
+                    $branchPlans = $branchPlans->merge($reqPlan);
+                }
+                $membership = $branchPlans->values();
+            }
+        }
+        // Membership Plan data : membership_plans - end
+
+
+        // Hour Plan data : Day_price -start
+        $hourPlan = DayPrice::whereNull('branch_id')->get();
+
+        if ($branchId) {
+            $branchPlans = DayPrice::where('branch_id', $branchId)->get();
+            if ($branchPlans->count() === 3) {
+                $hourPlan = $branchPlans->values();
+            } else {
+                // Fill missing hours from default
+                $requiredHours = ['1', '2', 'Unlimited'];
+                foreach ($requiredHours as $hour) {
+                    $branchHourPlan = DayPrice::where('branch_id', $branchId)->where('hour', $hour)->get();
+                    if ($branchHourPlan->isEmpty()) {
+                        $branchHourPlan = DayPrice::whereNull('branch_id')->where('hour', $hour)->get();
+                    }
+                    $branchPlans = $branchPlans->merge($branchHourPlan);
+                }
+                $hourPlan = $branchPlans->values();
+            }
+        }
+        // $hourPlan = $branchPlans->sortBy('id')->values();
+        // Hour Plan data : Day_price -end
         $users = User::where('role', 0);
         if ($branchId) {
             $users->where('branch_id', $branchId);
@@ -193,7 +242,7 @@ class AdminController extends Controller
         ini_set('max_execution_time', 180);
         $branches = Branch::where('status', 'Active')->get()->toArray();
         //  if(auth('admin')->user()->branch_id != null && auth('admin')->user()->isSuperAdmin == 1 && auth('admin')->user()->branch->type == 'Branch')
-        if(isset($request->daterange) && $request->daterange != "") {
+        if (isset($request->daterange) && $request->daterange != "") {
             $branchId = $request->branch_id ? $request->branch_id : null;
         } else {
             $branchId = $request->branch_id ?? auth('admin')->user()->branch_id ?? null;
@@ -248,7 +297,7 @@ class AdminController extends Controller
 
             if ($daterange[0] == $daterange[1]) {
                 $event_booking =   EventBooking::whereDate('booking_date', $daterange[0])->where('payment_status', 'Paid');
-                if($branchId) {
+                if ($branchId) {
                     $event_booking->where('branch_id', $branchId);
                 }
                 $event_booking = $event_booking->count();
@@ -261,14 +310,13 @@ class AdminController extends Controller
                     })
                     ->where('payment_status', 'Paid')
                     ->whereDate('booking_date', $daterange[0]);
-                if($branchId) {
+                if ($branchId) {
                     $event_sale->where('branch_id', $branchId);
                 }
                 $event_sale = $event_sale->sum('totalamount');
-
             } else {
                 $event_booking =   EventBooking::whereBetween('booking_date', [$daterange[0], $daterange[1]])->where('payment_status', 'Paid');
-                if($branchId) {
+                if ($branchId) {
                     $event_booking->where('branch_id', $branchId);
                 }
                 $event_booking = $event_booking->count();
@@ -281,31 +329,31 @@ class AdminController extends Controller
                     })
                     ->where('payment_status', 'Paid')
                     ->whereBetween('booking_date', [$daterange[0], $daterange[1]]);
-                if($branchId) {
+                if ($branchId) {
                     $event_sale->where('branch_id', $branchId);
                 }
                 $event_sale = $event_sale->sum('totalamount');
             }
             $event_booking_month = EventBooking::whereMonth('booking_date', '=', Carbon\Carbon::now());
-            if($branchId) {
+            if ($branchId) {
                 $event_booking_month->where('branch_id', $branchId);
             }
             $event_booking_month = $event_booking_month->count();
 
             $totalOpenBilling = OpenBilling::whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
-            if($branchId) {
+            if ($branchId) {
                 $totalOpenBilling->where('branch_id', $branchId);
             }
             $totalOpenBilling = $totalOpenBilling->count();
 
             $totalOpenBillingSales = OpenBilling::select('totalamount')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
-            if($branchId) {
+            if ($branchId) {
                 $totalOpenBillingSales->where('branch_id', $branchId);
             }
             $totalOpenBillingSales = $totalOpenBillingSales->sum('totalamount');
 
             $totalMembershipBuy = MembershipBuy::whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
-            if($branchId) {
+            if ($branchId) {
                 $totalMembershipBuy->where('branch_id', $branchId);
             }
             $totalMembershipBuy = $totalMembershipBuy->count();
@@ -539,14 +587,16 @@ class AdminController extends Controller
                 ->where('role', 2)
                 ->whereHas('membership', function ($query) {
                     $query->where('credit_left', '>', 0)->where('credit_left', '<', 5)->whereBetween('date', [
-                  Carbon\Carbon::now()->subDays(365), Carbon\Carbon::now() ]);
+                        Carbon\Carbon::now()->subDays(365),
+                        Carbon\Carbon::now()
+                    ]);
                 });
 
             if ($branchId) {
                 $member->where('branch_id', $branchId);
             }
             $member = $member->limit(3)->get()->sortBy(function ($member) {
-                    return $member->membership->credit_left;
+                return $member->membership->credit_left;
             });
 
             $applydate = $request->daterange;
@@ -831,16 +881,16 @@ class AdminController extends Controller
             $member = User::with('membership', 'userDetails')
                 ->where('role', 2)
                 ->whereHas('membership', function ($query) {
-                //     $query->where('credit_left', '>', 0)->where('credit_left', '<', 5)->whereBetween('renewal_date', [
-                //   Carbon\Carbon::now()->subDays(365), Carbon\Carbon::now() ]);
-                $query->whereBetween('credit_left', [1, 4])->whereBetween('date', [ Carbon\Carbon::now()->subDays(365),Carbon\Carbon::now()]);
-            });
+                    //     $query->where('credit_left', '>', 0)->where('credit_left', '<', 5)->whereBetween('renewal_date', [
+                    //   Carbon\Carbon::now()->subDays(365), Carbon\Carbon::now() ]);
+                    $query->whereBetween('credit_left', [1, 4])->whereBetween('date', [Carbon\Carbon::now()->subDays(365), Carbon\Carbon::now()]);
+                });
             if ($branchId) {
                 $member->where('branch_id', $branchId);
             }
             $member = $member->limit(3)->get()->sortBy(function ($member) {
-                    return $member->membership->credit_left;
-                });
+                return $member->membership->credit_left;
+            });
             $applydate = "Today";
         }
         return view('happyView.dashboard', compact('shocksCount', 'user', 'kid', 'totalMemberAmount', 'totalMembershipBuy', 'totalSales', 'totalTicketAmount', 'totalOpenBillingSales', 'totalOpenBilling', 'totalTicket', 'upi', 'cash', 'card', 'member', 'applydate', 'event_booking', 'event_booking_month', 'event_bookings', 'event_sale', 'couponcodes', 'couponvalue', 'customers', 'gst18', 'gst12', 'gst5', 'branches', 'isSuperAdminShow', 'branchId'));
@@ -1408,8 +1458,8 @@ class AdminController extends Controller
             return back()->with('error', 'Please Provide Product Name');
         }
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
-        if(!$branchId) {
-           return redirect()->back()->with('error', 'Please select a branch first.');
+        if (!$branchId) {
+            return redirect()->back()->with('error', 'Please select a branch first.');
         }
         $product = new Product();
         $product->product_name = $request->input('product_name');
@@ -1431,8 +1481,8 @@ class AdminController extends Controller
             return back()->with('error', 'Please Provide coupon name');
         }
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
-        if(!$branchId) {
-           return redirect()->back()->with('error', 'Please select a branch first.');
+        if (!$branchId) {
+            return redirect()->back()->with('error', 'Please select a branch first.');
         }
         $coupon = new Coupon();
         $coupon->coupon_name = $request->input('name');
@@ -1517,8 +1567,8 @@ class AdminController extends Controller
     {
         hasPermission('admin-products-edit');
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
-        if(!$branchId) {
-           return redirect()->back()->with('error', 'Please select a branch first.');
+        if (!$branchId) {
+            return redirect()->back()->with('error', 'Please select a branch first.');
         }
         $product = Product::where('id', $request->productId)->first();
         $product->product_price = $request->editprice;
@@ -1534,8 +1584,8 @@ class AdminController extends Controller
     {
         hasPermission('admin-coupon-edit');
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
-        if(!$branchId) {
-           return redirect()->back()->with('error', 'Please select a branch first.');
+        if (!$branchId) {
+            return redirect()->back()->with('error', 'Please select a branch first.');
         }
         $coupon = Coupon::where('id', $request->couponId)->first();
         $coupon->coupon_name = $request->couponName;
@@ -1554,20 +1604,38 @@ class AdminController extends Controller
     {
         $selectedItems = $request->input('selectedItems');
         $dayprice = DayPrice::where('id', $selectedItems)->first();
+        if (session()->has('branch_id') && session('branch_id') > 0) {
+            $dayprice->where('branch_id', session('branch_id'));
+        }
         return response()->json($dayprice);
     }
 
     public function editDayPricePost(Request $request)
     {
         hasPermission('admin-hours-edit');
-        $dayprice = DayPrice::where('id', $request->dayPriceId)->first();
+        $branch_id = session('branch_id');
+        if ($branch_id > 0) {
+            $dayprice = DayPrice::where([
+                ['id', '=', $request->dayPriceId],
+                ['branch_id', '=', session('branch_id')],
+            ])->first();
+            if (!$dayprice) {
+                $adminHour = DayPrice::where('id', $request->dayPriceId)->first();
+                $dayprice = new DayPrice();
+                $dayprice->branch_id = $branch_id;
+                $dayprice->Hour = $adminHour->Hour;
+                $dayprice->friday = $adminHour->friday;
+                $dayprice->saturday = $adminHour->saturday;
+                $dayprice->sunday = $adminHour->sunday;
+            }
+        } else {
+            $dayprice = DayPrice::where('id', $request->dayPriceId)->first();
+        }
         $dayprice->monday = $request->monday;
         $dayprice->tuesday = $request->tuesday;
         $dayprice->wednesday = $request->wednesday;
         $dayprice->thursday = $request->thursday;
-
         $dayprice->save();
-
         session()->flash('success', 'Weekdays Price Updated Successfully!');
         return redirect()->back();
     }
@@ -1576,6 +1644,9 @@ class AdminController extends Controller
     {
         $selectedItems = $request->input('selectedItems');
         $weekend = DayPrice::where('id', $selectedItems)->first();
+        if (session()->has('branch_id') && session('branch_id') > 0) {
+            $weekend->where('branch_id', session('branch_id'));
+        }
         return response()->json($weekend);
     }
 
@@ -1586,7 +1657,9 @@ class AdminController extends Controller
         $weekend->friday = $request->friday;
         $weekend->saturday = $request->saturday;
         $weekend->sunday = $request->sunday;
-
+        if (session()->has('branch_id') && session('branch_id') > 0) {
+            $weekend->branch_id = session('branch_id');
+        }
         $weekend->save();
 
         session()->flash('success', 'Weekend Price Updated Successfully!');

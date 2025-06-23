@@ -68,14 +68,14 @@
                                                         <div id="paid" class="container tab-pane active show"
                                                             role="tabpanel"><br>
                                                             <div class="data_table admin_table table-responsive">
-                                                                @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                                {{-- @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1) --}}
                                                                     @if (can('admin-hours-edit'))
                                                                         <div class="count" id="day_price_edit"
                                                                             style="text-align: right">
                                                                             <i class="fa fa-pencil" aria-hidden="true"></i>
                                                                         </div>
                                                                     @endif
-                                                                @endif
+                                                                {{-- @endif --}}
                                                                 <div class="modal fade" id="editDayPriceModal"
                                                                     tabindex="-1" role="dialog"
                                                                     aria-labelledby="editDayPriceLabel"
@@ -338,13 +338,13 @@
                                                     </div>
                                                     @endif
                                                 @endif
-                                                 @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                {{-- @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1) --}}
                                                     @if(can('admin-membership-edit'))
                                                     <div class="count" id="membership_edit">
                                                         <i class="fa fa-pencil" aria-hidden="true"></i>
                                                     </div>
                                                     @endif
-                                                @endif
+                                                {{-- @endif --}}
                                                 <div class="modal fade" id="editMemberModal" tabindex="-1"
                                                     role="dialog" aria-labelledby="editMemberModalLabel"
                                                     aria-hidden="true">
@@ -370,10 +370,10 @@
                                                                     <input type="number" class="form-control"
                                                                         id="editPlanPrice" placeholder="Price"
                                                                         name="editPlanPrice" step="0.01" required>
-                                                                    <label for="editquantityModalForm">Entry</label>
+                                                                    <label for="editquantityModalForm">Entry</label>                                                                    
                                                                     <input type="number" class="form-control"
                                                                         id="editPlanEntry" placeholder="Entry"
-                                                                        name="editPlanEntry" required>
+                                                                        name="editPlanEntry" required {{ session('branch_id') > 0 ? 'readonly' : '' }}>
                                                                     <input type="hidden" id="memberId"
                                                                         name="memberId">
                                                                 </div>

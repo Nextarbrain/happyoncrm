@@ -131,7 +131,7 @@
                                                             <div class="mb-4 input_wrap">
                                                                 <label>Type</label>
                                                                 <select name="type" id="type" class="form-select">
-                                                                    <option value="Branch" {{ $branch->type && $branch->type == 'Branch' ? 'selected' : '' }}>Branch</option>
+                                                                    <option value="Branch" {{ $branch->type && $branch->type == 'Company-Owned' ? 'selected' : '' }}>Company-Owned</option>
                                                                     <option value="Franchise" {{ $branch->type && $branch->type == 'Franchise' ? 'selected' : '' }}>Franchise</option>
                                                                 </select>
                                                             </div>

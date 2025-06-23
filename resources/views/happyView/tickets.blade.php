@@ -648,7 +648,8 @@
                 url: baseUrl + '/get-price-kids',
                 type: 'GET',
                 data: {
-                    option: $(this).val()
+                    option: $(this).val(),
+                    branch_id:$('#hiddenBranchId').val(),
                 },
                 success: function(data) {
 
