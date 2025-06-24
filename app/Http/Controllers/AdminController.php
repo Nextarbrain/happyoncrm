@@ -177,11 +177,6 @@ class AdminController extends Controller
         }
         $coupon = $coupon->get();
 
-        $membership = MembershipPlan::get();
-        if ($branchId) {
-            $membership->where('branch_id', $branchId);
-        }
-
         // Membership Plan data : membership_plans - start
         $membership = MembershipPlan::whereNull('branch_id')->get();
         if ($branchId) {
@@ -190,7 +185,7 @@ class AdminController extends Controller
                 $membership = $branchPlans->values();
             } else {
                 // Fill missing plan from default
-                $requiredPlans = ['Happy Star', 'Bright Star', 'Shooting Star'];
+                $requiredPlans = $membership->pluck('plan_name')->toArray();
                 foreach ($requiredPlans as $plan) {
                     $reqPlan = MembershipPlan::where('branch_id', $branchId)->where('plan_name', $plan)->get();
                     if ($reqPlan->isEmpty()) {
@@ -212,8 +207,8 @@ class AdminController extends Controller
             if ($branchPlans->count() === 3) {
                 $hourPlan = $branchPlans->values();
             } else {
-                // Fill missing hours from default
-                $requiredHours = ['1', '2', 'Unlimited'];
+                // Fill missing hours from default                
+                $requiredHours = $hourPlan->pluck('Hour')->toArray();
                 foreach ($requiredHours as $hour) {
                     $branchHourPlan = DayPrice::where('branch_id', $branchId)->where('hour', $hour)->get();
                     if ($branchHourPlan->isEmpty()) {
@@ -369,9 +364,9 @@ class AdminController extends Controller
             $memberSale = $memberSale->get();
             $amountMember = [];
             foreach ($memberSale as $memberTicket) {
-                if(!empty($memberTicket['paymentInfos'])) {
-                    foreach($memberTicket['paymentInfos'] as $paymentInfo) {
-                        $data = isset($paymentInfo['amounts']) ? $paymentInfo['amounts']: 0;
+                if (!empty($memberTicket['paymentInfos'])) {
+                    foreach ($memberTicket['paymentInfos'] as $paymentInfo) {
+                        $data = isset($paymentInfo['amounts']) ? $paymentInfo['amounts'] : 0;
                         $amountMember[] = $data;
                     }
                 }
@@ -438,7 +433,7 @@ class AdminController extends Controller
             // }
             // $card_membership = $card_membership->sum('amount');
 
-             $card_membership = MembershipBuyRenewable::select('amount')->where('payment_method', 'Debit/Credit')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
+            $card_membership = MembershipBuyRenewable::select('amount')->where('payment_method', 'Debit/Credit')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
             if ($branchId) {
                 $card_membership->where('branch_id', $branchId);
             }
@@ -715,9 +710,9 @@ class AdminController extends Controller
             $memberSale = $memberSale->get();
             $amountMember = [];
             foreach ($memberSale as $memberTicket) {
-               if(!empty($memberTicket['paymentInfos'])) {
-                    foreach($memberTicket['paymentInfos'] as $paymentInfo) {
-                        $data = isset($paymentInfo['amounts']) ? $paymentInfo['amounts']: 0;
+                if (!empty($memberTicket['paymentInfos'])) {
+                    foreach ($memberTicket['paymentInfos'] as $paymentInfo) {
+                        $data = isset($paymentInfo['amounts']) ? $paymentInfo['amounts'] : 0;
                         $amountMember[] = $data;
                     }
                 }
@@ -1699,15 +1694,29 @@ class AdminController extends Controller
     public function editWeekendPost(Request $request)
     {
         hasPermission('admin-hours-edit');
-        $weekend = DayPrice::where('id', $request->weekendId)->first();
+        $branch_id = session('branch_id');
+        if ($branch_id > 0) {
+            $weekend = DayPrice::where([
+                ['id', '=', $request->weekendId],
+                ['branch_id', '=', session('branch_id')],
+            ])->first();
+            if (!$weekend) {
+                $adminHour = DayPrice::where('id', $request->weekendId)->first();
+                $weekend = new DayPrice();
+                $weekend->branch_id = $branch_id;
+                $weekend->Hour = $adminHour->Hour;
+                $weekend->monday = $adminHour->monday;
+                $weekend->tuesday = $adminHour->tuesday;
+                $weekend->wednesday = $adminHour->wednesday;
+                $weekend->thursday = $adminHour->thursday;
+            }
+        } else {
+            $weekend = DayPrice::where('id', $request->weekendId)->first();
+        }
         $weekend->friday = $request->friday;
         $weekend->saturday = $request->saturday;
         $weekend->sunday = $request->sunday;
-        if (session()->has('branch_id') && session('branch_id') > 0) {
-            $weekend->branch_id = session('branch_id');
-        }
         $weekend->save();
-
         session()->flash('success', 'Weekend Price Updated Successfully!');
         return redirect()->back();
     }
