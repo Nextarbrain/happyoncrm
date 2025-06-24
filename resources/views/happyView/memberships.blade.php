@@ -329,11 +329,11 @@
                                                                     aria-hidden="true"></i></a>
                                                             <a target="_blank" class="btn btn-sm btn-primary"
                                                                 style="width: 30px; height: 30px; border-radius: 50%;"
-                                                                href="{{ url('invoice-membership-pdf/' . $membershipUser['user']->id) }}"><i
+                                                                href="{{ url('invoice-membership-pdf/' . optional($membershipUser['user'])->id ?? '') }}"><i
                                                                     class="fa fa-file" aria-hidden="true"></i></a>
                                                             <a class="btn btn-sm btn-dark"
                                                                 style="width: 30px; height: 30px; border-radius: 50%;"
-                                                                href="{{ url('membership-history/' . $membershipUser['user']->id) }}"><i
+                                                                href="{{ url('membership-history/' . optional($membershipUser['user'])->id ?? '') }}"><i
                                                                     class="fa fa-list" aria-hidden="true"></i></a>
                                                         </td>
                                                     </tr>
