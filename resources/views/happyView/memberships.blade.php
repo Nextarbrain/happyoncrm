@@ -290,7 +290,7 @@
                                                         <td><input type="checkbox"
                                                                 data-item-id="{{ $membershipUser->id }}"
                                                                 class="membership_checkbox"></td>
-                                                        <td class="text-capitalize">{{ $membershipUser['user']->name }}
+                                                        <td class="text-capitalize">{{optional($membershipUser['user'])->name ?? ''}}
                                                         </td>
 
                                                         @if (\Carbon\Carbon::parse($membershipUser->date, 'Asia/Kolkata')->isToday())
