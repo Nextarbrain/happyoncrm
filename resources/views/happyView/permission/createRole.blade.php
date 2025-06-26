@@ -45,13 +45,7 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="alert"
                                         aria-label="Close"></button>
                                 </div>
-                            @endif
-                            <nav aria-label="breadcrumb">
-                                <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page">Manage Role</li>
-                                </ol>
-                            </nav>
+                            @endif                            
                             <button type="button" class="btn btn-primary btn-sm my-2" data-bs-toggle="modal"
                                 data-bs-target="#addNew">
                                 Add New
