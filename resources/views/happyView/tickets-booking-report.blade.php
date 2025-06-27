@@ -48,10 +48,10 @@
                                     </div>
                                     <div class="col-md-6 text-md-right d-flex justify-content-md-end justify-content-start align-items-center flex-wrap">                                       
                                         <div class="mr-2 mb-2 mx-3">
-                                            <input type="search" id="datatable-search" class="form-control" placeholder="Search...">
+                                            Search:
                                         </div>
                                         <div class="mb-2">
-                                            <a href="{{ url('/add-event') }}" class="btn btn-sm btn-primary">Add New +</a>
+                                            <input type="search" id="datatable-search" class="form-control">
                                         </div>
                                     </div>
                                 </div>
