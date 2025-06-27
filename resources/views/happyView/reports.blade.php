@@ -54,15 +54,15 @@
                             <form action="{{url('/tickets-booking-report')}}" method="post">
                             @elseif($_GET['key'] == "Membership")
                             <form action="{{url('/membership-booking-report')}}" method="post">
-                            @elseif($_GET['key'] == "MembershipUser")
-                            <form action="{{url('/membership-booking-user')}}" method="post">
+                            @elseif($_GET['key'] == "MembershipUsage")
+                            <form action="{{url('/membership-booking-usage')}}" method="post">
                             @elseif($_GET['key'] == "Event")
                             <form action="{{url('/event-booking-report')}}" method="post">
                             @else
 							<form action="{{url('/open-billing-report')}}" method="post">
 							@endif
                                 <div class="modal-body">
-                                    @if($_GET['key'] == "MembershipUser")
+                                    @if($_GET['key'] == "MembershipUsage")
                                         @csrf
                                          @if (auth('admin')->user()->branch_id == null)
                                             <label>Branches:</label>

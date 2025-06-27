@@ -9,7 +9,8 @@
             <img src="{{ asset('assets/images/happyon_logo.png') }}" class="logo-icon" alt="logo">
         </div>
         <div class="mail-admin">
-            <a href="mailto:{{ auth('admin')->user()->email ?? 'contact@happyonplay.com' }}" class="text-white"> {{ auth('admin')->user()->email ?? 'contact@happyonplay.com' }}</a>
+            <a href="mailto:{{ auth('admin')->user()->email ?? 'contact@happyonplay.com' }}" class="text-white">
+                {{ auth('admin')->user()->email ?? 'contact@happyonplay.com' }}</a>
         </div>
         <span class="text-white" style="display: block; text-align: center;">
             {{ auth('admin')->user()->name ?? 'No name' }}
@@ -39,16 +40,55 @@
                     class="{{ in_array(Route::currentRouteName(), ['branch', 'create-branch']) ? 'active' : '' }}">
                     <div class="parent-icon">
 
-                        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg width="21" height="21" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
                             <path
                                 d="M6 3C4.34315 3 3 4.34315 3 6C3 7.65685 4.34315 9 6 9C7.65685 9 9 7.65685 9 6C9 4.34315 7.65685 3 6 3ZM6 15C4.34315 15 3 16.3431 3 18C3 19.6569 4.34315 21 6 21C7.65685 21 9 19.6569 9 18C9 16.3431 7.65685 15 6 15ZM18 3C16.3431 3 15 4.34315 15 6C15 7.65685 16.3431 9 18 9C19.6569 9 21 7.65685 21 6C21 4.34315 19.6569 3 18 3ZM15 12.5V10.5H13V13C13 14.1046 13.8954 15 15 15H17V17H13V21H11V17H7V15H11C12.1046 15 13 14.1046 13 13V10.5H11V12.5H9V9H15V12.5H15Z"
-                                fill="#FDCF6F"
-                            />
-                            </svg>
+                                fill="#FDCF6F" />
+                        </svg>
 
                     </div>
                     <div class="menu-title">Branches</div>
                 </a>
+            </li>
+        @endif
+        @php
+            $isMembershipRoute = request()->is('memberships*') || request()->is('membership-history*');
+        @endphp
+        @if (can('membership') || can('member-history'))
+            <li onclick="showMembershipSystemMenu()" class="{{ $isMembershipRoute ? 'mm-active' : '' }}">
+
+                <a href="javascript:void(0);" aria-expanded="{{ $isMembershipRoute ? 'true' : 'false' }}"
+                    style="justify-content: space-between;">
+                    <div class="parent-icon">
+                        <svg width="15" height="16" viewBox="0 0 15 16" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M13.5 0H1.5C0.6675 0 0 0.712 0 1.6V10.4C0 11.288 0.6675 12 1.5 12H4.5V16L7.5 14.4L10.5 16V12H13.5C14.3325 12 15 11.288 15 10.4V1.6C15 0.712 14.3325 0 13.5 0ZM13.5 10.4H1.5V8.8H13.5V10.4ZM13.5 6.4H1.5V1.6H13.5V6.4Z"
+                                fill="#FACB6A" />
+                        </svg>
+                    </div>Member Services<span class="fa arrow"></span>
+                </a>
+
+                <ul aria-expanded="false" id="membershipMenu" class="ml-3 {{ $isMembershipRoute ? '' : 'd-none' }}"
+                    style="border:none; background:none;">
+                    @if (can('membership'))
+                        <li>
+                            <a href="{{ url('/memberships') }}"
+                                class="{{ Route::currentRouteName() == 'memberships' ? 'active' : '' }}">
+                                Memberships
+                            </a>
+                        </li>
+                    @endif
+                    @if (can('member-history'))
+                        <li>
+                            <a href="{{ url('/membership-history') }}"
+                                class="{{ Route::currentRouteName() == 'membershipHistory' ? 'active' : '' }}">
+                                Member History
+                            </a>
+                        </li>
+                    @endif
+                </ul>
             </li>
         @endif
         @if (can('tickets'))
@@ -93,6 +133,75 @@
                         </svg>
                     </div>
                     <div class="menu-title">Manage Ticket</div>
+                </a>
+            </li>
+        @endif
+        @if (can('customers'))
+            <li>
+
+                <a href="{{ url('/all-customers') }}"
+                    class="{{ Route::currentRouteName() == 'allCustomers' ? 'active' : '' }}">
+                    <div class="parent-icon">
+
+
+                        <svg width="20" height="25" viewBox="0 0 20 25" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g clip-path="url(#clip0_347_6520)">
+                                <path
+                                    d="M6.77228 5.76636H5.16153C4.73433 5.76636 4.32463 5.97495 4.02256 6.34626C3.72048 6.71757 3.55078 7.22116 3.55078 7.74627V19.6257C3.55078 20.1509 3.72048 20.6545 4.02256 21.0258C4.32463 21.3971 4.73433 21.6057 5.16153 21.6057H9.74975"
+                                    stroke="#FDCF6F" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path
+                                    d="M14.826 12.6961V7.74627C14.826 7.22116 14.6563 6.71757 14.3542 6.34626C14.0521 5.97495 13.6424 5.76636 13.2152 5.76636H11.6045"
+                                    stroke="#FDCF6F" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path
+                                    d="M9.99347 3.78638H8.38272C7.49313 3.78638 6.77197 4.67281 6.77197 5.76629C6.77197 6.85977 7.49313 7.7462 8.38272 7.7462H9.99347C10.8831 7.7462 11.6042 6.85977 11.6042 5.76629C11.6042 4.67281 10.8831 3.78638 9.99347 3.78638Z"
+                                    stroke="#FDCF6F" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M6.77197 11.7061H9.99347" stroke="#FDCF6F" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M6.77197 15.6659H9.1881" stroke="#FDCF6F" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path
+                                    d="M13.6179 20.6157C14.7299 20.6157 15.6314 19.5076 15.6314 18.1408C15.6314 16.7739 14.7299 15.6659 13.6179 15.6659C12.5059 15.6659 11.6045 16.7739 11.6045 18.1408C11.6045 19.5076 12.5059 20.6157 13.6179 20.6157Z"
+                                    stroke="#FDCF6F" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M15.2285 20.1207L17.242 22.5956" stroke="#FDCF6F" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </g>
+                            <defs>
+                                <clipPath id="clip0_347_6520">
+                                    <rect width="19.329" height="23.759" fill="white"
+                                        transform="translate(0.329102 0.816528)" />
+                                </clipPath>
+                            </defs>
+                        </svg>
+
+                    </div>
+                    <div class="menu-title">All Customers</div>
+                </a>
+            </li>
+        @endif
+        @if (can('event-bookings'))
+            <li>
+                <a href="{{ url('/events') }}" class="{{ Route::currentRouteName() == 'events' ? 'active' : '' }}">
+                    <div class="parent-icon">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g clip-path="url(#clip0_153_3370)">
+                                <path
+                                    d="M2.5 16.5C2.0875 16.5 1.73425 16.3533 1.44025 16.0598C1.14675 15.7658 1 15.4125 1 15L1 4.5C1 4.0875 1.14675 3.73425 1.44025 3.44025C1.73425 3.14675 2.0875 3 2.5 3L13 3C13.4125 3 13.7658 3.14675 14.0598 3.44025C14.3533 3.73425 14.5 4.0875 14.5 4.5L14.5 8.7375C14.2625 8.625 14.0187 8.53425 13.7687 8.46525C13.5187 8.39675 13.2625 8.34375 13 8.30625V4.5L2.5 4.5L2.5 11.25H5.65C5.7625 11.5875 5.95 11.8813 6.2125 12.1313C6.475 12.3813 6.76875 12.5562 7.09375 12.6563C7.05625 12.9063 7.03125 13.1593 7.01875 13.4153C7.00625 13.6718 7.01875 13.925 7.05625 14.175C6.60625 14.0875 6.18425 13.922 5.79025 13.6785C5.39675 13.4345 5.05 13.125 4.75 12.75H2.5V15L7.24375 15C7.33125 15.275 7.43125 15.5375 7.54375 15.7875C7.65625 16.0375 7.79375 16.275 7.95625 16.5H2.5ZM2.5 15L7.24375 15L2.5 15ZM11.5187 17.25L11.2938 16.125C11.1438 16.0625 11.0033 15.997 10.8723 15.9285C10.7408 15.8595 10.6063 15.775 10.4687 15.675L9.38125 16.0125L8.63125 14.7375L9.49375 13.9875C9.46875 13.8375 9.45625 13.675 9.45625 13.5C9.45625 13.325 9.46875 13.1625 9.49375 13.0125L8.63125 12.2625L9.38125 10.9875L10.4687 11.325C10.6063 11.225 10.7408 11.1405 10.8723 11.0715C11.0033 11.003 11.1438 10.9375 11.2938 10.875L11.5187 9.75H13.0187L13.2438 10.875C13.3938 10.9375 13.5345 11.003 13.666 11.0715C13.797 11.1405 13.9312 11.225 14.0687 11.325L15.1562 10.9875L15.9062 12.2625L15.0438 13.0125C15.0688 13.1625 15.0812 13.325 15.0812 13.5C15.0812 13.675 15.0688 13.8375 15.0438 13.9875L15.9062 14.7375L15.1562 16.0125L14.0687 15.675C13.9312 15.775 13.797 15.8595 13.666 15.9285C13.5345 15.997 13.3938 16.0625 13.2438 16.125L13.0187 17.25H11.5187ZM12.2687 15C12.6812 15 13.0345 14.8533 13.3285 14.5598C13.622 14.2658 13.7687 13.9125 13.7687 13.5C13.7687 13.0875 13.622 12.7342 13.3285 12.4402C13.0345 12.1467 12.6812 12 12.2687 12C11.8562 12 11.5033 12.1467 11.2098 12.4402C10.9158 12.7342 10.7687 13.0875 10.7687 13.5C10.7687 13.9125 10.9158 14.2658 11.2098 14.5598C11.5033 14.8533 11.8562 15 12.2687 15Z"
+                                    fill="#FDCF6F" />
+                            </g>
+                            <defs>
+                                <clipPath id="clip0_153_3370">
+                                    <rect width="20" height="20" fill="white" />
+                                </clipPath>
+                            </defs>
+                        </svg>
+                    </div>
+                    <div class="menu-title">Event Bookings</div>
                 </a>
             </li>
         @endif
@@ -150,46 +259,14 @@
                 </a>
             </li>
         @endif --}}
-        @php
-            $isMembershipRoute = request()->is('memberships*') || request()->is('membership-history*');
-        @endphp
-        @if (can('membership') || can('member-history'))
-            <li onclick="showMembershipSystemMenu()" class="{{ $isMembershipRoute ? 'mm-active' : '' }}">
 
-                <a href="javascript:void(0);" aria-expanded="{{ $isMembershipRoute ? 'true' : 'false' }}" style="justify-content: space-between;">
-                    <div class="parent-icon">
-                        <svg width="15" height="16" viewBox="0 0 15 16" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M13.5 0H1.5C0.6675 0 0 0.712 0 1.6V10.4C0 11.288 0.6675 12 1.5 12H4.5V16L7.5 14.4L10.5 16V12H13.5C14.3325 12 15 11.288 15 10.4V1.6C15 0.712 14.3325 0 13.5 0ZM13.5 10.4H1.5V8.8H13.5V10.4ZM13.5 6.4H1.5V1.6H13.5V6.4Z"
-                                fill="#FACB6A" />
-                        </svg>
-                    </div>Member Services<span class="fa arrow"></span>
-                </a>
-
-                <ul aria-expanded="false" id="membershipMenu" class="ml-3 {{ $isMembershipRoute ? '' : 'd-none' }}"
-                    style="border:none; background:none;">
-                    @if (can('membership'))
-                        <li>
-                            <a href="{{ url('/memberships') }}"
-                                class="{{ Route::currentRouteName() == 'memberships' ? 'active' : '' }}">
-                                Memberships
-                            </a>
-                        </li>
-                    @endif
-                    @if (can('member-history'))
-                        <li>
-                            <a href="{{ url('/membership-history') }}"
-                                class="{{ Route::currentRouteName() == 'membershipHistory' ? 'active' : '' }}">
-                                Member History
-                            </a>
-                        </li>
-                    @endif
-                </ul>
-            </li>
-        @endif
         @php
-            $isReportRoute = request('key') === "Ticket" || request('key') === "Membership" || request('key') === "MembershipUser" || request('key') === "Event" || request('key') === "Billing";
+            $isReportRoute =
+                request('key') === 'Ticket' ||
+                request('key') === 'Membership' ||
+                request('key') === 'MembershipUsage' ||
+                request('key') === 'Event' ||
+                request('key') === 'Billing';
         @endphp
         @if (can('reports-ticket') ||
                 can('reports-membership') ||
@@ -198,13 +275,12 @@
                 can('report-membership-user'))
             <li onclick="showReportMenu()" class="{{ $isReportRoute ? 'mm-active' : '' }}">
 
-                <a href="javascript:void(0);" aria-expanded="{{ $isReportRoute ? 'true' : 'false' }}" style="justify-content: space-between;">
+                <a href="javascript:void(0);" aria-expanded="{{ $isReportRoute ? 'true' : 'false' }}"
+                    style="justify-content: space-between;">
                     <div class="parent-icon">
-                        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M4 4H6V20H4V4ZM10 10H12V20H10V10ZM16 6H18V20H16V6Z"
-                                fill="#FDCF6F"
-                            />
+                        <svg width="21" height="21" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 4H6V20H4V4ZM10 10H12V20H10V10ZM16 6H18V20H16V6Z" fill="#FDCF6F" />
                         </svg>
 
                     </div>
@@ -216,48 +292,36 @@
                     style="border:none; background:none;  ">
                     @if (can('reports-ticket'))
                         <li><a href="{{ url('/reports?key=Ticket') }}"
-                                class="menu-title {{ request('key') === 'Ticket' ? 'active' : '' }}">Ticket Report</a></li>
+                                class="menu-title {{ request('key') === 'Ticket' ? 'active' : '' }}">Ticket Report</a>
+                        </li>
                     @endif
                     @if (can('reports-membership'))
-                        <li><a href="{{ url('/reports?key=Membership') }}" class="menu-title {{ request('key') === 'Membership' ? 'active' : '' }}">Membership Report</a>
+                        <li><a href="{{ url('/reports?key=Membership') }}"
+                                class="menu-title {{ request('key') === 'Membership' ? 'active' : '' }}">Membership
+                                Report</a>
                         </li>
                     @endif
                     @if (can('report-membership-user'))
-                        <li><a href="{{ url('/reports?key=MembershipUser') }}" class="menu-title {{ request('key') === 'MembershipUser' ? 'active' : '' }}">Membership User</a>
+                        <li><a href="{{ url('/reports?key=MembershipUsage') }}"
+                                class="menu-title {{ request('key') === 'MembershipUsage' ? 'active' : '' }}">Membership
+                                Usage</a>
                         </li>
                     @endif
                     @if (can('reports-event'))
-                        <li><a href="{{ url('/reports?key=Event') }}" class="menu-title {{ request('key') === 'Event' ? 'active' : '' }}">Event Report</a></li>
+                        <li><a href="{{ url('/reports?key=Event') }}"
+                                class="menu-title {{ request('key') === 'Event' ? 'active' : '' }}">Event Report</a>
+                        </li>
                     @endif
                     @if (can('reports-openbilling'))
-                        <li><a href="{{ url('/reports?key=Billing') }}" class="menu-title {{ request('key') === 'Billing' ? 'active' : '' }}">Open Billing Report</a>
+                        <li><a href="{{ url('/reports?key=Billing') }}"
+                                class="menu-title {{ request('key') === 'Billing' ? 'active' : '' }}">Open Billing
+                                Report</a>
                         </li>
                     @endif
                 </ul>
             </li>
         @endif
-        @if (can('event-bookings'))
-            <li>
-                <a href="{{ url('/events') }}" class="{{ Route::currentRouteName() == 'events' ? 'active' : '' }}">
-                    <div class="parent-icon">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <g clip-path="url(#clip0_153_3370)">
-                                <path
-                                    d="M2.5 16.5C2.0875 16.5 1.73425 16.3533 1.44025 16.0598C1.14675 15.7658 1 15.4125 1 15L1 4.5C1 4.0875 1.14675 3.73425 1.44025 3.44025C1.73425 3.14675 2.0875 3 2.5 3L13 3C13.4125 3 13.7658 3.14675 14.0598 3.44025C14.3533 3.73425 14.5 4.0875 14.5 4.5L14.5 8.7375C14.2625 8.625 14.0187 8.53425 13.7687 8.46525C13.5187 8.39675 13.2625 8.34375 13 8.30625V4.5L2.5 4.5L2.5 11.25H5.65C5.7625 11.5875 5.95 11.8813 6.2125 12.1313C6.475 12.3813 6.76875 12.5562 7.09375 12.6563C7.05625 12.9063 7.03125 13.1593 7.01875 13.4153C7.00625 13.6718 7.01875 13.925 7.05625 14.175C6.60625 14.0875 6.18425 13.922 5.79025 13.6785C5.39675 13.4345 5.05 13.125 4.75 12.75H2.5V15L7.24375 15C7.33125 15.275 7.43125 15.5375 7.54375 15.7875C7.65625 16.0375 7.79375 16.275 7.95625 16.5H2.5ZM2.5 15L7.24375 15L2.5 15ZM11.5187 17.25L11.2938 16.125C11.1438 16.0625 11.0033 15.997 10.8723 15.9285C10.7408 15.8595 10.6063 15.775 10.4687 15.675L9.38125 16.0125L8.63125 14.7375L9.49375 13.9875C9.46875 13.8375 9.45625 13.675 9.45625 13.5C9.45625 13.325 9.46875 13.1625 9.49375 13.0125L8.63125 12.2625L9.38125 10.9875L10.4687 11.325C10.6063 11.225 10.7408 11.1405 10.8723 11.0715C11.0033 11.003 11.1438 10.9375 11.2938 10.875L11.5187 9.75H13.0187L13.2438 10.875C13.3938 10.9375 13.5345 11.003 13.666 11.0715C13.797 11.1405 13.9312 11.225 14.0687 11.325L15.1562 10.9875L15.9062 12.2625L15.0438 13.0125C15.0688 13.1625 15.0812 13.325 15.0812 13.5C15.0812 13.675 15.0688 13.8375 15.0438 13.9875L15.9062 14.7375L15.1562 16.0125L14.0687 15.675C13.9312 15.775 13.797 15.8595 13.666 15.9285C13.5345 15.997 13.3938 16.0625 13.2438 16.125L13.0187 17.25H11.5187ZM12.2687 15C12.6812 15 13.0345 14.8533 13.3285 14.5598C13.622 14.2658 13.7687 13.9125 13.7687 13.5C13.7687 13.0875 13.622 12.7342 13.3285 12.4402C13.0345 12.1467 12.6812 12 12.2687 12C11.8562 12 11.5033 12.1467 11.2098 12.4402C10.9158 12.7342 10.7687 13.0875 10.7687 13.5C10.7687 13.9125 10.9158 14.2658 11.2098 14.5598C11.5033 14.8533 11.8562 15 12.2687 15Z"
-                                    fill="#FDCF6F" />
-                            </g>
-                            <defs>
-                                <clipPath id="clip0_153_3370">
-                                    <rect width="20" height="20" fill="white" />
-                                </clipPath>
-                            </defs>
-                        </svg>
-                    </div>
-                    <div class="menu-title">Event Bookings</div>
-                </a>
-            </li>
-        @endif
+        
         @if (can('openbilling'))
             <li>
                 <a href="{{ url('/open-billing') }}"
@@ -281,53 +345,7 @@
                 </a>
             </li>
         @endif
-        @if (can('customers'))
-            <li>
-
-                <a href="{{ url('/all-customers') }}"
-                    class="{{ Route::currentRouteName() == 'allCustomers' ? 'active' : '' }}">
-                    <div class="parent-icon">
-
-
-                        <svg width="20" height="25" viewBox="0 0 20 25" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <g clip-path="url(#clip0_347_6520)">
-                                <path
-                                    d="M6.77228 5.76636H5.16153C4.73433 5.76636 4.32463 5.97495 4.02256 6.34626C3.72048 6.71757 3.55078 7.22116 3.55078 7.74627V19.6257C3.55078 20.1509 3.72048 20.6545 4.02256 21.0258C4.32463 21.3971 4.73433 21.6057 5.16153 21.6057H9.74975"
-                                    stroke="#FDCF6F" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" />
-                                <path
-                                    d="M14.826 12.6961V7.74627C14.826 7.22116 14.6563 6.71757 14.3542 6.34626C14.0521 5.97495 13.6424 5.76636 13.2152 5.76636H11.6045"
-                                    stroke="#FDCF6F" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" />
-                                <path
-                                    d="M9.99347 3.78638H8.38272C7.49313 3.78638 6.77197 4.67281 6.77197 5.76629C6.77197 6.85977 7.49313 7.7462 8.38272 7.7462H9.99347C10.8831 7.7462 11.6042 6.85977 11.6042 5.76629C11.6042 4.67281 10.8831 3.78638 9.99347 3.78638Z"
-                                    stroke="#FDCF6F" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" />
-                                <path d="M6.77197 11.7061H9.99347" stroke="#FDCF6F" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round" />
-                                <path d="M6.77197 15.6659H9.1881" stroke="#FDCF6F" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round" />
-                                <path
-                                    d="M13.6179 20.6157C14.7299 20.6157 15.6314 19.5076 15.6314 18.1408C15.6314 16.7739 14.7299 15.6659 13.6179 15.6659C12.5059 15.6659 11.6045 16.7739 11.6045 18.1408C11.6045 19.5076 12.5059 20.6157 13.6179 20.6157Z"
-                                    stroke="#FDCF6F" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" />
-                                <path d="M15.2285 20.1207L17.242 22.5956" stroke="#FDCF6F" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round" />
-                            </g>
-                            <defs>
-                                <clipPath id="clip0_347_6520">
-                                    <rect width="19.329" height="23.759" fill="white"
-                                        transform="translate(0.329102 0.816528)" />
-                                </clipPath>
-                            </defs>
-                        </svg>
-
-                    </div>
-                    <div class="menu-title">All Customers</div>
-                </a>
-            </li>
-        @endif
+        
         {{-- @if (can('admin'))
             <li>
                 <a href="{{ url('/admin') }}" class="{{ Route::currentRouteName() == 'admin' ? 'active' : '' }}">
@@ -373,20 +391,25 @@
             </li>
         @endif --}}
         @php
-            $isSystemRoute = request()->is('permission*') || request()->is('users/role*') || request()->is('users/admin*') || request()->is('admin*');
+            $isSystemRoute =
+                request()->is('permission*') ||
+                request()->is('users/role*') ||
+                request()->is('users/admin*') ||
+                request()->is('admin*');
         @endphp
 
 
         @if (can('permission-manage') || auth('admin')->user()->isSuperAdmin || can('admin'))
             <li onclick="showReportSystemMenu()" class="{{ $isSystemRoute ? 'mm-active' : '' }}">
 
-                <a href="javascript:void(0);" aria-expanded="{{ $isSystemRoute ? 'true' : 'false' }}" style="justify-content: space-between;">
+                <a href="javascript:void(0);" aria-expanded="{{ $isSystemRoute ? 'true' : 'false' }}"
+                    style="justify-content: space-between;">
                     <div class="parent-icon">
-                        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M4 4H8V8H4V4ZM10 4H20V6H10V4ZM10 8H20V10H10V8ZM4 10H8V14H4V10ZM10 12H20V14H10V12ZM4 16H8V20H4V16ZM10 16H20V18H10V16Z"
-                            fill="#FDCF6F"
-                        />
+                        <svg width="21" height="21" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M4 4H8V8H4V4ZM10 4H20V6H10V4ZM10 8H20V10H10V8ZM4 10H8V14H4V10ZM10 12H20V14H10V12ZM4 16H8V20H4V16ZM10 16H20V18H10V16Z"
+                                fill="#FDCF6F" />
                         </svg>
 
                     </div>System <span class="fa arrow"></span>
@@ -396,13 +419,16 @@
                 <ul aria-expanded="false" id="reportSystemMenu" class="ml-3 {{ $isSystemRoute ? '' : 'd-none' }}"
                     style="border:none; background:none;">
                     @if (can('permission-manage'))
-                        <li><a href="{{ route('permission.index') }}" class="nav-link {{ request()->is('permission') ? 'active' : '' }}"><i
+                        <li><a href="{{ route('permission.index') }}"
+                                class="nav-link {{ request()->is('permission') ? 'active' : '' }}"><i
                                     class="fa fa-lock me-3"></i>Add Permission</a>
                         </li>
-                        <li><a href="{{ route('admin.admin.role') }}" class="nav-link {{ request()->is('users/role') ? 'active' : '' }}"><i
+                        <li><a href="{{ route('admin.admin.role') }}"
+                                class="nav-link {{ request()->is('users/role') ? 'active' : '' }}"><i
                                     class="fa fa-lock me-3"></i>Manage Role</a>
                         </li>
-                        <li><a href="{{ route('admin.admin.permission') }}" class="nav-link {{ request()->is('users/admin') ? 'active' : '' }}"><i
+                        <li><a href="{{ route('admin.admin.permission') }}"
+                                class="nav-link {{ request()->is('users/admin') ? 'active' : '' }}"><i
                                     class="fa fa-users me-3"></i>Manage Admin</a>
                         </li>
                     @endif
