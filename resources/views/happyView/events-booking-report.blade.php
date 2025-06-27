@@ -27,12 +27,9 @@
                             </li>
                         </ul>
                     </div>
-
                 </nav>
             </div>
         </header>
-
-
         <!--end header -->
         <!--start page wrapper -->
         <div class="page-wrapper">
@@ -85,7 +82,6 @@
                                                         <td style="text-transform: capitalize;">
                                                             {{ $event_booking->bill_name }}</td>
                                                         <td>{{ $event_booking->subtotal }}</td>
-
                                                         <td>{{ $event_booking->gst18 }}</td>
                                                         <td>{{ $event_booking->gst12 }}</td>
                                                         <td>{{ $event_booking->gst5 }}</td>
