@@ -55,7 +55,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>                            
+                            </div>
                             <!-- data table  -->
                             <div class="container">
                                 <div class="row table-responsive">

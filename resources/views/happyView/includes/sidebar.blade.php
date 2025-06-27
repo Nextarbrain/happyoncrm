@@ -264,7 +264,7 @@
             $isReportRoute =
                 request('key') === 'Ticket' ||
                 request('key') === 'Membership' ||
-                request('key') === 'MembershipUser' ||
+                request('key') === 'MembershipUsage' ||
                 request('key') === 'Event' ||
                 request('key') === 'Billing';
         @endphp
@@ -302,9 +302,9 @@
                         </li>
                     @endif
                     @if (can('report-membership-user'))
-                        <li><a href="{{ url('/reports?key=MembershipUser') }}"
-                                class="menu-title {{ request('key') === 'MembershipUser' ? 'active' : '' }}">Membership
-                                User</a>
+                        <li><a href="{{ url('/reports?key=MembershipUsage') }}"
+                                class="menu-title {{ request('key') === 'MembershipUsage' ? 'active' : '' }}">Membership
+                                Usage</a>
                         </li>
                     @endif
                     @if (can('reports-event'))
