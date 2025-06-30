@@ -51,7 +51,7 @@
                                             Search:
                                         </div>
                                         <div class="mb-2">
-                                            <input type="search" id="datatable-search" class="form-control">
+                                            <input type="search" id="datatable-search" class="form-control form-control-sm">
                                         </div>
                                     </div>
                                 </div>
@@ -172,8 +172,6 @@
                 info: true
             });
             table.buttons().container().appendTo('#datatable-buttons');
-
-            $('#datatable-search').addClass('form-control-sm');
 
             // Bind custom search input
             $('#datatable-search').on('keyup', function() {

@@ -68,7 +68,7 @@
                                             @endif
                                         </div>
                                         <div class="mr-2 mb-2 mx-3">
-                                            <input type="search" id="datatable-search" class="form-control"
+                                            <input type="search" id="datatable-search" class="form-control form-control-sm"
                                                 placeholder="Search...">
                                         </div>
                                         <div class="mb-2">
@@ -355,9 +355,7 @@
                 responsive: true,
                 info: true
             });
-            table.buttons().container().appendTo('#datatable-buttons');
-
-            $('#datatable-search').addClass('form-control-sm');
+            table.buttons().container().appendTo('#datatable-buttons');            
 
             // Bind custom search input
             $('#datatable-search').on('keyup', function() {

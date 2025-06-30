@@ -76,7 +76,7 @@
                                             <i class="fa fa-trash-o fa-lg text-danger" aria-hidden="true"></i>
                                         </div>
                                         <div class="mr-2 mb-2 mx-3">
-                                            <input type="search" id="datatable-search" class="form-control" placeholder="Search...">
+                                            <input type="search" id="datatable-search" class="form-control form-control-sm" placeholder="Search...">
                                         </div>
                                         <div class="mb-2">
                                             <a href="{{ url('/add-event') }}" class="btn btn-sm btn-primary">Add New +</a>
@@ -231,16 +231,13 @@
                 responsive: true,
                 info: true
             });
-            table.buttons().container().appendTo('#datatable-buttons');
-
-            $('#datatable-search').addClass('form-control-sm');
+            table.buttons().container().appendTo('#datatable-buttons');            
 
             // Bind custom search input
             $('#datatable-search').on('keyup', function() {
                 table.search(this.value).draw();
             });
             $('.dt-buttons button').addClass('btn-sm');
-
         });
     </script>
 
