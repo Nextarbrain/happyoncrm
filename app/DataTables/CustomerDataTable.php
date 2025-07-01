@@ -124,16 +124,23 @@ class CustomerDataTable extends DataTable
         ->setTableId('customer-table')
         ->columns($this->getColumns())
         ->minifiedAjax()
-        ->dom('lBfrtip')
+        ->dom(
+                "<'row mb-2 align-items-center'" .
+                    "<'col-md-auto d-flex align-items-center gap-2'B>" .
+                    "<'col-md d-flex justify-content-end align-items-center gap-2'f<'#custom-toolbar'>>" .
+                    ">" .
+                    "<'row'<'col-sm-12'tr>>" .
+                    "<'row mt-2'<'col-sm-4'i><'col-sm-4 text-center'l><'col-sm-4 text-end'p>>"
+            )
         ->orderBy(1)
         ->buttons([
-            'extend' => 'reload',
+            // 'extend' => 'reload',
             ['extend' => 'csv', 'className' => 'btn btn-sm btn-primary'],
             ['extend' => 'copy', 'className' => 'btn btn-sm btn-primary'],
             ['extend' => 'excel', 'className' => 'btn btn-sm btn-primary'],
             ['extend' => 'print', 'className' => 'btn btn-sm btn-primary'],
             ['extend' => 'pdf', 'className' => 'btn btn-sm btn-primary'],
-            'colvis'
+            ['extend' => 'colvis', 'className' => 'btn btn-sm btn-primary'],
         ])
         ->columnDefs([
             ['checkboxes' => true, 'render' => '<input  type="checkbox">', 'target' => 0, 'selectRow' => true]
@@ -144,10 +151,10 @@ class CustomerDataTable extends DataTable
         ->lengthMenu([
             [10, 25, 50, 100, 500, -1], // Show these options in the length menu, -1 will show all
             ['10', '25', '50', '100', '500', 'All'] // Label for each option
-        ])
-        ->languageSearchPlaceholder('Search...')
+        ])        
         ->language([
-            'searchPlaceholder' => "Search All Columns..."
+            'searchPlaceholder' => "Search All Columns...",
+            'search' => '',
         ]);
     }
 

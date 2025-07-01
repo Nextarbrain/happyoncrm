@@ -88,7 +88,6 @@
                             <div class="container">
                                 <div class="row table-responsive">
                                     <div class="data_table">
-
                                         <table id="example1" class="table table-striped text-center"
                                             style="width:100%">
                                             <thead>
