@@ -1,4 +1,5 @@
 @include('happyView.includes.head')
+
 <body>
     <!--wrapper-->
     <div class="wrapper">
@@ -68,8 +69,8 @@
                                             @endif
                                         </div>
                                         <div class="mr-2 mb-2 mx-3">
-                                            <input type="search" id="datatable-search" class="form-control form-control-sm"
-                                                placeholder="Search...">
+                                            <input type="search" id="datatable-search"
+                                                class="form-control form-control-sm" placeholder="Search...">
                                         </div>
                                         <div class="mb-2">
                                             @if (can('membership-add'))
@@ -88,7 +89,8 @@
                                             style="width:100%">
                                             <thead>
                                                 <tr>
-                                                    <th><input type="checkbox" onclick="checkAll(this)"></th>
+                                                    <th><input type="checkbox" name="checkAll-member"
+                                                            onclick="checkAll(this)"></th>
                                                     <th>Kid Name</th>
                                                     <th>Date</th>
                                                     <th>Renewal</th>
@@ -105,7 +107,7 @@
                                             <tbody>
                                                 @foreach ($membershipUsers as $membershipUser)
                                                     <tr>
-                                                        <td><input type="checkbox"
+                                                        <td><input name="member-check" type="checkbox"
                                                                 data-item-id="{{ $membershipUser->id }}"
                                                                 class="membership_checkbox"></td>
                                                         <td class="text-capitalize">
@@ -192,7 +194,7 @@
                             @if (auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
                                 <div class="col-md-12 ">
                                     <div class="mb-4 input_wrap">
-                                        <label for="branch_id">Branch<span>*</span></label>
+                                        <label for="branchId">Branch<span>*</span></label>
                                         <select name="branch_id" class="form-select" id="branchId" required>
                                             @foreach ($branches as $branch)
                                                 <option value="{{ $branch['id'] }}">
@@ -221,14 +223,14 @@
                                 <div class="mb-4 input_wrap">
                                     <label for="name">Member Name <span>*</span></label>
                                     <input type="text" class="form-control" placeholder="Name of Kid"
-                                        name="name" required>
+                                        name="name" id='name' required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-4 input_wrap">
                                     <label for="phone">Phone <span>*</span></label>
                                     <input type="text" class="form-control" placeholder="Phone" name="phone"
-                                        maxlength="10" required>
+                                        id="phone" maxlength="10" required>
                                 </div>
                             </div>
                             <div class="col-md-12 ">
@@ -262,7 +264,7 @@
                                     <label for="coupon_code">COUPAN CODE</label>
                                     <div class="d-flex align-items-center">
                                         <input type="text" class="form-control" placeholder="Any Discount Code"
-                                            name="coupon_code">
+                                            name="coupon_code" id="coupon_code">
                                         <button type="button" class="btn btn-primary"
                                             id="apply-coupon">Apply</button>
                                     </div>
@@ -283,7 +285,7 @@
                                 </div>
                                 <hr>
                                 <div class="gst">
-                                    <p id="gst">Includes Gst @ 18% on
+                                    <p id="gst">Exclude Gst @ 18% on
                                     </p>
                                     <p id="gstTotal"></p>
                                     <input type="hidden" id="gst18" name="gst18">
@@ -297,7 +299,7 @@
                                 <hr>
                             </div>
                             <div class="tearm_condition">
-                                <input type="checkbox" id="" name="" value=""
+                                <input type="checkbox" id="term-text" name="term-text" value=""
                                     checked="checked">
                                 <p>By Agreeing to the <b>Terms and Condition</b>
                                     of HappyOn</p>
@@ -355,7 +357,7 @@
                 responsive: true,
                 info: true
             });
-            table.buttons().container().appendTo('#datatable-buttons');            
+            table.buttons().container().appendTo('#datatable-buttons');
 
             // Bind custom search input
             $('#datatable-search').on('keyup', function() {
@@ -435,7 +437,6 @@
             var membershipId = $('#membershipPlan').val();
             var branchId = $('#branchId').val();
             var couponcode = $('input[name="coupon_code"]').val();
-            console.log(membershipId);
             var baseUrl = "{{ URL::to('/') }}";
             $.ajax({
                 url: baseUrl + '/get-membership-plan',
@@ -458,18 +459,23 @@
                         $('#plan_value').val(response.price);
                         var fullPrice = parseFloat(response.price);
                         $('#subtotal').val(parseFloat(response.price));
-                        $('#price').text('₹ ' + fullPrice);
-                        $('#gst').html("Includes Gst @18% on ₹ " + fullPrice);
+                        /* plan price should be the same  gstTotal */
+                        $('#price').text('₹ ' + response.subtotal);
+                        $('#gst').html("Exclude Gst @18% on ₹ " + response.subtotal);
+                        let discount = 0;
                         if (response && response.coupan_name) {
+                            discount = parseFloat(response.discounte_amt);
                             $('#couponCodeShow').html("Coupon Code (" + response.coupan_name + ")");
-                            $('#couponValueShow').html(response.coupan_price.toFixed(
-                                2));
+                            $('#couponValueShow').html(discount.toFixed(2));
+                        } else {
+                            $('#couponCodeShow').html("Coupon");
+                            $('#couponValueShow').html('');
                         }
-                        var total = (parseFloat(response.price) * 18) / 100;
+                        var total = (parseFloat(response.subtotal) * 18) / 100;
                         $('#gstTotal').html(total);
                         $('#gst18').val(total);
-                        var totalAmount = parseFloat(response.price) + total;
-                        $('#totalAmount').html('₹ ' + fullPrice);
+                        let totalAmount = parseFloat(response.subtotal) - discount;
+                        $('#totalAmount').html('₹ ' + totalAmount);
                         $('#wholeAMount').val(fullPrice);
                     } else {
                         $('#plan_value').val(0);
@@ -512,7 +518,7 @@
                 $("#success-message").fadeOut("slow", function() {
                     $(this).remove();
                 });
-            }, 3000); 
+            }, 3000);
         });
 
         document.getElementById('membership_div').addEventListener("click", function() {
