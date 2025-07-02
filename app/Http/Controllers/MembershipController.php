@@ -4,10 +4,8 @@ namespace App\Http\Controllers;
 
 use Carbon;
 use Exception;
-use Dompdf\Dompdf;
 use App\Models\Kid;
 use App\Models\User;
-use App\Models\Admin;
 use App\Models\Coupon;
 use App\Models\Event;
 use App\Models\UserDetail;
@@ -16,16 +14,8 @@ use Illuminate\Http\Request;
 use App\Models\MembershipBuy;
 use App\Models\PaymentMethod;
 use App\Models\MembershipBuyRenewable;
-use App\Models\DeleteActivity;
 use App\Models\MembershipPlan;
 use App\Models\MembershipHistory;
-
-// //import model admin
-// use Illuminate\Support\Facades\Http;
-// use SimpleSoftwareIO\QrCode\Facades\QrCode;
-
-// //import class hash password
-// use Illuminate\Support\Facades\Hash;
 
 class MembershipController extends Controller
 {
@@ -166,6 +156,7 @@ class MembershipController extends Controller
             return response()->json(["status" => false, "message" => "Please Choose Membership Plan "]);
         }
         $price = $data->price;
+        $data->subtotal = $data->price;
         if ($request->coupon) {
             $coupon = Coupon::where('coupon_name', $request->coupon);
             if ($branchId) {
@@ -180,9 +171,10 @@ class MembershipController extends Controller
         if (isset($coupon) && !is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
             $finalCoupanPrice = $price - $coupon->discount;
             $data->price = number_format($finalCoupanPrice, 2, '.', '');
+            $data->discounte_amt = number_format($coupon->discount, 2, '.', '');
         } elseif (isset($coupon) && !is_null($coupon) && $coupon->discount_type === 'percent') {
             $finalCoupanPrice = ($coupon->discount / 100) * $price;
-            $data->price = number_format($finalCoupanPrice, 2, '.', '');
+            $data->price = $data->discounte_amt = number_format($finalCoupanPrice, 2, '.', '');
         }
         $data->coupan_name = $coupon->coupon_name ?? '';
         $data->coupan_price = $coupon->discount ?? '';
