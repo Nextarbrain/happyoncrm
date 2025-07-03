@@ -65,8 +65,10 @@ class MembershipController extends Controller
         $id = $request->id;
         $user = User::with('membership', 'userDetails', 'event', 'paymentInfo')->where('id', $id)->latest()->first();
 
-        $paymentMethod = PaymentMethod::where('user_id', $id)->latest()->first();
+        $paymentMethod = PaymentMethod::where('user_id', $id)->latest()->first();       
 
+        // $paymentMethod->subTotal
+        $subTotal = $paymentMethod->subTotal + ($paymentMethod->couponvalue ?? 0);
         $data = [
             'guardian_name' => $user->name,
             "payment_method" => $paymentMethod->payment_method,
@@ -79,7 +81,7 @@ class MembershipController extends Controller
             "couponvalue" => $user['paymentInfo']->couponvalue,
             "invoiceNo" => $paymentMethod->id,
 
-            "subTotal" => $paymentMethod->subTotal,
+            "subTotal" => $subTotal,
             "gst18" => $paymentMethod->gst18,
 
             "totalAmount" => $paymentMethod->amounts,
@@ -184,6 +186,8 @@ class MembershipController extends Controller
     public function addMembershipPlan(Request $request)
     {
         hasPermission('membership-add');
+        //  dd($request->input('totalamount'));
+        // dd($request->input('subtotal'));
         $userdetail = UserDetail::with('user')->where('phone_no', $request->input('phone'))->where('membership_plan', 1)->first();
         $getPlan = MembershipPlan::where('id', $request->input('membershipPlan'))->first();
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
@@ -829,7 +833,7 @@ class MembershipController extends Controller
     }
     public function getBranchPlan(Request $request)
     {
-        $branchId = $request->get('branch_id');        
+        $branchId = $request->get('branch_id');
         $membership = MembershipPlan::whereNull('branch_id')->get();
 
         if ($branchId) {
@@ -848,7 +852,7 @@ class MembershipController extends Controller
                 }
                 $membership = $branchPlans->values();
             }
-        }        
+        }
         return response()->json($membership);
     }
 }
