@@ -229,7 +229,6 @@
                                                                 <p id="gstSock">Exclude Gst @5% </p>
                                                                 <p id="valueGst"></p>
                                                             </div>
-
                                                             <hr>
                                                             <div class="amount">
                                                                 <p>Total Amount</p>
@@ -787,7 +786,7 @@
             var totalwithTax = (totalPrice + taxAmount18 + taxAmount5 + taxAmount12).toFixed(2);
             var totalwithOutTax = totalPrice.toFixed(2);
             $('#totalAmount').text("₹ " + totalwithOutTax);
-            $('input[name="totalAmount"]').val(totalwithTax);
+            $('input[name="totalAmount"]').val(totalwithOutTax);
             $('input[name="subTotal"]').text(totalPrice.toFixed(2));
         }
     </script>
@@ -908,7 +907,7 @@
                             finalAmount += gstSocks;
                         }
                         document.getElementById('totalAmount').innerHTML = '₹ ' + sumamount.toFixed(2);
-                        $("#chargeAmount").val(finalAmount.toFixed(2));
+                        $("#chargeAmount").val(sumamount.toFixed(2));
                         $('#gst18').val(gstKid.toFixed(2));
 
                     } else {

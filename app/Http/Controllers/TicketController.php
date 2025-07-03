@@ -250,7 +250,7 @@ class TicketController extends Controller
                 $kidTotal = $kidTempData->where('hours', $dist)->count();
                 array_push($kidsInvoice, ['hours' => $dist, 'quantity' => $kidTotal, 'price' => $KidPrices->kidPrice, 'subtotal' => $totalKidPrice]);
             }
-
+            $subTotal = $paymentMethod->subTotal + ($paymentMethod->couponvalue ?? 0);
             $data = [
                 'guardian_name' => $user->name,
                 "payment_method" => $paymentMethod->payment_method,
@@ -271,7 +271,7 @@ class TicketController extends Controller
                 "adultPrice" => $adultPrice,
                 "socksPrice" => $socksPrice,
                 "extraTime" => $extraTime,
-                "subTotal" => $paymentMethod->subTotal,
+                "subTotal" => $subTotal,
                 "gst18" => $paymentMethod->gst18,
                 "gst12" => $paymentMethod->gst12,
                 "totalAmount" => $paymentMethod->amounts,
