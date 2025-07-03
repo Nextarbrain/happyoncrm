@@ -137,7 +137,7 @@
                                                         @else
                                                             <td>{{ $membershipUser->plan }}</td>
                                                         @endif
-                                                        <td>{{ $membershipUser['userDetails']->phone_no }}</td>
+                                                        <td>{{ optional($membershipUser['userDetails'])->phone_no ?? '' }}</td>                                                        
                                                         <td>{{ $membershipUser->credit_left }} hrs</td>
                                                         <td>{{ $membershipUser->payment_method }}</td>
                                                         <td class="gree_c">
@@ -458,7 +458,7 @@
                     if (response && response.price) {
                         $('#plan_value').val(response.price);
                         var fullPrice = parseFloat(response.price);
-                        $('#subtotal').val(parseFloat(response.price));
+                        $('#subtotal').val(parseFloat(response.subtotal));
                         /* plan price should be the same  gstTotal */
                         $('#price').text('₹ ' + response.subtotal);
                         $('#gst').html("Exclude Gst @18% on ₹ " + response.subtotal);
@@ -476,7 +476,7 @@
                         $('#gst18').val(total);
                         let totalAmount = parseFloat(response.subtotal) - discount;
                         $('#totalAmount').html('₹ ' + totalAmount);
-                        $('#wholeAMount').val(fullPrice);
+                        $('#wholeAMount').val(totalAmount);
                     } else {
                         $('#plan_value').val(0);
                         $('#subtotal').val(0);
