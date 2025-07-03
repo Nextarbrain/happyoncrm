@@ -270,8 +270,8 @@
                                                             <div class="col-md-12 ">
                                                                 <div class="mb-4 input_wrap">
                                                                     <label for="branch_id">Branch<span>*</span></label>
-                                                                    <select name="branch_id" id="branch_id" class="form-select"
-                                                                        required>
+                                                                    <select name="branch_id" id="branch_id"
+                                                                        class="form-select" required>
                                                                         @foreach ($branches as $branch)
                                                                             <option value="{{ $branch['id'] }}">
                                                                                 {{ $branch['name'] }}</option>
@@ -614,11 +614,12 @@
                         var val = parseFloat($(this).val()) || 0;
                         sum += val;
                     });
-                    $('#subtotal').text("₹ " + sum.toFixed(2));
-                    $('#subtotlSave').val(sum.toFixed(2));
+                    var gstKid = (sum * 18) / 100;
+                    var totalDeductGst = sum - gstKid;
+                    $('#subtotal').text("₹ " + totalDeductGst.toFixed(2));
+                    $('#subtotlSave').val(totalDeductGst.toFixed(2));
                     document.getElementById('gstOn').innerHTML = "Exclude Gst @18% on " + sum.toFixed(
                         2);
-                    var gstKid = (sum * 18) / 100;
                     document.getElementById('gstValue').innerHTML = '' + gstKid.toFixed(2);
                     // var finalAmount = sum + gstKid;
                     let finalAmount = sum;
@@ -702,13 +703,15 @@
 
         });
 
-        function calculateTotal() {            
+        function calculateTotal() {
             var sum = 0;
             var totalPrice = 0;
             var taxAmount18 = 0;
             var taxAmount12 = 0;
             var taxAmount5 = 0;
             var finalPriceEach = [];
+            var socksPrice = 0;
+            var paddlePrice = 0;
             $('.kid_price').each(function() {
                 var val = parseFloat($(this).val()) || 0;
                 sum += val;
@@ -717,13 +720,17 @@
             $('select[name="product_quantity[]"]').each(function() {
                 var val = parseFloat($(this).val()) || 0;
                 select1Value.push(val);
-            });            
+            });
             adult_price = [];
             $('.product_price').each(function() {
                 var val = parseFloat($(this).val()) || 0;
                 adult_price.push(val);
-            });            
+            });
             var itemPrice = [];
+            console.log("select1Value => ", select1Value);
+            console.log("adult_price => ", adult_price);
+            console.log("totalPrice => ", totalPrice);
+
             $('input[name="price[]"]').each(function(index) {
                 var finalAdultPrice = parseFloat(select1Value[index]) * parseFloat(adult_price[index]);
                 totalPrice += finalAdultPrice;
@@ -739,7 +746,7 @@
             $('select[name="tax[]"]').each(function(index) {
                 var val = parseFloat($(this).val()) || 0;
                 tax.push(val);
-            });            
+            });
             $('input[name="kid_price[]"]').each(function(index) {
                 var val = parseFloat($(this).val()) || 0;
                 var taxAmount = (val * 18) / 100;
@@ -752,22 +759,32 @@
                 }
                 if (tax[index] == 5) {
                     taxAmount5 += taxAmount;
+                    socksPrice = finalPriceEach[index];
+
                 }
                 if (tax[index] == 12) {
                     taxAmount12 += taxAmount;
+                    paddlePrice = finalPriceEach[index];
                 }
                 var total = (finalPriceEach[index] + taxAmount).toFixed(2);
                 $(this).val(total);
             });
-            $('#subtotal').text("₹ " + totalPrice.toFixed(2));
-            $('input[name="subTotal"]').val(totalPrice.toFixed(2));
-            $('input[name="totalAmount"]').text(totalPrice.toFixed(2));            
+
+            var subTotalPrice = totalPrice - taxAmount18 - socksPrice - paddlePrice;
+            var sockePriceDeductGst = socksPrice - taxAmount5;
+            subTotalPrice += sockePriceDeductGst
+            var peddalPriceDeductGst = paddlePrice - taxAmount12;
+            subTotalPrice += peddalPriceDeductGst
+
+            $('#subtotal').text("₹ " + subTotalPrice.toFixed(2));
+            $('input[name="subTotal"]').val(subTotalPrice.toFixed(2));
+            $('input[name="totalAmount"]').text(totalPrice.toFixed(2));
             let priceWith18Gst = 0;
             tax.forEach((value, index) => {
                 if (value === 18) {
                     priceWith18Gst += adult_price[index] * select1Value[index];
                 }
-            });            
+            });
             let gstOnPrice = sum + priceWith18Gst;
             document.getElementById('gstOn').innerHTML = "Exclude Gst @18% on " + gstOnPrice.toFixed(2);
             $('#gstValue').text("₹ " + taxAmount18.toFixed(2));
@@ -782,7 +799,6 @@
             }
             $('#gst12PercentVal').text("₹ " + taxAmount12.toFixed(2));
             $('input[name="gst12"]').val(taxAmount12.toFixed(2));
-
             var totalwithTax = (totalPrice + taxAmount18 + taxAmount5 + taxAmount12).toFixed(2);
             var totalwithOutTax = totalPrice.toFixed(2);
             $('#totalAmount').text("₹ " + totalwithOutTax);
@@ -855,7 +871,7 @@
                         var socks_price = document.getElementById(
                             'socks_price_backend').value;
                         var finalSocksPrice = parseFloat(socks_price) *
-                            parseFloat(select2Value);                        
+                            parseFloat(select2Value);
                         $("#socks_price").val(finalSocksPrice.toFixed(
                             2));
                         if (isNaN(finalSocksPrice) && isNaN(finalAdultPrice)) {
@@ -928,7 +944,7 @@
                         var socks_price = document.getElementById(
                             'socks_price_backend').value;
                         var finalSocksPrice = parseFloat(socks_price) *
-                            parseFloat(select2Value);                        
+                            parseFloat(select2Value);
                         $("#socks_price").val(finalSocksPrice.toFixed(
                             2));
 
@@ -1155,7 +1171,7 @@
             var hour = parseInt(time[0]);
             var minute = parseInt(time[1]);
             var now1 = new Date();
-            var datetime = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour, minute);            
+            var datetime = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour, minute);
             if (datetime < now1) {
                 alert('Please select current or future date and time');
 
@@ -1183,7 +1199,7 @@
             const form = document.getElementById('my-form');
             const credit = form.querySelector('[name="credit_left"]').value;
 
-            const hrs = form.querySelector('[name="hrs"]').value;            
+            const hrs = form.querySelector('[name="hrs"]').value;
 
             // Validate the form data
             if (parseInt(credit) < parseInt(hrs)) {
