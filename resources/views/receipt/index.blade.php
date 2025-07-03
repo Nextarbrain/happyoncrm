@@ -344,7 +344,7 @@
                                                                  ">
                                                                  <td style="
                                                                     font-size: 15px;
-                                                                    ">Includes Gst
+                                                                    ">Exclude Gst
                                                                     @ 18% :
                                                                  </td>
                                                                  <td
@@ -360,7 +360,7 @@
                                                                  ">
                                                                  <td style="
                                                                     font-size: 15px;
-                                                                    ">Includes Gst
+                                                                    ">Exclude Gst
                                                                     @ 5% :
                                                                  </td>
                                                                  <td
@@ -378,7 +378,7 @@
                                                                  ">
                                                                  <td style="
                                                                     font-size: 15px;
-                                                                    ">Includes Gst
+                                                                    ">Exclude Gst
                                                                     @ 5% :
                                                                  </td>
                                                                  <td
