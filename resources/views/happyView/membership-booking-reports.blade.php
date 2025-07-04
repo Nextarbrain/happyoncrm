@@ -1,4 +1,5 @@
 @include('happyView.includes.head')
+
 <body>
     <!--wrapper-->
     <div class="wrapper">
@@ -30,28 +31,30 @@
             </div>
         </header>
         <!--end header -->
-		<!--start page wrapper -->
+        <!--start page wrapper -->
         <div class="page-wrapper">
             <div class="page-content">
                 <div class="row">
                     <div class="col-md-12">s
                         <div class="dashboard_left">
-							<div class="container-fluid">                                
+                            <div class="container-fluid">
                                 <div class="row mb-2">
                                     <div class="col">
                                         <h5 class="mb-0">Members List ({{ count($membershipUsers) }})</h5>
                                     </div>
                                 </div>
-                                <div class="row mb-3 align-items-center">                                    
+                                <div class="row mb-3 align-items-center">
                                     <div class="col-md-6">
                                         <div id="datatable-buttons"></div>
                                     </div>
-                                    <div class="col-md-6 text-md-right d-flex justify-content-md-end justify-content-start align-items-center flex-wrap">                                       
-                                         <div class="mr-2 mb-2 mx-3">
+                                    <div
+                                        class="col-md-6 text-md-right d-flex justify-content-md-end justify-content-start align-items-center flex-wrap">
+                                        <div class="mr-2 mb-2 mx-3">
                                             Search:
                                         </div>
                                         <div class="mb-2">
-                                            <input type="search" id="datatable-search" class="form-control form-control-sm">
+                                            <input type="search" id="datatable-search"
+                                                class="form-control form-control-sm">
                                         </div>
                                     </div>
                                 </div>
@@ -87,7 +90,13 @@
                                                         <td>MS{{ $membershipUser->id }}</td>
                                                         <td style="text-transform: capitalize;">
                                                             {{ optional($membershipUser['user'])->name ?? '' }}</td>
-                                                        <td>{{ isset($membershipUser['paymentInfo']) && $membershipUser['paymentInfo']->subTotal ? $membershipUser['paymentInfo']->subTotal : 0 }}
+                                                        <td>
+                                                            @php
+                                                                $subTotal_ind =
+                                                                    ($membershipUser['paymentInfo']->subTotal ?? 0) -
+                                                                    ($membershipUser['paymentInfo']->gst18 ?? 0);
+                                                            @endphp
+                                                            {{ $subTotal_ind }}
                                                         </td>
                                                         <td>{{ isset($membershipUser['paymentInfo']) && $membershipUser['paymentInfo']->gst18 ? $membershipUser['paymentInfo']->gst18 : 0 }}
                                                         </td>
@@ -97,7 +106,8 @@
                                                     </tr>
                                                     @php
                                                         $subtotal +=
-                                                            optional($membershipUser['paymentInfo'])->subTotal ?? 0;
+                                                            ($membershipUser['paymentInfo']->subTotal ?? 0) -
+                                                                    ($membershipUser['paymentInfo']->gst18 ?? 0);
                                                         $gst18 += optional($membershipUser['paymentInfo'])->gst18 ?? 0;
                                                         $total += $membershipUser->amount;
                                                     @endphp

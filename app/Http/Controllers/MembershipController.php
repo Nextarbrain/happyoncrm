@@ -68,7 +68,9 @@ class MembershipController extends Controller
         $paymentMethod = PaymentMethod::where('user_id', $id)->latest()->first();       
 
         // $paymentMethod->subTotal
-        $subTotal = $paymentMethod->subTotal + ($paymentMethod->couponvalue ?? 0);
+        $subTotalWithoutDiscount = $paymentMethod->subTotal + ($paymentMethod->couponvalue ?? 0);
+
+        $subTotal = ($subTotalWithoutDiscount - $paymentMethod->gst18);
         $data = [
             'guardian_name' => $user->name,
             "payment_method" => $paymentMethod->payment_method,

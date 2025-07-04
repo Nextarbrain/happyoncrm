@@ -199,7 +199,7 @@
 ">
                                                                         <td style="
     font-size: 15px;
-">Exclude Gst
+">Includes Gst
                                                                             @ 18% :</td>
                                                                         <td
                                                                             style="
