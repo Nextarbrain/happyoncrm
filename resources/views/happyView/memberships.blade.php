@@ -265,8 +265,10 @@
                                     <div class="d-flex align-items-center">
                                         <input type="text" class="form-control" placeholder="Any Discount Code"
                                             name="coupon_code" id="coupon_code">
-                                        <button type="button" class="btn btn-primary"
+                                        <button type="button" class="btn btn-sm btn-primary ms-2"
                                             id="apply-coupon">Apply</button>
+                                        <button type="button" class="btn btn-sm btn-warning ms-2 disabled"
+                                            id="remove-coupon">Remove</button>
                                     </div>
                                     <p id="couponmsg"></p>
                                     <input type="hidden" id="plan_value">
@@ -393,10 +395,16 @@
                 getMembershipPlan();
             });
             $('input[name="coupon_code"]').blur(function() {
-                getMembershipPlan();
+                // getMembershipPlan();
             });
             $('#apply-coupon').click(function() {
                 getMembershipPlan();
+            });
+            $('#remove-coupon').click(function() {
+                $('#coupon_code').val('');
+                $('#apply-coupon').removeClass('disabled');
+                getMembershipPlan();
+                $('#remove-coupon').addClass('disabled');
             });
         });
 
@@ -451,34 +459,35 @@
                 },
                 success: function(response) {
                     if (response.status == false) {
-                        $('#couponmsg').html("<p style='color:red;'>" + response.message + "</p>");
+                        $('#couponmsg').html("<p style='color:red;'> HERE FROM" + response.message + "</p>");
                         return false;
                     }
-                    //  $('#couponmsg').html('<p style="color:#0A5F59;">Apply Coupon Successful!</p>');
                     if (response && response.price) {
                         $('#plan_value').val(response.price);
                         var fullPrice = parseFloat(response.price);
                         var total = (parseFloat(response.subtotal) * 18) / 100;
                         $('#subtotal').val(parseFloat(response.subtotal));
-                        /* plan price should be the same  gstTotal */                        
-                        let stGSTC = response.subtotal-total;
-                        // $('#price').text('₹ SBT' + (response.subtotal-total));
+                        /* plan price should be the same  gstTotal */
+                        let stGSTC = response.subtotal - total;
                         $('#gst').html("Includes Gst @18% on ₹ " + response.subtotal);
-                        let discount = 0;
+                        let couponDiscountAmount = 0;
                         if (response && response.coupan_name) {
-                            discount = parseFloat(response.discounte_amt);
+                            $('#remove-coupon').removeClass('disabled');
+                            $('#apply-coupon').addClass('disabled');
+                            couponDiscountAmount = parseFloat(response.discounted_amt);
                             $('#couponCodeShow').html("Coupon Code (" + response.coupan_name + ")");
-                            $('#couponValueShow').html(discount.toFixed(2));
+                            $('#couponValueShow').html(couponDiscountAmount.toFixed(2));
                         } else {
+                            couponDiscountAmount = 0;
                             $('#couponCodeShow').html("Coupon");
                             $('#couponValueShow').html('');
                         }
-                        stGSTC -= discount.toFixed(2);
-                        $('#price').text('₹ ' + stGSTC );
+                        stGSTC -= couponDiscountAmount.toFixed(2);
+                        $('#price').text('₹ ' + stGSTC);
                         var total = (parseFloat(response.subtotal) * 18) / 100;
                         $('#gstTotal').html(total);
                         $('#gst18').val(total);
-                        let totalAmount = parseFloat(response.subtotal) - discount;
+                        let totalAmount = parseFloat(response.subtotal) - couponDiscountAmount;
                         $('#totalAmount').html('₹ ' + totalAmount);
                         $('#wholeAMount').val(totalAmount);
                     } else {
@@ -493,13 +502,10 @@
                     }
                 },
                 error: function(xhr) {
-                    console.log(xhr.responseText); // Handle errors
+                    console.log(xhr.responseText);
                 }
             });
         }
-        //Current Date
-
-        //var today1 =  new Date().toISOString().substr(0,10);
         var today = new Date();
         var day = ("0" + today.getDate()).slice(-2);
         var month = ("0" + (today.getMonth() + 1)).slice(-2);
