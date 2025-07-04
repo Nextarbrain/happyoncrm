@@ -172,12 +172,15 @@ class MembershipController extends Controller
             }
         }
 
+        $gstAmount = ($data->price * 18) / 100;
+        $planAfterGST = $data->price - $gstAmount;
+
         if (isset($coupon) && !is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
-            $finalCoupanPrice = $price - $coupon->discount;
+            $finalCoupanPrice = $planAfterGST - $coupon->discount;
             $data->price = number_format($finalCoupanPrice, 2, '.', '');
             $data->discounte_amt = number_format($coupon->discount, 2, '.', '');
         } elseif (isset($coupon) && !is_null($coupon) && $coupon->discount_type === 'percent') {
-            $finalCoupanPrice = ($coupon->discount / 100) * $price;
+            $finalCoupanPrice = ($coupon->discount / 100) * $planAfterGST;
             $data->price = $data->discounte_amt = number_format($finalCoupanPrice, 2, '.', '');
         }
         $data->coupan_name = $coupon->coupon_name ?? '';
@@ -275,7 +278,8 @@ class MembershipController extends Controller
                         $amount->couponcode = $request->coupon_code;
                         $amount->subTotal = $request->input('subtotal') - $coupon->discount;
                     } elseif (!is_null($coupon) && $coupon->discount_type === 'percent') {
-                        $amount->couponvalue = ($coupon->discount / 100) * $amount->subTotal;
+                        $totalAfterGST = $amount->subTotal - $request->input('gst18');
+                        $amount->couponvalue = ($coupon->discount / 100) * $totalAfterGST;
                         $amount->couponcode = $request->coupon_code;
                         $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
                     }
@@ -381,7 +385,8 @@ class MembershipController extends Controller
                             $amount->couponcode = $request->coupon_code;
                             $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
                         } elseif (!is_null($coupon) && $coupon->discount_type === 'percent') {
-                            $amount->couponvalue = ($coupon->discount / 100) * $amount->subTotal;
+                            $totalAfterGST = $amount->subTotal - $request->input('gst18');
+                            $amount->couponvalue = ($coupon->discount / 100) * $totalAfterGST;
                             $amount->couponcode = $request->coupon_code;
                             $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
                         }
@@ -486,7 +491,8 @@ class MembershipController extends Controller
                         $amount->couponcode = $request->coupon_code;
                         $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
                     } elseif (!is_null($coupon) && $coupon->discount_type === 'percent') {
-                        $amount->couponvalue = ($coupon->discount / 100) * $amount->subTotal;
+                        $totalAfterGST = $amount->subTotal - $request->input('gst18');
+                        $amount->couponvalue = ($coupon->discount / 100) * $totalAfterGST;
                         $amount->couponcode = $request->coupon_code;
                         $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
                     }
@@ -591,7 +597,8 @@ class MembershipController extends Controller
                     $amount->couponcode = $request->coupon_code;
                     $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
                 } elseif (!is_null($coupon) && $coupon->discount_type === 'percent') {
-                    $amount->couponvalue = ($coupon->discount / 100) * $amount->subTotal;
+                    $totalAfterGST = $amount->subTotal - $request->input('gst18');
+                    $amount->couponvalue = ($coupon->discount / 100) * $totalAfterGST;
                     $amount->couponcode = $request->coupon_code;
                     $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
                 }
