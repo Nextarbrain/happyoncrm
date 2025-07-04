@@ -285,7 +285,7 @@
                                 </div>
                                 <hr>
                                 <div class="gst">
-                                    <p id="gst">Exclude Gst @ 18% on
+                                    <p id="gst">Includes Gst @ 18% on
                                     </p>
                                     <p id="gstTotal"></p>
                                     <input type="hidden" id="gst18" name="gst18">
@@ -458,10 +458,12 @@
                     if (response && response.price) {
                         $('#plan_value').val(response.price);
                         var fullPrice = parseFloat(response.price);
+                        var total = (parseFloat(response.subtotal) * 18) / 100;
                         $('#subtotal').val(parseFloat(response.subtotal));
-                        /* plan price should be the same  gstTotal */
-                        $('#price').text('₹ ' + response.subtotal);
-                        $('#gst').html("Exclude Gst @18% on ₹ " + response.subtotal);
+                        /* plan price should be the same  gstTotal */                        
+                        let stGSTC = response.subtotal-total;
+                        // $('#price').text('₹ SBT' + (response.subtotal-total));
+                        $('#gst').html("Includes Gst @18% on ₹ " + response.subtotal);
                         let discount = 0;
                         if (response && response.coupan_name) {
                             discount = parseFloat(response.discounte_amt);
@@ -471,6 +473,8 @@
                             $('#couponCodeShow').html("Coupon");
                             $('#couponValueShow').html('');
                         }
+                        stGSTC -= discount.toFixed(2);
+                        $('#price').text('₹ ' + stGSTC );
                         var total = (parseFloat(response.subtotal) * 18) / 100;
                         $('#gstTotal').html(total);
                         $('#gst18').val(total);
