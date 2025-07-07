@@ -434,15 +434,11 @@
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
-
-
             </div>
         </div>
         <!--end page wrapper -->
@@ -452,7 +448,6 @@
         <!--Start Back To Top Button-->
         <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
         <!--End Back To Top Button-->
-
     </div>
     <!--end wrapper-->
 
@@ -460,19 +455,11 @@
     <script src="assets/js/bootstrap.bundle.min.js"></script>
     <!--plugins-->
     <script src="assets/js/jquery.min.js"></script>
-
     <script src="assets/plugins/simplebar/js/simplebar.min.js"></script>
     <script src="assets/plugins/metismenu/js/metisMenu.min.js"></script>
     <script src="assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
     <script src="assets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js"></script>
     <script src="assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js"></script>
-    {{-- <script src="assets/plugins/chartjs/js/Chart.min.js"></script>
-    <script src="assets/plugins/chartjs/js/Chart.extension.js"></script>
-    <script src="assets/js/index.js"></script>
-    <!--app JS-->
-    <script src="assets/js/circle-progress.min.js"></script>
-    <script src="assets/js/app.js"></script> --}}
-
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.0/js/toastr.js"></script>
 
@@ -561,6 +548,13 @@
             document.getElementById('gstOn').innerHTML = "Exclude Gst @18%";
             document.getElementById('gstValue').innerHTML = '';
             document.getElementById('totalAmount').innerHTML = '';
+            document.getElementById('couponCodeShow').innerHTML = 'Coupon';
+            document.getElementById('couponValueShow').innerHTML = '';
+            document.getElementById("couponCode").value ='';
+            document.getElementById("couponValue").value ='';
+            $('#couponmsg').removeAttr('style').text('');
+            $('#couponCodebutton').prop('disabled', false);           
+            
             $('#subtotal').text("");
 
             if (!numDivs) {
@@ -822,7 +816,8 @@
                 },
                 success: function(data) {
                     if (data.status === 400) {
-                        $('#couponmsg').html("<p style='color:red;'>" + data.msg + "</p>");
+                        $('#couponmsg').css('color', 'red').text(data.msg);
+                        // $('#couponmsg').html("<p style='color:red;'>" + data.msg + "</p>");
                         return false;
                     }
                     if (!sum) {
@@ -852,7 +847,8 @@
                             var sumamount = sum - discount;
                         }
                         $('#couponCodebutton').prop('disabled', true);
-                        $('#couponmsg').html('<p style="color:#0A5F59;">Apply Coupon Successful!</p>');
+                        $('#couponmsg').css('color', '#0A5F59').text('Apply Coupon Successful!');
+                        // $('#couponmsg').html('<p style="color:#0A5F59;">Apply Coupon Successful!</p>');
 
                         // Get the value of the first select box
                         var select1Value = parseInt($('#adult_qty')
