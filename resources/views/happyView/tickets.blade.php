@@ -553,7 +553,7 @@
             document.getElementById("couponCode").value ='';
             document.getElementById("couponValue").value ='';
             $('#couponmsg').removeAttr('style').text('');
-            $('#couponCodebutton').prop('disabled', false);           
+            $('#couponCodebutton').prop('disabled', false);
             
             $('#subtotal').text("");
 
