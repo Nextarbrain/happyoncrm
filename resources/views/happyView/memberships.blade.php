@@ -459,7 +459,7 @@
                 },
                 success: function(response) {
                     if (response.status == false) {
-                        $('#couponmsg').html("<p style='color:red;'> HERE FROM" + response.message + "</p>");
+                        $('#couponmsg').html("<p style='color:red;'>" + response.message + "</p>");
                         return false;
                     }
                     if (response && response.price) {

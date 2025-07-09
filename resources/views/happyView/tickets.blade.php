@@ -156,12 +156,12 @@
 
                                                         </div>
 
-                                                        <div class="col-md-12 add_adults">
+                                                        {{-- <div class="col-md-12 add_adults">
 
                                                         </div>
                                                         <div class="col-md-12 add_sock">
 
-                                                        </div>
+                                                        </div> --}}
                                                         <table id="dataRow">
 
                                                         </table>
@@ -198,11 +198,13 @@
                                                                     <input type="hidden" name="couponvalue"
                                                                         id="couponValue">
                                                                     <button type="button" id="couponCodebutton"
-                                                                        class="btn btn-primary">Apply</button>
+                                                                        class="btn btn-sm btn-primary ms-2">Apply</button>
+                                                                    <button type="button"
+                                                                        class="btn btn-sm btn-warning ms-2 disabled d-none"
+                                                                        id="remove-coupon">Remove</button>
                                                                 </diV>
                                                                 <p id="couponmsg"></p>
                                                             </div>
-
                                                         </div>
                                                         <div class="total_wrap">
                                                             <div class="subtotal">
@@ -216,17 +218,17 @@
                                                             </div>
                                                             <hr>
                                                             <div class="gst">
-                                                                <p id="gstOn">Exclude Gst @ 18%</p>
+                                                                <p id="gstOn">Includes Gst @ 18%</p>
                                                                 <p id="gstValue"></p>
                                                             </div>
                                                             <hr>
                                                             <div class="gst d-none" id="gst12Container">
-                                                                <p id="gst12Percent">Exclude Gst @12% </p>
+                                                                <p id="gst12Percent">Includes Gst @12% </p>
                                                                 <p id="gst12PercentVal"></p>
                                                             </div>
                                                             <hr>
                                                             <div class="gst1">
-                                                                <p id="gstSock">Exclude Gst @5% </p>
+                                                                <p id="gstSock">Includes Gst @5% </p>
                                                                 <p id="valueGst"></p>
                                                             </div>
                                                             <hr>
@@ -238,6 +240,7 @@
                                                                 <input type="hidden" name="subTotal"
                                                                     id="subtotlSave">
                                                                 <input type="hidden" name="gst18" id="gst18">
+                                                                <input type="hidden" name="gst18On" id="gst18On">
                                                                 <input type="hidden" name="gst5" id="gst5">
                                                                 <input type="hidden" name="gst12" id="gst12">
                                                                 <input type="hidden" id="adult_price_backend"
@@ -425,8 +428,6 @@
                                                                         id="submit-button">Use <span
                                                                             id="credit"></span> hours
                                                                         Credit</button>
-
-                                                                    {{-- <button class="btn btn-dark" type="submit" id="left_credit"> left Credit </button> --}}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -434,15 +435,11 @@
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
-
-
             </div>
         </div>
         <!--end page wrapper -->
@@ -452,7 +449,6 @@
         <!--Start Back To Top Button-->
         <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
         <!--End Back To Top Button-->
-
     </div>
     <!--end wrapper-->
 
@@ -460,29 +456,21 @@
     <script src="assets/js/bootstrap.bundle.min.js"></script>
     <!--plugins-->
     <script src="assets/js/jquery.min.js"></script>
-
     <script src="assets/plugins/simplebar/js/simplebar.min.js"></script>
     <script src="assets/plugins/metismenu/js/metisMenu.min.js"></script>
     <script src="assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
     <script src="assets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js"></script>
     <script src="assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js"></script>
-    {{-- <script src="assets/plugins/chartjs/js/Chart.min.js"></script>
-    <script src="assets/plugins/chartjs/js/Chart.extension.js"></script>
-    <script src="assets/js/index.js"></script>
-    <!--app JS-->
-    <script src="assets/js/circle-progress.min.js"></script>
-    <script src="assets/js/app.js"></script> --}}
-
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.0/js/toastr.js"></script>
 
 
     <script>
+        let removeCouponDiscountAmt = '';
+        let removeCouponType = '';
         //Get Phone List from Tickets
         $(document).ready(function() {
-
             var baseUrl = "{{ URL::to('/') }}";
-
             $('#phone').keyup(function() {
                 var search = $(this).val();
                 if (search.length > 0) {
@@ -515,7 +503,6 @@
         function fetchuserDetail(user) {
             if (user != "") {
                 $.ajax({
-
                     type: 'Post',
                     url: baseUrl + '/get-user-detail',
                     headers: {
@@ -527,7 +514,6 @@
 
                     success: function(data) {
                         var arr = JSON.parse(data);
-
                         $("#nameOfKid").val(arr.name);
                         $("#phone").val(arr.phone_no);
                         $("#dob").val(arr.dob);
@@ -558,16 +544,22 @@
         $("#kidsQty").on("change", function() {
             var numDivs = $(this).val(); // Get the selected value
             $('#parent-div').empty();
-            document.getElementById('gstOn').innerHTML = "Exclude Gst @18%";
+            document.getElementById('gstOn').innerHTML = "Includes Gst @18%";
             document.getElementById('gstValue').innerHTML = '';
             document.getElementById('totalAmount').innerHTML = '';
+            document.getElementById('couponCodeShow').innerHTML = 'Coupon';
+            document.getElementById('couponValueShow').innerHTML = '';
+            document.getElementById("couponCode").value = '';
+            document.getElementById("couponValue").value = '';
+            $('#couponmsg').removeAttr('style').text('');
+            $('#couponCodebutton').prop('disabled', false);
             $('#subtotal').text("");
 
             if (!numDivs) {
                 $('#subtotal').text("");
                 $('#subtotlSave').val('0');
                 $("#chargeAmount").val('0');
-                document.getElementById('gstOn').innerHTML = "Exclude Gst @18% on 0";
+                document.getElementById('gstOn').innerHTML = "Includes Gst @18% on 0";
                 document.getElementById('gstValue').innerHTML = '0';
                 document.getElementById('totalAmount').innerHTML = '₹ 0';
                 $('#valueGst').text("₹ 0");
@@ -618,8 +610,9 @@
                     var totalDeductGst = sum - gstKid;
                     $('#subtotal').text("₹ " + totalDeductGst.toFixed(2));
                     $('#subtotlSave').val(totalDeductGst.toFixed(2));
-                    document.getElementById('gstOn').innerHTML = "Exclude Gst @18% on " + sum.toFixed(
+                    document.getElementById('gstOn').innerHTML = "Includes Gst @18% on " + sum.toFixed(
                         2);
+                    $('#gst18On').val(sum.toFixed(2));
                     document.getElementById('gstValue').innerHTML = '' + gstKid.toFixed(2);
                     // var finalAmount = sum + gstKid;
                     let finalAmount = sum;
@@ -692,16 +685,17 @@
             event.target.style.display = 'none';
         }
 
-        $(document).ready(function() {
-            $(document).on('change', '#adult_qty', function() {
-                calculateTotal();
-            });
-            // Listen for changes to the second select box
-            $(document).on('change', '#socks_qty', function() {
-                calculateTotal();
-            });
+        // $(document).ready(function() {
+        //     $(document).on('change', '#adult_qty', function() {
+        //         alert('Adt Qty INPUT BOX');
+        //         calculateTotal();
+        //     });
+        //     // Listen for changes to the second select box
+        //     $(document).on('change', '#socks_qty', function() {
+        //         calculateTotal();
+        //     });
 
-        });
+        // });
 
         function calculateTotal() {
             var sum = 0;
@@ -727,9 +721,6 @@
                 adult_price.push(val);
             });
             var itemPrice = [];
-            console.log("select1Value => ", select1Value);
-            console.log("adult_price => ", adult_price);
-            console.log("totalPrice => ", totalPrice);
 
             $('input[name="price[]"]').each(function(index) {
                 var finalAdultPrice = parseFloat(select1Value[index]) * parseFloat(adult_price[index]);
@@ -760,7 +751,6 @@
                 if (tax[index] == 5) {
                     taxAmount5 += taxAmount;
                     socksPrice = finalPriceEach[index];
-
                 }
                 if (tax[index] == 12) {
                     taxAmount12 += taxAmount;
@@ -786,7 +776,8 @@
                 }
             });
             let gstOnPrice = sum + priceWith18Gst;
-            document.getElementById('gstOn').innerHTML = "Exclude Gst @18% on " + gstOnPrice.toFixed(2);
+            document.getElementById('gstOn').innerHTML = "Includes Gst @18% on " + gstOnPrice.toFixed(2);
+            $('#gst18On').val(gstOnPrice.toFixed(2));
             $('#gstValue').text("₹ " + taxAmount18.toFixed(2));
             $('input[name="gst18"]').val(taxAmount18.toFixed(2));
             $('#valueGst').text("₹ " + taxAmount5.toFixed(2));
@@ -808,11 +799,8 @@
     </script>
 
     <script>
-        //Coupon Code
         $("#couponCodebutton").on("click", function() {
-            var sum = $("#subtotlSave").val();
             var branchId = $("#hiddenBranchId").val();
-
             $.ajax({
                 url: baseUrl + '/get-coupon',
                 type: 'GET',
@@ -821,111 +809,91 @@
                     branch: branchId
                 },
                 success: function(data) {
+                    let sum = $("#chargeAmount").val();
+                    let sumamount = 0;
                     if (data.status === 400) {
-                        $('#couponmsg').html("<p style='color:red;'>" + data.msg + "</p>");
+                        $('#couponmsg').css('color', 'red').text(data.msg);
                         return false;
                     }
                     if (!sum) {
                         toastr.error("Please select Number of kids & Hours");
                         return false;
                     }
-
-                    var discount = 0;
                     if (data != '') {
+                        let discount = removeCouponDiscountAmt = data.discount;
+                        removeCouponType = data.discount_type;
+                        $('#remove-coupon').removeClass('disabled');
+                        $('#couponCodebutton').addClass('disabled');
+                        $('#couponmsg').css('color', '#0A5F59').text('Apply Coupon Successful!');
+
+
+                        // // Get the value of the first select box
+                        // var select1Value = parseInt($('#adult_qty').val());
+                        // console.log('select1Value', select1Value);
+                        // var adult_price = document.getElementById('adult_price_backend').value;
+                        // var finalAdultPrice = parseFloat(adult_price) * parseFloat(select1Value);
+
+                        // // Get the value of the second select box
+                        // var select2Value = parseInt($('#socks_qty').val());
+                        // console.log('select2Value', select2Value);
+                        // var socks_price = document.getElementById('socks_price_backend').value;
+                        // var finalSocksPrice = parseFloat(socks_price) * parseFloat(select2Value);
+
+                        // $("#socks_price").val(finalSocksPrice.toFixed(2));
+
+                        // if (isNaN(finalSocksPrice) && isNaN(finalAdultPrice)) {
+                        //     finalSocksPrice = 0;
+                        //     finalAdultPrice = 0;
+                        //     var taxSum = sum + finalAdultPrice;
+                        //     var gstKid = (taxSum * 18) / 100;
+                        //     sumamount += (finalAdultPrice + finalSocksPrice);                            
+                        //     $("#adult_price").val(finalAdultPrice.toFixed(2));
+                        // } else if (!isNaN(finalSocksPrice) && !isNaN(finalAdultPrice)) {
+                        //     var taxSum = sum + finalAdultPrice;
+                        //     var gstKid = (taxSum * 18) / 100;
+                        //     sumamount += (finalAdultPrice + finalSocksPrice);                            
+                        //     $("#adult_price").val(finalAdultPrice.toFixed(2));
+                        // } else if (!isNaN(finalAdultPrice)) {                            
+                        //     var taxSum = sum + finalAdultPrice;
+                        //     var gstKid = (taxSum * 18) / 100;
+                        //     sumamount += finalAdultPrice;
+                        //     $("#adult_price").val(finalAdultPrice.toFixed(2));
+                        // } else if (!isNaN(finalSocksPrice)) {
+                        //     sumamount += finalSocksPrice;
+                        // }
+
+                        // GST deduction                        
+                        let subTotalLessGST = parseFloat(sum);
+
+                        ["#gst5", "#gst18", "#gst12"].forEach(id => {
+                            let gst = parseFloat($(id).val()) || 0;
+                            subTotalLessGST -= gst;
+                        });
+
+                        $('#subtotal').text("₹ " + subTotalLessGST.toFixed(2));
+                        $('#subtotlSave').val(subTotalLessGST.toFixed(2));
+
+                        let gst18Ded = parseFloat($('#gst18').val()) || 0;
+                        let gst18OnVal = parseFloat($('#gst18On').val()) || 0;
+                        document.getElementById('gstOn').innerHTML = "Includes Gst @18% on " +
+                            gst18OnVal.toFixed(2);
+                        document.getElementById('gstValue').innerHTML = gst18Ded.toFixed(2);
+
+                        // coupon discount deduction  AFTER GST deducated
                         if (data.discount_type == 'flat') {
-                            var discount = data.discount;
                             $('#couponValue').val(discount.toFixed(2));
-                            $('#couponCodeShow').html("Coupon Code (" +
-                                data.coupon_name + ")");
-                            $('#couponValueShow').html(discount.toFixed(
-                                2));
-                            var sumamount = sum - discount;
-
+                            $('#couponCodeShow').html("Coupon Code (" + data.coupon_name + ")");
+                            $('#couponValueShow').html(discount.toFixed(2));
+                            sum = sum - discount.toFixed(2);
                         } else if (data.discount_type == 'percent') {
-                            var discount = data.discount;
-                            var discount = (sum * discount) / 100;
-                            $('#couponValue').val(discount.toFixed(2));
-                            $('#couponCodeShow').html("Coupon Code (" +
-                                data.coupon_name + ")");
-                            $('#couponValueShow').html(discount.toFixed(
-                                2));
-                            var sumamount = sum - discount;
+                            let percentDiscount = (subTotalLessGST.toFixed(2) * discount) / 100;
+                            $('#couponValue').val(percentDiscount.toFixed(2));
+                            $('#couponCodeShow').html("Coupon Code (" + data.coupon_name + ")");
+                            $('#couponValueShow').html(percentDiscount.toFixed(2));
+                            sum = sum - percentDiscount.toFixed(2);
                         }
-                        $('#couponCodebutton').prop('disabled', true);
-                        $('#couponmsg').html('<p style="color:#0A5F59;">Apply Coupon Successful!</p>');
-
-                        // Get the value of the first select box
-                        var select1Value = parseInt($('#adult_qty')
-                            .val());
-                        var adult_price = document.getElementById(
-                            'adult_price_backend').value;
-                        var finalAdultPrice = parseFloat(adult_price) *
-                            parseFloat(select1Value);
-
-                        //   var taxSum = sum+finalAdultPrice;
-                        // 	$("#adult_price").val(finalAdultPrice);
-
-                        // Get the value of the second select box
-                        var select2Value = parseInt($('#socks_qty').val());
-
-                        var socks_price = document.getElementById(
-                            'socks_price_backend').value;
-                        var finalSocksPrice = parseFloat(socks_price) *
-                            parseFloat(select2Value);
-                        $("#socks_price").val(finalSocksPrice.toFixed(
-                            2));
-                        if (isNaN(finalSocksPrice) && isNaN(finalAdultPrice)) {
-                            finalSocksPrice = 0;
-                            finalAdultPrice = 0;
-                            var taxSum = sum + finalAdultPrice;
-                            var gstKid = (taxSum * 18) / 100;
-                            sumamount += (finalAdultPrice +
-                                finalSocksPrice);
-                            //alert(sum);
-                            $("#adult_price").val(finalAdultPrice
-                                .toFixed(2));
-                        } else if (!isNaN(finalSocksPrice) && !isNaN(
-                                finalAdultPrice)) {
-
-                            var taxSum = sum + finalAdultPrice;
-                            var gstKid = (taxSum * 18) / 100;
-                            sumamount += (finalAdultPrice +
-                                finalSocksPrice);
-                            //alert(sum);
-                            $("#adult_price").val(finalAdultPrice
-                                .toFixed(2));
-                        } else if (!isNaN(finalAdultPrice)) {
-                            //finalAdultPrice = 0;
-                            var taxSum = sum + finalAdultPrice;
-                            var gstKid = (taxSum * 18) / 100;
-                            sumamount += finalAdultPrice;
-                            //alert(finalAdultPrice);
-
-                            $("#adult_price").val(finalAdultPrice
-                                .toFixed(2));
-                        } else if (!isNaN(finalSocksPrice)) {
-
-                            sumamount += finalSocksPrice;
-                        }
-                        let subTotal = parseFloat(sum);
-                        $('#subtotal').text("₹ " + subTotal.toFixed(2));
-                        $('#subtotlSave').val(sumamount.toFixed(2));
-                        document.getElementById('gstOn').innerHTML =
-                            "Exclude Gst @18% on " + sumamount.toFixed(
-                                2);
-                        var gstKid = (sumamount * 18) / 100;
-                        document.getElementById('gstValue').innerHTML =
-                            '' + gstKid.toFixed(2);
-                        var finalAmount = sumamount + gstKid;
-                        // In ticket view socks is not added
-                        if (finalSocksPrice > 0) {
-                            var gstSocks = (socks_price * 5) / 100;
-                            finalAmount += gstSocks;
-                        }
-                        document.getElementById('totalAmount').innerHTML = '₹ ' + sumamount.toFixed(2);
-                        $("#chargeAmount").val(sumamount.toFixed(2));
-                        $('#gst18').val(gstKid.toFixed(2));
-
+                        document.getElementById('totalAmount').innerHTML = '₹ ' + sum.toFixed(2);
+                        $("#chargeAmount").val(sum.toFixed(2));
                     } else {
                         // Get the value of the first select box
                         var select1Value = parseInt($('#adult_qty')
@@ -934,10 +902,6 @@
                             'adult_price_backend').value;
                         var finalAdultPrice = parseFloat(adult_price) *
                             parseFloat(select1Value);
-
-                        //   var taxSum = sum+finalAdultPrice;
-                        // 	$("#adult_price").val(finalAdultPrice);
-
                         // Get the value of the second select box
                         var select2Value = parseInt($('#socks_qty')
                             .val());
@@ -947,29 +911,20 @@
                             parseFloat(select2Value);
                         $("#socks_price").val(finalSocksPrice.toFixed(
                             2));
-
                         // Add the values of the select boxes to the sum
                         if (isNaN(finalAdultPrice)) {
                             var taxSum = sumamount + finalAdultPrice;
                             var gstKid = (taxSum * 18) / 100;
                             sumamount += finalAdultPrice;
-
                             $("#adult_price").val(finalAdultPrice
                                 .toFixed(2));
                         }
-                        // Display the sum on the screen
-                        //$('#total').text(sum);
-
                         $('#subtotal').text("₹ " + sum.toFixed(2));
-
-
-
                         $('#subtotlSave').val(sum.toFixed(2));
-                        document.getElementById('gstOn').innerHTML =
-                            "Exclude Gst @18% on " + sum.toFixed(2);
+                        document.getElementById('gstOn').innerHTML = "Includes Gst @18% on " + sum
+                            .toFixed(2);
                         var gstKid = (sum * 18) / 100;
-                        document.getElementById('gstValue').innerHTML =
-                            '' + gstKid.toFixed(2);
+                        document.getElementById('gstValue').innerHTML = '' + gstKid.toFixed(2);
                         var finalAmount = sum + gstKid;
                         if (!isNaN(finalSocksPrice)) {
                             var gstSocks = (socks_price * 5) / 100;
@@ -987,14 +942,41 @@
             });
         });
     </script>
+    <script>
+        //Coupon Code remove
+        $("#remove-coupon").on("click", function() {
+            const sum = $("#chargeAmount").val();
+            console.log('sum : ', sum);
+            const branchId = $("#hiddenBranchId").val();
+            let revertedSumAmt = 0;
 
-
+            if (removeCouponDiscountAmt !== '' || removeCouponType !== '') {
+                $('#couponCodeShow').html("Coupon");
+                $('#couponCodebutton').removeClass('disabled');
+                $('#remove-coupon').addClass('disabled');
+                $('#couponmsg').removeAttr('style').text('');
+                $('#couponValue').val('');
+                $('#couponCode').val('');                
+                $('#couponValueShow').text('');
+                if (removeCouponType == 'flat') {                    
+                    revertedSumAmt = parseFloat(sum) + parseFloat(removeCouponDiscountAmt);                    
+                } else if (removeCouponType == 'percent') {
+                    console.log('sum : ', sum);
+                    console.log('removeCouponDiscountAmt : ', removeCouponDiscountAmt);
+                    revertedSumAmt = parseFloat(sum) / (1 - (parseFloat(removeCouponDiscountAmt) / 100));
+                    console.log('revertedSumAmt : ', revertedSumAmt);
+                } else {    
+                    return false;
+                }
+                revertedSumAmt = parseFloat(revertedSumAmt);                
+                console.log('revertedSumAmt : ', revertedSumAmt);
+                $('#totalAmount').text('₹ ' + revertedSumAmt.toFixed(2));
+            }
+        });
+    </script>
 
     <script>
-        //Auto Fetch Membership Program
-
         $(document).ready(function() {
-
             var baseUrl = "{{ URL::to('/') }}";
             let errorShown = false;
             $('#mobile_no').keyup(function() {
@@ -1002,7 +984,6 @@
                 if (search.length > 0) {
                     $('#resultmembership').css("display", "block");
                     $.ajax({
-
                         type: 'Post',
                         url: baseUrl + '/get-membership-phone-list',
                         headers: {
@@ -1050,7 +1031,6 @@
                     data: {
                         mobile: user
                     },
-
                     success: function(response) {
                         if (response && response.user) {
                             $('#submit-button').prop('disabled', false);
