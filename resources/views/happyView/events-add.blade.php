@@ -11,7 +11,6 @@
                     <div class="mobile-toggle-menu">
                         <i class="fa fa-bars" aria-hidden="true"></i>
                     </div>
-
                     <div class="top-menu ms-auto">
                         <ul class="navbar-nav align-items-center">
                             <li class="nav-item dropdown dropdown-large">
@@ -28,7 +27,6 @@
                             </li>
                         </ul>
                     </div>
-
                 </nav>
             </div>
         </header>
@@ -45,218 +43,152 @@
                                         <div class="tab_wrap_theme">
                                             <ul class="nav nav-tabs" role="tablist">
                                                 <li class="nav-item" role="presentation">
-                                                    <a class="nav-link active rounded" data-bs-toggle="tab"
-                                                        href="#paid" aria-selected="true" role="tab">
+                                                    <a class="nav-link active rounded" data-bs-toggle="tab" href="#paid" aria-selected="true" role="tab">
                                                         <p class="heading">Event Booking </p>
                                                     </a>
                                                 </li>
-
                                             </ul>
                                         </div>
                                         <div class="tab-content">
-
                                             <div id="paid" class="container tab-pane active" role="tabpanel"><br>
-                                                <form action="{{ url('/add-event-post') }}" method="post"
-                                                    id="my-form">
+                                                <form action="{{ url('/add-event-post') }}" method="post" id="my-form">
                                                     @csrf
                                                     <div class="row">
-                                                        @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
-                                                        <div class="col-md-12 ">
-                                                            <div class="mb-4 input_wrap">
-                                                                <label>Branch<span>*</span></label>
-                                                                <select name="branch_id" class="form-select" id="branchId" required>
-                                                                    @foreach ($branches as $branch)
-                                                                        <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
-                                                                    @endforeach
-                                                                </select>
+                                                        @if (auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                            <div class="col-md-12 ">
+                                                                <div class="mb-4 input_wrap">
+                                                                    <label>Branch<span>*</span></label>
+                                                                    <select name="branch_id" class="form-select" id="branchId" required>
+                                                                        @foreach ($branches as $branch)
+                                                                            <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
                                                             </div>
-                                                        </div>
                                                         @else
-                                                        <input type="hidden" name="branch_id" id="branchId" value="{{ auth('admin')->user()->branch_id }}">
+                                                            <input type="hidden" name="branch_id" id="branchId" value="{{ auth('admin')->user()->branch_id }}">
                                                         @endif
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap dark">
                                                                 <label>Booking Date</label>
-                                                                <input type="date" class="form-control"
-                                                                    placeholder="date" name="date" id="date"
-                                                                    required readonly>
+                                                                <input type="date" class="form-control" placeholder="date" name="date" id="date" required readonly>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6 input_wrap dark time">
                                                             <div class="mb-4">
                                                                 <label>Booking Time</label>
-                                                                <input type="time" class="form-control"
-                                                                    placeholder="Time" name="time" id="time"
-                                                                    required readonly>
+                                                                <input type="time" class="form-control" placeholder="Time" name="time" id="time" required readonly>
                                                             </div>
                                                         </div>
 
                                                         <div class="col-md-4">
                                                             <div class="mb-4 input_wrap">
                                                                 <label>Event Date</label>
-                                                                <input type="date" class="form-control"
-                                                                    placeholder="Booking Date" id="date"
-                                                                    name="booking_date" required>
+                                                                <input type="date" class="form-control" placeholder="Booking Date" id="bdate" name="booking_date" required>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-4 input_wrap time">
                                                             <div class="mb-4">
                                                                 <label>Booking From</label>
-                                                                <input type="time" class="form-control"
-                                                                    placeholder="Booking Time From" id="time_from"
-                                                                    name="booking_time_from" required>
+                                                                <input type="time" class="form-control" placeholder="Booking Time From" id="time_from" name="booking_time_from" required>
                                                             </div>
                                                         </div>
 
                                                         <div class="col-md-4 input_wrap time">
                                                             <div class="mb-4">
                                                                 <label>Booking To</label>
-                                                                <input type="time" class="form-control"
-                                                                    placeholder="Booking Time To" id="time_to"
-                                                                    name="booking_time_to" required>
+                                                                <input type="time" class="form-control" placeholder="Booking Time To" id="time_to" name="booking_time_to" required>
                                                             </div>
                                                         </div>
-
                                                         <div class="col-md-4">
                                                             <div class="mb-4 input_wrap">
                                                                 <label for="phone">Phone <span>*</span></label>
-                                                                <input type="tel" class="form-control"
-                                                                    placeholder="Phone" name="phone" id="phone"
-                                                                    pattern="[0-9]{10}" maxlength="10" required>
-
+                                                                <input type="tel" class="form-control" placeholder="Phone" name="phone" id="phone" pattern="[0-9]{10}" maxlength="10" required>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-4">
                                                             <div class="mb-4 input_wrap">
                                                                 <label>Billing Name <span>*</span></label>
-                                                                <input type="text" class="form-control"
-                                                                    placeholder="Billing Name" name="billing_name"
-                                                                    required>
-
+                                                                <input type="text" class="form-control" placeholder="Billing Name" name="billing_name" required>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-4">
                                                             <div class="mb-4 input_wrap">
                                                                 <label for="contact">Contact Person
                                                                     <span>*</span></label>
-                                                                <input type="text" class="form-control"
-                                                                    placeholder="Contact" name="contact" required>
-
+                                                                <input type="text" class="form-control" placeholder="Contact" name="contact" id="contact" required>
                                                             </div>
                                                         </div>
-
-
                                                         <div class="col-md-6 input_wrap">
                                                             <div class="mb-4">
                                                                 <label>Kid name</label>
-                                                                <input type="text" class="form-control"
-                                                                    placeholder="Kid Name" name="kid_name" required>
+                                                                <input type="text" class="form-control" placeholder="Kid Name" name="kid_name" required>
                                                             </div>
                                                         </div>
 
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap">
                                                                 <label>Kid DOB</label>
-                                                                <input type="date" class="form-control"
-                                                                    placeholder="Kid DOB" name="kid_dob" required>
+                                                                <input type="date" class="form-control" placeholder="Kid DOB" name="kid_dob" required>
                                                             </div>
                                                         </div>
-
                                                         <div class="col-md-12" id="item_box">
                                                             <h4><b>List Items</b></h4>
                                                             <br>
                                                             <div class="row">
-
                                                                 <div class="col-md-3 input_wrap">
                                                                     <div class="mb-4">
                                                                         <label>Item</label>
-                                                                        <input type="text"
-                                                                            class="form-control item_name"
-                                                                            id="item_name" placeholder="Item"
-                                                                            name="item_name[]"
-                                                                            onkeyup="searchProductData(event)">
-                                                                        <div id="searchResult"
-                                                                            class="shadow phone-list">
+                                                                        <input type="text" class="form-control item_name" id="item_name" placeholder="Item" name="item_name[]" onkeyup="searchProductData(event)" required>
+                                                                        <div id="searchResult" class="shadow phone-list">
                                                                         </div>
                                                                     </div>
                                                                 </div>
-
                                                                 <div class="col-md-3 input_wrap">
                                                                     <div class="mb-4">
                                                                         <label>Prices</label>
-                                                                        <input type="text"
-                                                                            class="form-control item_price"
-                                                                            id="item_price" placeholder="Prices"
-                                                                            name="item_price[]">
+                                                                        <input type="text" class="form-control item_price" id="item_price" placeholder="Prices" name="item_price[]" oninput="validatePrice(this)">
                                                                     </div>
                                                                 </div>
-
                                                                 <div class="col-md-3 input_wrap">
                                                                     <div class="mb-4">
                                                                         <label>Qty</label>
-                                                                        <input type="number"
-                                                                            class="form-control item_qty"
-                                                                            id="item_qty" placeholder="Qty"
-                                                                            value="1" name="item_qty[]">
+                                                                        <input type="number" class="form-control item_qty" id="item_qty" placeholder="Qty" value="1"  min="1" oninput="validity.valid||(value='');" name="item_qty[]">
                                                                     </div>
                                                                 </div>
-
                                                                 <div class="col-md-2 input_wrap">
                                                                     <div class="mb-4">
                                                                         <label>Tax</label>
-                                                                        <select name="item_tax[]" id="item_tax"
-                                                                            class="form-select item_tax">
+                                                                        <select name="item_tax[]" id="item_tax" class="form-select item_tax">
                                                                             <option value="18">18%</option>
                                                                             <option value="12">12%</option>
-                                                                            <option value="5">5% </option>
-                                                                            <option value="0">0% </option>
-
+                                                                            <option value="5">5%</option>
+                                                                            <option value="0">0%</option>
                                                                         </select>
-
                                                                     </div>
                                                                 </div>
-
                                                                 <div class="col-md-1">
-                                                                    <i class="fa fa-plus fs-4 btn btn-primary"
-                                                                        onclick="add_item_more()"
-                                                                        style="background:#0A5F59;"
-                                                                        aria-hidden="true"></i>
+                                                                    <i class="fa fa-plus fs-4 btn btn-primary" onclick="add_item_more()" style="background:#0A5F59;" aria-hidden="true"></i>
                                                                 </div>
-
                                                             </div>
-
-
                                                         </div>
-
                                                         <div class="row mb-4">
-                                                            <div class="col-lg-12 col-md-12">
-                                                                <a href="javascript:void(0)" class="btn btn-primary"
-                                                                    onclick="calculate_items()"
-                                                                    style="background:#0A5F59;">Calculate</a>
+                                                            <div class="col-lg-12 d-flex justify-content-between align-items-center">
+                                                                <a href="javascript:void(0)" class="btn btn-primary" onclick="calculate_items()" style="background:#0A5F59;">Calculate</a>
+                                                                <div id="errorMsg"></div>
                                                             </div>
-
                                                         </div>
-
                                                         <div class="col-md-12">
                                                             <div class="mb-4 input_wrap">
                                                                 <label>COUPON CODE</label>
                                                                 <div class="d-flex">
-                                                                    <input type="text" name="couponcode"
-                                                                        class="form-control" id="couponCode"
-                                                                        placeholder="Any Discount Code">
-                                                                    <input type="hidden" name="couponvalue"
-                                                                        id="couponValue">
-                                                                    <button type="button" id="couponCodebutton"
-                                                                        class="btn btn-primary">Apply</button>
+                                                                    <input type="text" name="couponcode" class="form-control" id="couponCode" placeholder="Any Discount Code">
+                                                                    <input type="hidden" name="couponvalue" id="couponValue">
+                                                                    <button type="button" id="couponCodebutton" class="btn btn-primary">Apply</button>
                                                                 </diV>
                                                                 <p id="couponmsg"></p>
                                                             </div>
-
                                                         </div>
-
-
-
-
                                                         <div class="total_wrap">
                                                             <div class="subtotal">
                                                                 <p>Subtotal</p>
@@ -269,43 +201,35 @@
                                                             </div>
                                                             <hr>
                                                             <div class="gst">
-                                                                <p id="gst18per">Includes Gst @ 18% on <span
-                                                                        id="18peron"></span></p>
+                                                                <p id="gst18per">Includes Gst @ 18% on <span id="18peron"></span></p>
                                                                 <p id="valueGst18"></p>
                                                             </div>
                                                             <hr>
                                                             <div class="gst1">
-                                                                <p id="gst12per">Includes Gst @12% on <span
-                                                                        id="12peron"></span></p>
+                                                                <p id="gst12per">Includes Gst @12% on <span id="12peron"></span></p>
                                                                 <p id="valueGst12"></p>
                                                             </div>
                                                             <hr>
                                                             <div class="gst1">
-                                                                <p id="gst5per">Includes Gst @5% on <span
-                                                                        id="5peron"></span></p>
+                                                                <p id="gst5per">Includes Gst @5% on <span id="5peron"></span></p>
                                                                 <p id="valueGst5"></p>
                                                             </div>
                                                             <hr>
                                                             <div class="amount">
                                                                 <p>Total Amount</p>
                                                                 <p id="totalAmount"></p>
-                                                                <input type="hidden" name="totalAmount"
-                                                                    id="chargeAmount">
-                                                                <input type="hidden" name="subtotal"
-                                                                    id="subtotalSave">
+                                                                <input type="hidden" name="totalAmount" id="chargeAmount">
+                                                                <input type="hidden" name="subtotal" id="subtotalSave">
                                                                 <input type="hidden" name="gst18" id="gst18">
                                                                 <input type="hidden" name="gst12" id="gst12">
                                                                 <input type="hidden" name="gst5" id="gst5">
-
                                                             </div>
                                                             <br>
                                                         </div>
-
                                                         <div class="col-md-12">
                                                             <div class="mb-4 input_wrap">
                                                                 <label>Payment Mode</label>
-                                                                <select name="payment_method" id="payment_method"
-                                                                    class="form-select">
+                                                                <select name="payment_method" id="payment_method" class="form-select">
                                                                     <option value="UPI">UPI</option>
                                                                     <option value="Cash">Cash</option>
                                                                     <option value="Debit/Credit">Debit/Credit </option>
@@ -314,75 +238,55 @@
                                                                 </select>
                                                             </div>
                                                         </div>
-
-                                                        <div class="col-md-12" id="advance_payment"
-                                                            style="display:none">
+                                                        <div class="col-md-12" id="advance_payment" style="display:none">
                                                             <div class="row">
                                                                 <div class="col-md-6">
                                                                     <div class="mb-4 input_wrap">
                                                                         <label>Advance Amount</label>
-                                                                        <input type="number" class="form-control"
-                                                                            placeholder="Advance Amount"
-                                                                            id="advance_amount" name="advance_amount">
+                                                                        <input type="number" class="form-control" placeholder="Advance Amount" id="advance_amount" name="advance_amount">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-6 input_wrap time">
                                                                     <div class="mb-4 input_wrap">
                                                                         <label>Payment Method</label>
-                                                                        <select name="advance_payment_method"
-                                                                            class="form-select">
+                                                                        <select name="advance_payment_method" class="form-select">
                                                                             <option value="UPI">UPI</option>
                                                                             <option value="Cash">Cash</option>
-                                                                            <option value="Debit/Credit">Debit/Credit
-                                                                            </option>
-                                                                            <option value="Pending">Pending </option>
+                                                                            <option value="Debit/Credit">Debit/Credit</option>
+                                                                            <option value="Pending">Pending</option>
                                                                         </select>
                                                                     </div>
                                                                 </div>
                                                             </div>
-
                                                             <div class="row">
                                                                 <div class="col-md-6">
                                                                     <div class="mb-4 input_wrap">
                                                                         <label>Due Amount</label>
-                                                                        <input type="text" class="form-control"
-                                                                            placeholder="Due Amount"
-                                                                            id="due_amount_show" disabled>
-                                                                        <input type="hidden" id="due_amount"
-                                                                            name="due_amount">
+                                                                        <input type="text" class="form-control" placeholder="Due Amount" id="due_amount_show" disabled>
+                                                                        <input type="hidden" id="due_amount" name="due_amount">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-6 input_wrap time">
                                                                     <div class="mb-4 input_wrap">
                                                                         <label>Payment in installment</label>
-                                                                        <select name="payment_in_installment"
-                                                                            id="payment_in_installment_method"
-                                                                            class="form-select">
+                                                                        <select name="payment_in_installment" id="payment_in_installment_method" class="form-select">
                                                                             <option value="No">No</option>
                                                                             <option value="Yes">Yes</option>
-
                                                                         </select>
                                                                     </div>
                                                                 </div>
                                                             </div>
-
-                                                            <div class="row" id="installment_amount_box"
-                                                                style="display:none">
+                                                            <div class="row" id="installment_amount_box" style="display:none">
                                                                 <div class="col-md-6">
                                                                     <div class="mb-4 input_wrap">
                                                                         <label>Installment Amount</label>
-                                                                        <input type="number" class="form-control"
-                                                                            class=""
-                                                                            placeholder="Installment Amount"
-                                                                            id="installment_amount"
-                                                                            name="installment_amount">
+                                                                        <input type="number" class="form-control" class="" placeholder="Installment Amount" id="installment_amount" name="installment_amount">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-6 input_wrap time">
                                                                     <div class="mb-4 input_wrap">
                                                                         <label>Payment Method</label>
-                                                                        <select name="installment_amount_method"
-                                                                            class="form-select">
+                                                                        <select name="installment_amount_method" class="form-select">
                                                                             <option value="UPI">UPI</option>
                                                                             <option value="Cash">Cash</option>
                                                                             <option value="Debit/Credit">Debit/Credit
@@ -396,17 +300,13 @@
                                                                 <div class="col-md-6">
                                                                     <div class="mb-4 input_wrap">
                                                                         <label>Final Installment</label>
-                                                                        <input type="text" class="form-control"
-                                                                            placeholder="Final Amount"
-                                                                            id="final_amount"
-                                                                            name="final_installment">
+                                                                        <input type="text" class="form-control" placeholder="Final Amount" id="final_amount" name="final_installment">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-6 input_wrap time">
                                                                     <div class="mb-4 input_wrap">
                                                                         <label>Payment Method</label>
-                                                                        <select name="final_installment_method"
-                                                                            class="form-select">
+                                                                        <select name="final_installment_method" class="form-select">
                                                                             <option value="UPI">UPI</option>
                                                                             <option value="Cash">Cash</option>
                                                                             <option value="Debit/Credit">Debit/Credit
@@ -420,18 +320,15 @@
                                                         <div class="col-md-12">
                                                             <div class="mb-4 input_wrap">
                                                                 <label>Payment Status</label>
-                                                                <select name="payment_status" id="payment_status"
-                                                                    class="form-select">
+                                                                <select name="payment_status" id="payment_status" class="form-select">
                                                                     <option value="Open">Open</option>
                                                                     <option value="Paid">Paid</option>
                                                                     <option value="Cancel">Cancel</option>
-
                                                                 </select>
                                                             </div>
                                                         </div>
                                                         <div class="tearm_condition">
-                                                            <input type="checkbox" id="" name=""
-                                                                value="" checked="checked">
+                                                            <input type="checkbox" id="term" name="term" value="" checked="checked">
                                                             <p>By Agreeing to the <b>Terms and Condition</b> of HappyOn
                                                             </p>
                                                         </div>
@@ -441,18 +338,13 @@
                                                     </div>
                                                 </form>
                                             </div>
-
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
-
-
             </div>
         </div>
         <!--end page wrapper -->
@@ -476,19 +368,12 @@
     <script src="{{ asset('assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js') }}"></script>
     <script src="{{ asset('assets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js') }}"></script>
     <script src="{{ asset('assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js') }}"></script>
-    <script src="{{ asset('assets/plugins/chartjs/js/Chart.min.js') }}"></script>
-    <script src="{{ asset('assets/plugins/chartjs/js/Chart.extension.js') }}"></script>
-    <script src="{{ asset('assets/js/index.js') }}"></script>
-    <!--app JS-->
-    <script src="{{ asset('assets/js/circle-progress.min.js') }}"></script>
-    <script src="{{ asset('assets/js/app.js') }}"></script>
 
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.0/js/toastr.js"></script>
 
     <script>
         $('#payment_method').on('change', function() {
-
             if (this.value == "Partial Payment") {
                 $('#advance_payment').css("display", "block");
                 $('#advance_amount').on('blur', function() {
@@ -506,7 +391,6 @@
                         $('#final_amount').val(0);
                     }
                 });
-
             } else {
                 $('#advance_payment').css("display", "none");
                 $('#advance_amount').val(0);
@@ -517,7 +401,6 @@
         });
 
         $('#payment_in_installment_method').on('change', function() {
-
             if (this.value == "Yes") {
                 $('#installment_amount_box').css("display", "flex");
 
@@ -534,10 +417,8 @@
                         $('#due_amount_show').val(final_amount.toFixed(2));
                     } else {
                         $('#installment_amount').val(0);
-
                     }
                 });
-
             } else {
                 $('#installment_amount_box').css("display", "none");
                 $('#installment_amount').val(0);
@@ -546,7 +427,6 @@
 
 
         $('#payment_status').on('change', function() {
-
             if (this.value == "Paid") {
                 $('#due_amount').val(0);
                 $('#due_amount_show').val(0);
@@ -565,20 +445,16 @@
                         $('#due_amount_show').val(final_amount.toFixed(2));
                     } else {
                         $('#installment_amount').val(0);
-
                     }
                 } else {
-
                     var advance_amount = parseFloat($('#advance_amount').val());
                     var totalAmount = parseFloat($('#chargeAmount').val());
                     if (totalAmount > advance_amount && advance_amount > 0) {
-
                         var final_amount = totalAmount - advance_amount;
                         $('#final_amount').val(final_amount.toFixed(2));
                         $('#due_amount').val(final_amount.toFixed(2));
                         $('#due_amount_show').val(final_amount.toFixed(2));
                     } else {
-
                         $('#advance_amount').val(0);
                         $('#due_amount').val(0);
                         $('#due_amount_show').val(0);
@@ -600,10 +476,9 @@
                     option: $("#couponCode").val()
                 },
                 success: function(data) {
-                    if(data.status==400){
+                    if (data.status == 400) {
                         $('#couponmsg').html(`<p class="text-danger">${data.msg}</p>`);
-                    }
-                    else{
+                    } else {
                         calculate_items_with_coupon(data);
                     }
 
@@ -611,131 +486,30 @@
             });
         });
     </script>
-
-
     <script>
         //add more item
         var loop_item_count = 1;
-
         function add_item_more() {
-
             loop_item_count++;
-
-            var item_name = $("input[name='item_name[]']")
-                .map(function() {
-                    return $(this).val();
-                }).get();
-
-            var item_price = $("input[name='item_price[]']")
-                .map(function() {
-                    return $(this).val();
-                }).get();
-
-            var item_qty = $("input[name='item_qty[]']")
-                .map(function() {
-                    return $(this).val();
-                }).get();
-
-
-            var item_tax = $("select[name='item_tax[]']")
-                .map(function() {
-                    return $(this).val();
-                }).get();
-
-
-            var subTotal = 0;
-
-            var gst18total = 0;
-            // var peron18 = 0;
-
-            var gst12total = 0;
-            // var peron12 = 0
-
-            var gst5total = 0;
-            //  var peron5 = 0
-            var totalAmount = 0;
-            for (i = 0; i < item_name.length; i++) {
-
-                if (item_qty[i] == 0) {
-                    var erroMsg = '<span class="alert alert-danger ml-5">Minimum Qty should be 1 or More than 1</span>';
-                    $('#errorMsg').html(erroMsg).fadeOut(9000);
-                } else {
-
-                    var rowtotal = 0;
-                    var gst18 = 0;
-                    var gst12 = 0;
-                    var gst5 = 0;
-                    var rowtotal = item_price[i] * item_qty[i];
-                    if (item_tax[i] == 18) {
-
-                        var gst18 = (rowtotal * item_tax[i]) / 100;
-
-
-                    }
-                    if (item_tax[i] == 12) {
-
-                        var gst12 = (rowtotal * item_tax[i]) / 100;
-
-                    }
-                    if (item_tax[i] == 5) {
-
-                        var gst5 = (rowtotal * item_tax[i]) / 100;
-
-                    }
-                }
-
-
-                subTotal += parseFloat(rowtotal);
-                gst18total += parseFloat(gst18);
-                gst12total += parseFloat(gst12);
-                gst5total += parseFloat(gst5);
-
-            }
-
-            var totalAmount = subTotal + gst18total + gst12total + gst5total;
-
-            $('#subtotal').text(subTotal.toFixed(2));
-
-            //$('#18peron').text(peron18);
-            $('#valueGst18').text(gst18total.toFixed(2));
-            //$('#12peron').text(peron18);
-            $('#valueGst12').text(gst12total.toFixed(2));
-            //$('#5peron').text(peron18);
-            $('#valueGst5').text(gst5total.toFixed(2));
-            $('#totalAmount').text(totalAmount.toFixed(2));
-
-
-            $('#subtotalSave').val(subTotal.toFixed(2));
-            $('#gst18').val(gst18total.toFixed(2));
-            $('#gst12').val(gst12total.toFixed(2));
-            $('#gst5').val(gst5total.toFixed(2));
-            $('#chargeAmount').val(totalAmount.toFixed(2));
-
-
+            calculate_items();
             var html =
                 '<div class="row items_' + loop_item_count +
                 '"><div class="col-md-3 input_wrap"><div class="mb-4"><label>Item</label><input type="text" id="item_name' +
                 loop_item_count +
-                '" class="form-control" placeholder="Item" name="item_name[]"  onkeyup="searchProductData(event)"><div id="searchResult' +
+                '" class="form-control" placeholder="Item" name="item_name[]"  onkeyup="searchProductData(event)" required><div id="searchResult' +
                 loop_item_count +
                 '" class="shadow phone-list"></div> </div></div><div class="col-md-3 input_wrap"><div class="mb-4"><label>Prices</label><input type="text" id="item_price' +
                 loop_item_count +
-                '" class="form-control" placeholder="Prices" name="item_price[]"></div></div><div class="col-md-3 input_wrap"><div class="mb-4"><label>Qty</label><input type="number" class="form-control" id="item_qty' +
+                '" class="form-control" placeholder="Prices" name="item_price[]" oninput="validatePrice(this)"></div></div><div class="col-md-3 input_wrap"><div class="mb-4"><label>Qty</label><input type="number" class="form-control" id="item_qty' +
                 loop_item_count +
-                '" placeholder="Qty" value="1" name="item_qty[]"></div></div><div class="col-md-2 input_wrap"><div class="mb-4"><label>Tax</label><select name="item_tax[]" id="item_tax' +
+                '" placeholder="Qty" value="1" min="1" name="item_qty[]" oninput="validity.valid || (value = \'\');"></div></div><div class="col-md-2 input_wrap"><div class="mb-4"><label>Tax</label><select name="item_tax[]" id="item_tax' +
                 loop_item_count +
                 '" class="form-select"><option value="18">18%</option><option value="12">12%</option><option value="5">5% </option><option value="0">0% </option></select></div></div><div class="col-md-1"><i class="fa fa-trash fs-4 btn btn-danger" onclick="remove_image_more(' +
                 loop_item_count + ')" aria-hidden="true"></i></div></div>';
-
-
             jQuery('#item_box').append(html);
-
-
         }
 
         function calculate_items_with_coupon(data) {
-
-
             var item_name = $("input[name='item_name[]']")
                 .map(function() {
                     return $(this).val();
@@ -854,88 +628,53 @@
         }
 
         function calculate_items() {
-
-
             var item_name = $("input[name='item_name[]']")
                 .map(function() {
                     return $(this).val();
                 }).get();
-
             var item_price = $("input[name='item_price[]']")
                 .map(function() {
                     return $(this).val();
                 }).get();
-
             var item_qty = $("input[name='item_qty[]']")
                 .map(function() {
                     return $(this).val();
                 }).get();
-
-
             var item_tax = $("select[name='item_tax[]']")
                 .map(function() {
                     return $(this).val();
                 }).get();
+            var subTotal = 0,
+                gst18total = 0,
+                gst12total = 0,
+                gst5total = 0,
+                totalAmount = 0;
 
-            var subTotal = 0;
-
-            var gst18total = 0;
-            // var peron18 = 0;
-
-            var gst12total = 0;
-            // var peron12 = 0
-
-            var gst5total = 0;
-            //  var peron5 = 0
-            var totalAmount = 0;
-            for (i = 0; i < item_name.length; i++) {
-
-                if (item_qty[i] == 0) {
-                    var erroMsg = '<span class="alert alert-danger ml-5">Minimum Qty should be 1 or More than 1</span>';
-                    $('#errorMsg').html(erroMsg).fadeOut(9000);
-                } else {
-
-                    var rowtotal = 0;
-                    var gst18 = 0;
-                    var gst12 = 0;
-                    var gst5 = 0;
-                    var rowtotal = item_price[i] * item_qty[i];
-                    if (item_tax[i] == 18) {
-
-                        var gst18 = (rowtotal * item_tax[i]) / 100;
-
-                    }
-                    if (item_tax[i] == 12) {
-
-                        var gst12 = (rowtotal * item_tax[i]) / 100;
-
-                    }
-                    if (item_tax[i] == 5) {
-
-                        var gst5 = (rowtotal * item_tax[i]) / 100;
-
-                    }
+            for (let i = 0; i < item_name.length; i++) {
+                if (item_qty[i] == 0 || item_price[i] == 0) {
+                    $('#errorMsg').html('<span class="alert alert-danger">Minimum Qty should be 1.</span>').fadeOut(8000);
+                    return false;
                 }
+                let qty = parseFloat(item_qty[i]) || 0;
+                let price = parseFloat(item_price[i]) || 0;
+                let taxRate = parseFloat(item_tax[i]) || 0;
 
-                subTotal += parseFloat(rowtotal);
-                gst18total += parseFloat(gst18);
-                gst12total += parseFloat(gst12);
-                gst5total += parseFloat(gst5);
+                let rowtotal = price * qty;
+                let gstAmt = (rowtotal * taxRate) / 100;
+                rowtotal -= gstAmt;
 
+                subTotal += rowtotal;
+
+                if (taxRate === 18) gst18total += gstAmt;
+                else if (taxRate === 12) gst12total += gstAmt;
+                else if (taxRate === 5) gst5total += gstAmt;
             }
-
             var totalAmount = subTotal + gst18total + gst12total + gst5total;
-
             $('#subtotal').text(subTotal.toFixed(2));
-
-            //$('#18peron').text(peron18);
             $('#valueGst18').text(gst18total.toFixed(2));
-            //$('#12peron').text(peron18);
             $('#valueGst12').text(gst12total.toFixed(2));
-            //$('#5peron').text(peron18);
             $('#valueGst5').text(gst5total.toFixed(2));
             $('#totalAmount').text(totalAmount.toFixed(2));
-
 
             $('#subtotalSave').val(subTotal.toFixed(2));
             $('#gst18').val(gst18total.toFixed(2));
@@ -944,99 +683,11 @@
             $('#chargeAmount').val(totalAmount.toFixed(2));
 
         }
-
 
         function remove_image_more(loop_image_count) {
             jQuery('.items_' + loop_image_count).remove();
-
-
-            var item_name = $("input[name='item_name[]']")
-                .map(function() {
-                    return $(this).val();
-                }).get();
-
-            var item_price = $("input[name='item_price[]']")
-                .map(function() {
-                    return $(this).val();
-                }).get();
-
-            var item_qty = $("input[name='item_qty[]']")
-                .map(function() {
-                    return $(this).val();
-                }).get();
-
-
-            var item_tax = $("select[name='item_tax[]']")
-                .map(function() {
-                    return $(this).val();
-                }).get();
-
-
-            var subTotal = 0;
-
-            var gst18total = 0;
-            // var peron18 = 0;
-
-            var gst12total = 0;
-            // var peron12 = 0
-
-            var gst5total = 0;
-            //  var peron5 = 0
-            var totalAmount = 0;
-            for (i = 0; i < item_name.length; i++) {
-
-                if (item_qty[i] == 0) {
-                    var erroMsg = '<span class="alert alert-danger ml-5">Minimum Qty should be 1 or More than 1</span>';
-                    $('#errorMsg').html(erroMsg).fadeOut(9000);
-                } else {
-
-                    var rowtotal = 0;
-                    var gst18 = 0;
-                    var gst12 = 0;
-                    var gst5 = 0;
-                    var rowtotal = item_price[i] * item_qty[i];
-                    if (item_tax[i] == 18) {
-
-                        var gst18 = (rowtotal * item_tax[i]) / 100;
-
-                    }
-                    if (item_tax[i] == 12) {
-
-                        var gst12 = (rowtotal * item_tax[i]) / 100;
-
-                    }
-                    if (item_tax[i] == 5) {
-
-                        var gst5 = (rowtotal * item_tax[i]) / 100;
-
-                    }
-                }
-
-                subTotal += parseFloat(rowtotal);
-                gst18total += parseFloat(gst18);
-                gst12total += parseFloat(gst12);
-                gst5total += parseFloat(gst5);
-
-            }
-
-            var totalAmount = subTotal + gst18total + gst12total + gst5total;
-            $('#subtotal').text(subTotal.toFixed(2));
-            //$('#18peron').text(peron18);
-            $('#valueGst18').text(gst18total.toFixed(2));
-            //$('#12peron').text(peron18);
-            $('#valueGst12').text(gst12total.toFixed(2));
-            //$('#5peron').text(peron18);
-            $('#valueGst5').text(gst5total.toFixed(2));
-            $('#totalAmount').text(totalAmount.toFixed(2));
-
-            $('#subtotalSave').val(subTotal.toFixed(2));
-            $('#gst18').val(gst18total.toFixed(2));
-            $('#gst12').val(gst12total.toFixed(2));
-            $('#gst5').val(gst5total.toFixed(2));
-            $('#chargeAmount').val(totalAmount.toFixed(2));
-
+            calculate_items();
         }
-
 
         function searchProductData(event) {
             var search = event.target.value;
@@ -1047,10 +698,7 @@
                 } else {
                     $('#searchResult').css("display", "block");
                 }
-
-
                 $.ajax({
-
                     type: 'get',
                     url: '{{ route('getProduct') }}',
                     headers: {
@@ -1059,9 +707,7 @@
                     data: {
                         query: search,
                         branchId: branchId,
-
                     },
-
                     success: function(data) {
                         console.log(loop_item_count);
                         if (loop_item_count > 1) {
@@ -1077,7 +723,6 @@
                                     `<a class="text-dark borderSearch" href="javascript:void(0)" onclick="appendProductData(${element.id})"><p class="py-2 px-3">${element.product_name}</p></a>`;
                             });
                         }
-
                     }
                 });
             } else {
@@ -1105,13 +750,9 @@
                         $('#item_tax').val(response.product_tax);
                         $('#searchResult').css("display", "none");
                     }
-
                 }
             });
         }
-        //Current Date
-
-        //var today1 =  new Date().toISOString().substr(0,10);
         var today = new Date();
         var day = ("0" + today.getDate()).slice(-2);
         var month = ("0" + (today.getMonth() + 1)).slice(-2);
@@ -1152,11 +793,6 @@
                 timeInput.value = timeString;
             }
         }
-
-
-
-
-
         $(document).ready(function() {
             toastr.options.timeOut = 10000;
             @if (Session::has('error'))
@@ -1165,20 +801,21 @@
                 toastr.success('{{ Session::get('success') }}');
             @endif
         });
+    </script>
+    <script>
+        function validatePrice(input) {
+            // Remove non-numeric and non-dot characters
+            input.value = input.value.replace(/[^0-9.]/g, '');
 
-        const button = document.getElementById('submit-button');
-
-        // Add an event listener to the button click event
-        button.addEventListener('click', (event) => {
-            // Prevent the default form submission behavior
-            event.preventDefault();
-
-            // Get the form data
-            const form = document.getElementById('my-form');
-
-            // Submit the form if the data is valid
-            form.submit();
-        });
+            // Convert to float and check value
+            const value = parseFloat(input.value);
+            if (value <= 0 || isNaN(value)) {
+                input.setCustomValidity("Price must be greater than 0");
+                input.reportValidity();
+            } else {
+                input.setCustomValidity("");
+            }
+        }
     </script>
 </body>
 
