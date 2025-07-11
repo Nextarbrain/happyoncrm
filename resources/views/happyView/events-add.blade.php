@@ -153,7 +153,7 @@
                                                                 <div class="col-md-3 input_wrap">
                                                                     <div class="mb-4">
                                                                         <label>Qty</label>
-                                                                        <input type="number" class="form-control item_qty" id="item_qty" placeholder="Qty" value="1"  min="1" oninput="validity.valid||(value='');" name="item_qty[]">
+                                                                        <input type="number" class="form-control item_qty" id="item_qty" placeholder="Qty" value="1" min="1" oninput="validity.valid||(value='');" name="item_qty[]">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-2 input_wrap">
@@ -174,7 +174,7 @@
                                                         </div>
                                                         <div class="row mb-4">
                                                             <div class="col-lg-12 d-flex justify-content-between align-items-center">
-                                                                <a href="javascript:void(0)" class="btn btn-primary" onclick="calculate_items()" style="background:#0A5F59;">Calculate</a>
+                                                                <a href="javascript:void(0)" class="btn btn-primary" onclick="calculate_amount()" style="background:#0A5F59;">Calculate</a>
                                                                 <div id="errorMsg"></div>
                                                             </div>
                                                         </div>
@@ -184,7 +184,7 @@
                                                                 <div class="d-flex">
                                                                     <input type="text" name="couponcode" class="form-control" id="couponCode" placeholder="Any Discount Code">
                                                                     <input type="hidden" name="couponvalue" id="couponValue">
-                                                                    <button type="button" id="couponCodebutton" class="btn btn-primary">Apply</button>
+                                                                    <button type="button" id="couponCodebutton" class="btn btn-primary" onclick="calculate_amount()">Apply</button>
                                                                 </diV>
                                                                 <p id="couponmsg"></p>
                                                             </div>
@@ -464,34 +464,132 @@
             }
         });
     </script>
-
+    {{-- {{NEW CALCULATION FLOW...START}} --}}
     <script>
-        var baseUrl = "{{ URL::to('/') }}";
-        $("#couponCodebutton").on("click", function() {
-            $('#couponmsg').html(`<p class="text-danger"></p>`);
-            $.ajax({
-                url: baseUrl + '/get-coupon',
-                type: 'GET',
-                data: {
-                    option: $("#couponCode").val()
-                },
-                success: function(data) {
-                    if (data.status == 400) {
-                        $('#couponmsg').html(`<p class="text-danger">${data.msg}</p>`);
-                    } else {
-                        calculate_items_with_coupon(data);
+        function calculate_amount() {
+            const items = getItemDetails();
+            const totals = calculateTotals(items);
+            if (totals === false) return;
+
+            // check coupon code appied or not.
+            const raw = $("#couponCode").val();
+            const couponCode = raw ? raw.trim() : '';
+            if (couponCode) {
+                const baseUrl = "{{ URL::to('/') }}";
+                $.ajax({
+                    url: baseUrl + '/get-coupon',
+                    type: 'GET',
+                    data: {
+                        option: $("#couponCode").val()
+                    },
+                    success: function(data) {
+                        if (data.status == 400) {
+                            $('#couponmsg').html(`<p class="text-danger">${data.msg}</p>`);
+                            updateTotalsOnUI(totals);
+                        } else {
+                            $('#couponmsg').html("<p>Apply Coupon Successfull!</p>");
+                            let discountTotal = 0;
+                            if (data.discount_type === 'flat') {
+                                discountTotal = data.discount;
+                            } else if (data.discount_type === 'percent') {
+                                discountTotal = (totals.subTotal * data.discount) / 100;
+                            }
+                            updateTotalsOnUI(totals, discountTotal, data);
+                        }
                     }
+                });
+            } else {
+                updateTotalsOnUI(totals);
+            }
+        }
 
+        function getItemDetails() {
+            return {
+                item_name: $("input[name='item_name[]']").map(function() {
+                    return $(this).val();
+                }).get(),
+                item_price: $("input[name='item_price[]']").map(function() {
+                    return $(this).val();
+                }).get(),
+                item_qty: $("input[name='item_qty[]']").map(function() {
+                    return $(this).val();
+                }).get(),
+                item_tax: $("select[name='item_tax[]']").map(function() {
+                    return $(this).val();
+                }).get()
+            };
+        }
+
+        function calculateTotals({
+            item_price,
+            item_qty,
+            item_tax
+        }) {
+            let subTotal = 0,
+                gst18total = 0,
+                gst12total = 0,
+                gst5total = 0;
+
+            for (let i = 0; i < item_price.length; i++) {
+                if (item_qty[i] == 0 || item_price[i] == 0) {
+                    $('#errorMsg').html('<span class="alert alert-danger">Minimum Qty should be 1.</span>').fadeOut(8000);
+                } else {
+                    let qty = parseFloat(item_qty[i]) || 0;
+                    let price = parseFloat(item_price[i]) || 0;
+                    let taxRate = parseFloat(item_tax[i]) || 0;
+
+                    let rowtotal = price * qty;
+                    let gstAmt = (rowtotal * taxRate) / 100;
+                    rowtotal -= gstAmt;
+                    subTotal += rowtotal;
+
+                    if (taxRate === 18) gst18total += gstAmt;
+                    else if (taxRate === 12) gst12total += gstAmt;
+                    else if (taxRate === 5) gst5total += gstAmt;
                 }
-            });
-        });
+            }
+
+            return {
+                subTotal,
+                gst18total,
+                gst12total,
+                gst5total
+            };
+        }
+
+        function updateTotalsOnUI({
+            subTotal,
+            gst18total,
+            gst12total,
+            gst5total
+        }, discountTotal = 0, couponData = null) {
+            const totalAmount = (subTotal + gst18total + gst12total + gst5total) - discountTotal;
+
+            $('#subtotal').text(subTotal.toFixed(2));
+            $('#valueGst18').text(gst18total.toFixed(2));
+            $('#valueGst12').text(gst12total.toFixed(2));
+            $('#valueGst5').text(gst5total.toFixed(2));
+            $('#totalAmount').text(totalAmount.toFixed(2));
+
+            $('#subtotalSave').val(subTotal.toFixed(2));
+            $('#gst18').val(gst18total.toFixed(2));
+            $('#gst12').val(gst12total.toFixed(2));
+            $('#gst5').val(gst5total.toFixed(2));
+            $('#chargeAmount').val(totalAmount.toFixed(2));
+
+            if (couponData) {
+                $('#couponValue').val(discountTotal.toFixed(2));
+                $('#couponCodeShow').html(`Coupon Code (${couponData.coupon_name})`);
+                $('#couponValueShow').html(discountTotal.toFixed(2));
+            }
+        }
     </script>
+
+    {{-- {{NEW CALCULATION FLOW...END}} --}}
     <script>
-        //add more item
         var loop_item_count = 1;
         function add_item_more() {
             loop_item_count++;
-            calculate_items();
             var html =
                 '<div class="row items_' + loop_item_count +
                 '"><div class="col-md-3 input_wrap"><div class="mb-4"><label>Item</label><input type="text" id="item_name' +
@@ -509,184 +607,9 @@
             jQuery('#item_box').append(html);
         }
 
-        function calculate_items_with_coupon(data) {
-            var item_name = $("input[name='item_name[]']")
-                .map(function() {
-                    return $(this).val();
-                }).get();
-
-            var item_price = $("input[name='item_price[]']")
-                .map(function() {
-                    return $(this).val();
-                }).get();
-
-            var item_qty = $("input[name='item_qty[]']")
-                .map(function() {
-                    return $(this).val();
-                }).get();
-
-
-            var item_tax = $("select[name='item_tax[]']")
-                .map(function() {
-                    return $(this).val();
-                }).get();
-
-            var subTotal = 0;
-
-            var discountTotal = 0;
-
-            var gst18total = 0;
-
-
-            var gst12total = 0;
-
-
-            var gst5total = 0;
-
-            var totalAmount = 0;
-            for (i = 0; i < item_name.length; i++) {
-
-
-                if (item_qty[i] == 0) {
-                    var erroMsg = '<span class="alert alert-danger ml-5">Minimum Qty should be 1 or More than 1</span>';
-                    $('#errorMsg').html(erroMsg).fadeOut(9000);
-                } else {
-                    subTotal += item_price[i] * item_qty[i];
-                    var rowtotal = 0;
-                    var discount = 0;
-                    var gst18 = 0;
-                    var gst12 = 0;
-                    var gst5 = 0;
-                    var rowtotal = item_price[i] * item_qty[i];
-
-                    if (data.discount_type == 'flat') {
-                        var discount = data.discount;
-                        var rowtotal = rowtotal - discount;
-
-                    } else if (data.discount_type == 'percent') {
-                        var discount = data.discount;
-                        var discount = (rowtotal * discount) / 100;
-                        var rowtotal = rowtotal - discount;
-
-                    }
-
-                    if (item_tax[i] == 18) {
-
-                        var gst18 = (rowtotal * item_tax[i]) / 100;
-
-                    }
-                    if (item_tax[i] == 12) {
-
-                        var gst12 = (rowtotal * item_tax[i]) / 100;
-
-                    }
-                    if (item_tax[i] == 5) {
-
-                        var gst5 = (rowtotal * item_tax[i]) / 100;
-
-                    }
-                }
-
-                discountTotal += parseFloat(discount);
-                gst18total += parseFloat(gst18);
-                gst12total += parseFloat(gst12);
-                gst5total += parseFloat(gst5);
-
-            }
-
-            if (data.discount_type == 'flat') {
-                $('#couponValue').val(discountTotal.toFixed(2));
-                $('#couponCodeShow').html("Coupon Code (" + data.coupon_name + ")");
-                $('#couponValueShow').html(discountTotal.toFixed(2));
-            } else if (data.discount_type == 'percent') {
-                $('#couponValue').val(discountTotal.toFixed(2));
-                $('#couponCodeShow').html("Coupon Code (" + data.coupon_name + ")");
-                $('#couponValueShow').html(discountTotal.toFixed(2));
-            }
-
-            $('#couponmsg').html("<p>Apply Coupon Successfull!</p>");
-
-            var totalAmount = subTotal + gst18total + gst12total + gst5total - discountTotal;
-
-            $('#subtotal').text(subTotal.toFixed(2));
-
-
-            $('#valueGst18').text(gst18total.toFixed(2));
-
-            $('#valueGst12').text(gst12total.toFixed(2));
-
-            $('#valueGst5').text(gst5total.toFixed(2));
-            $('#totalAmount').text(totalAmount.toFixed(2));
-
-
-            $('#subtotalSave').val(subTotal.toFixed(2));
-            $('#gst18').val(gst18total.toFixed(2));
-            $('#gst12').val(gst12total.toFixed(2));
-            $('#gst5').val(gst5total.toFixed(2));
-            $('#chargeAmount').val(totalAmount.toFixed(2));
-
-        }
-
-        function calculate_items() {
-            var item_name = $("input[name='item_name[]']")
-                .map(function() {
-                    return $(this).val();
-                }).get();
-            var item_price = $("input[name='item_price[]']")
-                .map(function() {
-                    return $(this).val();
-                }).get();
-            var item_qty = $("input[name='item_qty[]']")
-                .map(function() {
-                    return $(this).val();
-                }).get();
-            var item_tax = $("select[name='item_tax[]']")
-                .map(function() {
-                    return $(this).val();
-                }).get();
-            var subTotal = 0,
-                gst18total = 0,
-                gst12total = 0,
-                gst5total = 0,
-                totalAmount = 0;
-
-            for (let i = 0; i < item_name.length; i++) {
-                if (item_qty[i] == 0 || item_price[i] == 0) {
-                    $('#errorMsg').html('<span class="alert alert-danger">Minimum Qty should be 1.</span>').fadeOut(8000);
-                    return false;
-                }
-                let qty = parseFloat(item_qty[i]) || 0;
-                let price = parseFloat(item_price[i]) || 0;
-                let taxRate = parseFloat(item_tax[i]) || 0;
-
-                let rowtotal = price * qty;
-                let gstAmt = (rowtotal * taxRate) / 100;
-                rowtotal -= gstAmt;
-
-                subTotal += rowtotal;
-
-                if (taxRate === 18) gst18total += gstAmt;
-                else if (taxRate === 12) gst12total += gstAmt;
-                else if (taxRate === 5) gst5total += gstAmt;
-            }
-            var totalAmount = subTotal + gst18total + gst12total + gst5total;
-            $('#subtotal').text(subTotal.toFixed(2));
-            $('#valueGst18').text(gst18total.toFixed(2));
-            $('#valueGst12').text(gst12total.toFixed(2));
-            $('#valueGst5').text(gst5total.toFixed(2));
-            $('#totalAmount').text(totalAmount.toFixed(2));
-
-            $('#subtotalSave').val(subTotal.toFixed(2));
-            $('#gst18').val(gst18total.toFixed(2));
-            $('#gst12').val(gst12total.toFixed(2));
-            $('#gst5').val(gst5total.toFixed(2));
-            $('#chargeAmount').val(totalAmount.toFixed(2));
-
-        }
-
         function remove_image_more(loop_image_count) {
             jQuery('.items_' + loop_image_count).remove();
-            calculate_items();
+            calculate_amount();
         }
 
         function searchProductData(event) {
@@ -709,7 +632,6 @@
                         branchId: branchId,
                     },
                     success: function(data) {
-                        console.log(loop_item_count);
                         if (loop_item_count > 1) {
                             document.querySelector('#searchResult' + loop_item_count).innerHTML = '';
                             data.data.forEach(element => {
