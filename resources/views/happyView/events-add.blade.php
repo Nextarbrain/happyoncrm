@@ -532,7 +532,7 @@
 
             for (let i = 0; i < item_price.length; i++) {
                 if (item_qty[i] == 0 || item_price[i] == 0) {
-                    $('#errorMsg').html('<span class="alert alert-danger">Minimum Qty should be 1.</span>').fadeOut(8000);
+                    $('#errorMsg').html('<span class="alert alert-danger">Minimum Qty/Price should be 1.</span>').fadeOut(8000);
                 } else {
                     let qty = parseFloat(item_qty[i]) || 0;
                     let price = parseFloat(item_price[i]) || 0;

@@ -147,7 +147,7 @@
                                                         </div>
                                                         <div class="row mb-4">
                                                             <div class="col-lg-12 d-flex justify-content-between align-items-center">
-                                                                <a href="javascript:void(0)" class="btn btn-primary" onclick="calculate_items()" style="background:#0A5F59;">Calculate</a>
+                                                                <a href="javascript:void(0)" class="btn btn-primary" onclick="calculate_amount()" style="background:#0A5F59;">Calculate</a>
                                                                 <div id="errorMsg"></div>
                                                             </div>
                                                         </div>
@@ -157,7 +157,7 @@
                                                                 <div class="d-flex">
                                                                     <input type="text" name="couponcode" class="form-control" id="couponCode" placeholder="Any Discount Code">
                                                                     <input type="hidden" name="couponvalue" id="couponValue">
-                                                                    <button type="button" id="couponCodebutton" class="btn btn-primary">Apply</button>
+                                                                    <button type="button" id="couponCodebutton" class="btn btn-primary" onclick="calculate_amount()">Apply</button>
                                                                 </diV>
                                                                 <p id="couponmsg"></p>
                                                             </div>
@@ -196,7 +196,6 @@
                                                                 <input type="hidden" name="gst18" id="gst18">
                                                                 <input type="hidden" name="gst12" id="gst12">
                                                                 <input type="hidden" name="gst5" id="gst5">
-
                                                             </div>
                                                             <br>
                                                         </div>
@@ -206,8 +205,7 @@
                                                                 <select name="payment_method" id="payment_method" class="form-select">
                                                                     <option value="UPI">UPI</option>
                                                                     <option value="Cash">Cash</option>
-                                                                    <option value="Debit/Credit">Debit/Credit </option>
-
+                                                                    <option value="Debit/Credit">Debit/Credit</option>
                                                                 </select>
                                                             </div>
                                                         </div>
@@ -256,56 +254,133 @@
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.0/js/toastr.js"></script>
 
+
+    {{-- {{NEW CALCULATION FLOW...START}} --}}
     <script>
-        var baseUrl = "{{ URL::to('/') }}";
-        $("#couponCodebutton").on("click", function() {
-            var sum = $("#subtotalSave").val();
-            var chargeAmount = $("#chargeAmount").val();
-            $.ajax({
-                url: baseUrl + '/get-coupon',
-                type: 'GET',
-                data: {
-                    option: $("#couponCode").val()
-                },
-                success: function(data) {
-                    if (data.status == 400) {
-                        $('#couponmsg').html(`<p class="text-danger">${data.msg}</p>`);
-                    }
-                    var discount = 0;
-                    if (data != '') {
-                        if (data.discount_type == 'flat') {
-                            var discount = data.discount;
-                            $('#couponValue').val(discount.toFixed(2));
-                            $('#couponCodeShow').html("Coupon Code (" + data.coupon_name + ")");
-                            $('#couponValueShow').html(discount.toFixed(2));
-                            var sumamount = chargeAmount - discount;
+        function calculate_amount() {
+            const items = getItemDetails();
+            const totals = calculateTotals(items);
+            if (totals === false) return;
 
-                        } else if (data.discount_type == 'percent') {
-                            var discount = data.discount;
-                            var discount = (sum * discount) / 100;
-                            $('#couponValue').val(discount.toFixed(2));
-                            $('#couponCodeShow').html("Coupon Code (" + data.coupon_name + ")");
-                            $('#couponValueShow').html(discount.toFixed(2));
-                            var sumamount = chargeAmount - discount;
-
+            // check coupon code appied or not.
+            const raw = $("#couponCode").val();
+            const couponCode = raw ? raw.trim() : '';
+            if (couponCode) {
+                const baseUrl = "{{ URL::to('/') }}";
+                $.ajax({
+                    url: baseUrl + '/get-coupon',
+                    type: 'GET',
+                    data: {
+                        option: $("#couponCode").val()
+                    },
+                    success: function(data) {
+                        if (data.status == 400) {
+                            $('#couponmsg').html(`<p class="text-danger">${data.msg}</p>`);
+                            updateTotalsOnUI(totals);
+                        } else {
+                            $('#couponmsg').html("<p>Apply Coupon Successfull!</p>");
+                            let discountTotal = 0;
+                            if (data.discount_type === 'flat') {
+                                discountTotal = data.discount;
+                            } else if (data.discount_type === 'percent') {
+                                discountTotal = (totals.subTotal * data.discount) / 100;
+                            }
+                            updateTotalsOnUI(totals, discountTotal, data);
                         }
-
-                        $('#chargeAmount').val(sumamount.toFixed(2));
-                        // $('#totalAmount').html(sumamount.toFixed(2));
-                        $('#totalAmount').text(sumamount.toFixed(2));
-                        $('#couponmsg').html("<p>Apply Coupon Successfull!</p>");
                     }
+                });
+            } else {
+                updateTotalsOnUI(totals);
+            }
+        }
 
+        function getItemDetails() {
+            return {
+                item_name: $("input[name='item_name[]']").map(function() {
+                    return $(this).val();
+                }).get(),
+                item_price: $("input[name='item_price[]']").map(function() {
+                    return $(this).val();
+                }).get(),
+                item_qty: $("input[name='item_qty[]']").map(function() {
+                    return $(this).val();
+                }).get(),
+                item_tax: $("select[name='item_tax[]']").map(function() {
+                    return $(this).val();
+                }).get()
+            };
+        }
+
+        function calculateTotals({
+            item_price,
+            item_qty,
+            item_tax
+        }) {
+            let subTotal = 0,
+                gst18total = 0,
+                gst12total = 0,
+                gst5total = 0;
+
+            for (let i = 0; i < item_price.length; i++) {
+                if (item_qty[i] == 0 || item_price[i] == 0) {
+                    $('#errorMsg').html('<span class="alert alert-danger">Minimum Qty/Price should be 1.</span>').fadeOut(8000);
+                } else {
+                    let qty = parseFloat(item_qty[i]) || 0;
+                    let price = parseFloat(item_price[i]) || 0;
+                    let taxRate = parseFloat(item_tax[i]) || 0;
+
+                    let rowtotal = price * qty;
+                    let gstAmt = (rowtotal * taxRate) / 100;
+                    rowtotal -= gstAmt;
+                    subTotal += rowtotal;
+
+                    if (taxRate === 18) gst18total += gstAmt;
+                    else if (taxRate === 12) gst12total += gstAmt;
+                    else if (taxRate === 5) gst5total += gstAmt;
                 }
-            });
-        });
+            }
+
+            return {
+                subTotal,
+                gst18total,
+                gst12total,
+                gst5total
+            };
+        }
+
+        function updateTotalsOnUI({
+            subTotal,
+            gst18total,
+            gst12total,
+            gst5total
+        }, discountTotal = 0, couponData = null) {
+            const totalAmount = (subTotal + gst18total + gst12total + gst5total) - discountTotal;
+
+            $('#subtotal').text(subTotal.toFixed(2));
+            $('#valueGst18').text(gst18total.toFixed(2));
+            $('#valueGst12').text(gst12total.toFixed(2));
+            $('#valueGst5').text(gst5total.toFixed(2));
+            $('#totalAmount').text(totalAmount.toFixed(2));
+
+            $('#subtotalSave').val(subTotal.toFixed(2));
+            $('#gst18').val(gst18total.toFixed(2));
+            $('#gst12').val(gst12total.toFixed(2));
+            $('#gst5').val(gst5total.toFixed(2));
+            $('#chargeAmount').val(totalAmount.toFixed(2));
+
+            if (couponData) {
+                $('#couponValue').val(discountTotal.toFixed(2));
+                $('#couponCodeShow').html(`Coupon Code (${couponData.coupon_name})`);
+                $('#couponValueShow').html(discountTotal.toFixed(2));
+            }
+        }
     </script>
+
+    {{-- {{NEW CALCULATION FLOW...END}} --}}
     <script>
         var loop_item_count = 1;
-
         function add_item_more() {
-            loop_item_count++;
-            calculate_items();
+            loop_item_count++;            
             var html =
                 '<div class="row items_' + loop_item_count +
                 '"><div class="col-md-3 input_wrap"><div class="mb-4"><label>Item</label><input type="text" id="item_name' +
@@ -321,51 +396,9 @@
                 '" class="form-select"><option value="18">18%</option><option value="12">12%</option><option value="5">5% </option><option value="0">0% </option></select></div></div><div class="col-md-1"><i class="fa fa-trash fs-4 btn btn-danger" onclick="remove_image_more(' +
                 loop_item_count + ')" aria-hidden="true"></i></div></div>';
             jQuery('#item_box').append(html);
-        }
+        }       
 
-        function searchProductData(event) {
-            var search = event.target.value;
-            if (search.length > 0) {
-                if (loop_item_count > 1) {
-                    $('#searchResult' + loop_item_count).css("display", "block");
-                } else {
-                    $('#searchResult').css("display", "block");
-                }
-                $.ajax({
-
-                    type: 'get',
-                    url: '{{ route('getProduct') }}',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    data: {
-                        query: search
-                    },
-
-                    success: function(data) {
-                        console.log(loop_item_count);
-                        if (loop_item_count > 1) {
-                            document.querySelector('#searchResult' + loop_item_count).innerHTML = '';
-                            data.data.forEach(element => {
-                                document.querySelector('#searchResult' + loop_item_count).innerHTML +=
-                                    `<a class="text-dark borderSearch" href="javascript:void(0)" onclick="appendProductData(${element.id})"><p class="py-2 px-3">${element.product_name}</p></a>`;
-                            });
-                        } else {
-                            document.querySelector('#searchResult').innerHTML = '';
-                            data.data.forEach(element => {
-                                document.querySelector('#searchResult').innerHTML +=
-                                    `<a class="text-dark borderSearch" href="javascript:void(0)" onclick="appendProductData(${element.id})"><p class="py-2 px-3">${element.product_name}</p></a>`;
-                            });
-                        }
-
-                    }
-                });
-            } else {
-                $('#searchResult').css("display", "none");
-            }
-        }
-
-        function appendProductData(id) {
+        function appendProductData(id) {          
             $.ajax({
                 type: "get",
                 url: '{{ route('productByID') }}',
@@ -388,67 +421,11 @@
                     }
                 }
             });
-        }
-
-        function calculate_items() {
-            var item_name = $("input[name='item_name[]']")
-                .map(function() {
-                    return $(this).val();
-                }).get();
-            var item_price = $("input[name='item_price[]']")
-                .map(function() {
-                    return $(this).val();
-                }).get();
-            var item_qty = $("input[name='item_qty[]']")
-                .map(function() {
-                    return $(this).val();
-                }).get();
-            var item_tax = $("select[name='item_tax[]']")
-                .map(function() {
-                    return $(this).val();
-                }).get();
-            var subTotal = 0,
-                gst18total = 0,
-                gst12total = 0,
-                gst5total = 0,
-                totalAmount = 0;
-
-            for (let i = 0; i < item_name.length; i++) {
-                if (item_qty[i] == 0 || item_price[i] == 0) {
-                    $('#errorMsg').html('<span class="alert alert-danger">Minimum Qty should be 1.</span>').fadeOut(8000);
-                    return false;
-                }
-                let qty = parseFloat(item_qty[i]) || 0;
-                let price = parseFloat(item_price[i]) || 0;
-                let taxRate = parseFloat(item_tax[i]) || 0;
-
-                let rowtotal = price * qty;
-                let gstAmt = (rowtotal * taxRate) / 100;
-                rowtotal -= gstAmt;
-
-                subTotal += rowtotal;
-
-                if (taxRate === 18) gst18total += gstAmt;
-                else if (taxRate === 12) gst12total += gstAmt;
-                else if (taxRate === 5) gst5total += gstAmt;                
-            }
-            var totalAmount = subTotal + gst18total + gst12total + gst5total;
-            $('#subtotal').text(subTotal.toFixed(2));
-            $('#valueGst18').text(gst18total.toFixed(2));
-            $('#valueGst12').text(gst12total.toFixed(2));
-            $('#valueGst5').text(gst5total.toFixed(2));
-            $('#totalAmount').text(totalAmount.toFixed(2));
-
-            $('#subtotalSave').val(subTotal.toFixed(2));
-            $('#gst18').val(gst18total.toFixed(2));
-            $('#gst12').val(gst12total.toFixed(2));
-            $('#gst5').val(gst5total.toFixed(2));
-            $('#chargeAmount').val(totalAmount.toFixed(2));
-        }
+        }      
 
         function remove_image_more(loop_image_count) {
             jQuery('.items_' + loop_image_count).remove();
-            calculate_items();
+            calculate_amount();
         }
         var today = new Date();
         var day = ("0" + today.getDate()).slice(-2);
@@ -533,7 +510,6 @@
                         query: search,
                         branchId: branchId
                     },
-
                     success: function(data) {
                         console.log(loop_item_count);
                         if (loop_item_count > 1) {
@@ -556,32 +532,6 @@
                 $('#searchResult').css("display", "none");
             }
         }
-
-        function appendProductData(id) {
-            $.ajax({
-                type: "get",
-                url: '{{ route('productByID') }}',
-                data: {
-                    id: id
-                },
-                success: function(response) {
-                    if (loop_item_count > 1) {
-                        $('#item_name' + loop_item_count).val(response.product_name);
-                        $('#item_price' + loop_item_count).val(response.product_price);
-                        $('#item_qty' + loop_item_count).val(response.product_qty);
-                        $('#item_tax' + loop_item_count).val(response.product_tax);
-                        $('#searchResult' + loop_item_count).css("display", "none");
-                    } else {
-                        $('#item_name').val(response.product_name);
-                        $('#item_price').val(response.product_price);
-                        $('#item_qty').val(response.product_qty);
-                        $('#item_tax').val(response.product_tax);
-                        $('#searchResult').css("display", "none");
-                    }
-                }
-            });
-        }
     </script>
 </body>
-
 </html>
