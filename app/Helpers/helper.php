@@ -54,7 +54,7 @@ function getTax($name)
 {
     $branchId = auth('admin')->user()->branch_id ?? null;
     $product = Product::select('product_tax')->where(['product_name' => $name]);
-    if($branchId) {
+    if ($branchId) {
         $product->where('branch_id', $branchId);
     }
     $product = $product->first();
@@ -119,7 +119,7 @@ function getProductPrice($name)
 {
     $branchId = auth('admin')->user()->branch_id ?? null;
     $product = Product::where('product_name', $name);
-     if($branchId) {
+    if ($branchId) {
         $product->where('branch_id', $branchId);
     }
     $product = $product->first();
@@ -128,20 +128,19 @@ function getProductPrice($name)
 
 function couponCountUpdate($code)
 {
-    if($code){
-    $branchId = auth('admin')->user()->branch_id ??  auth('admin')->user()->branch_id;
-    $coupon = Coupon::where('coupon_name', $code);
-    if ($branchId) {
-        $coupon->where('branch_id', $branchId);
-    }
-    $coupon = $coupon->first();
-    if($coupon) {
-        $coupon->coupon_count = ($coupon->coupon_count ?? 0) + 1;
-        $coupon->save();
-        return true;
-    }
+    if ($code) {
+        $branchId = auth('admin')->user()->branch_id ??  auth('admin')->user()->branch_id;
+        $coupon = Coupon::where('coupon_name', $code);
+        if ($branchId) {
+            $coupon->where('branch_id', $branchId);
+        }
+        $coupon = $coupon->first();
+        if ($coupon) {
+            $coupon->coupon_count = ($coupon->coupon_count ?? 0) + 1;
+            $coupon->save();
+            return true;
+        }
         return false;
-
     }
     return false;
 }
@@ -158,6 +157,38 @@ function branchName($branchId)
     $branchName = Branch::where('id', $branchId)->first();
     return $branchName != null ? $branchName->name : '';
 }
-    // $msg = "Thank you for visiting HappyOn Party & Play. We hope you had a great time. Please spare 2 mins for your valuable review: https://rb.gy/pvkwg";
-    // $template_id = "1707168821233182292";
-    // dd(sendsms('7079322204', $msg, $template_id));
+// $msg = "Thank you for visiting HappyOn Party & Play. We hope you had a great time. Please spare 2 mins for your valuable review: https://rb.gy/pvkwg";
+// $template_id = "1707168821233182292";
+// dd(sendsms('7079322204', $msg, $template_id));
+
+
+
+
+if (! function_exists('remaining_time')) {
+    /**
+     * Calculate the remaining time for a booking in “HH : mm : ss” format.
+     *
+     * @param  string|null  $bookingDate   // e.g. 2025‑07‑14
+     * @param  string|null  $startTime     // e.g. 13:30  (from event->Hours)
+     * @param  string|null  $kidHours      // e.g. 1, 1.5 or "Unlimited"
+     * @param  string       $timezone      // default: Asia/Kolkata
+     * @return string                      // formatted “HH : mm : ss”
+     */
+    function remaining_time($bookingDate, $startTime, $kidHours, $timezone = 'Asia/Kolkata'): string
+    {
+        if (! $bookingDate || ! $startTime) {
+            return '00 : 00 : 00';
+        }       
+        $start = Carbon::parse("{$bookingDate} {$startTime}:00", $timezone);        
+        $hours   = ($kidHours === 'Unlimited') ? 1 : (float) ($kidHours ?? 0);
+        $end     = (clone $start)->addSeconds($hours * 3600);
+
+        $secondsLeft = max(0, $end->diffInSeconds(now($timezone), false) * -1);
+
+        $h = floor($secondsLeft / 3600);
+        $m = floor(($secondsLeft % 3600) / 60);
+        $s = $secondsLeft % 60;
+
+        return sprintf('%02d : %02d : %02d', $h, $m, $s);
+    }
+}

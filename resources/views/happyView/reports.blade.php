@@ -58,6 +58,8 @@
                             <form action="{{url('/membership-booking-usage')}}" method="post">
                             @elseif($_GET['key'] == "Event")
                             <form action="{{url('/event-booking-report')}}" method="post">
+                            @elseif($_GET['key'] == "Sales")
+                            <form action="{{url('/sales-report')}}" method="post">
                             @else
 							<form action="{{url('/open-billing-report')}}" method="post">
 							@endif
@@ -99,7 +101,6 @@
                                         <div class="d-flex">
                                             <input type="text" name="daterange" class="form-control float-right"
                                                 id="reservation">
-
                                         </div>
                                         @endif
                                 <div class="modal-footer">
@@ -138,15 +139,11 @@
     <script src="assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
     <script src="assets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js"></script>
     <script src="assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js"></script>
-    <script src="assets/plugins/chartjs/js/Chart.min.js"></script>
-    <script src="assets/plugins/chartjs/js/Chart.extension.js"></script>
-    <script src="assets/js/index.js"></script>
     <script src="assets/plugins/moment/moment.min.js"></script>
 
     <script src="assets/plugins/daterangepicker/daterangepicker.js"></script>
     <!--app JS-->
-    <script src="assets/js/circle-progress.min.js"></script>
-    <script src="assets/js/app.js"></script>
+    
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.0/js/toastr.js"></script>
     <script src="assets/js/bootstrap-select.min.js"></script>
