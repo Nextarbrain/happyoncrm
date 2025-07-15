@@ -14,6 +14,7 @@ use App\Models\Branch;
 use App\Models\UserProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
 use App\Models\PaymentMethod;
 //import model admin
 use App\DataTables\UserDataTable;
@@ -94,13 +95,6 @@ class TicketController extends Controller
 
         return view('happyView.customerfilter', compact('user'));
     }
-
-
-    // public function dd(){
-    //       dd(time());
-    // }
-
-
 
     public function addTickets(Request $request)
     {
@@ -395,29 +389,11 @@ class TicketController extends Controller
                     "order_from" => "POS"
                 ]
             ];
-            // dd($postData);
 
             // Make the POST request
             $response = Http::post('https://api.reelo.io/v1/pos/integrations/e7499eb1-3ef1-4162-8dfb-8b5a55d3e6ba/bill/customer', $postData);
-
-            // dd($postData);
-
-            // if ($response->successful()) {
-            //     $data = $response->json();
-            //     return $data;
-            // } else {
-            //     $errorCode = $response->status();
-            //     $errorMessage = $response->body();
-            //     return response()->json(['error' => $errorMessage], $errorCode);
-            // }
-
-
-
             //invoice generate end
             return view('receipt.index', $data);
-            //    return redirect('/customers')->with('success', 'Successfully Created! Please Pay for confirm');
-
-
         }
     }
 
@@ -579,12 +555,8 @@ class TicketController extends Controller
                 $totalSecond = (int)$hourQty * 3600;
             }
 
-
             $end_time_unix_plus_one_hour = $start_time_unix + $totalSecond;
-
-
             $remaining_seconds = $end_time_unix_plus_one_hour - time();
-
 
             if ($remaining_seconds <= 0) {
                 $remaining_seconds = 0;
@@ -606,7 +578,6 @@ class TicketController extends Controller
             $template_id = "1707168001515557376";
             sendsms($mobile, $msg, $template_id);
         }
-
 
         if ($request->input('adult_qty')) {
             if ($request->input('adult_product_id') > 0) {
@@ -655,7 +626,6 @@ class TicketController extends Controller
                 $product_add->save();
             }
         }
-
 
         $user__id = User::max('id');
         $customerKey = str_pad($user__id, 10, '0', STR_PAD_LEFT);
@@ -707,22 +677,8 @@ class TicketController extends Controller
                 "order_from" => "POS"
             ]
         ];
-
-        // dd($postData);
         // Make the POST request
-
         $response = Http::patch('https://api.reelo.io/v1/pos/integrations/e7499eb1-3ef1-4162-8dfb-8b5a55d3e6ba/update-bill', $postData);
-
-        // dd($response);
-        // if (!in_array('Socks', $request->product_name)) {
-        //     $product_add = new UserProduct();
-        //     $product_add->user_id = $id;
-        //     $product_add->product_name = 'Socks';
-        //     $product_add->price = 0;
-        //     $product_add->qty = $num_of_kid;
-        //     $product_add->save();
-        // }
-
         return redirect('/customers')->with('success', 'Successfully Updated!');
     }
 
@@ -838,7 +794,6 @@ class TicketController extends Controller
                 "totalAmount" => $paymentMethod->amounts,
                 'kidsInvoice' => $kidsInvoice
             ];
-            // dd($kidValue);
             return view('receipt.index', $data);
         }
     }
@@ -885,16 +840,7 @@ class TicketController extends Controller
     {
         hasPermission('customers');
         return $datatable->with('data', $req)->render('happyView.all-customer');
-
-        // $user = DB::table('users')
-        //     ->join('user_details', 'users.id', '=', 'user_details.user_id')
-        //     ->distinct('user_details.phone_no')
-        //     ->take(10)->get();
-        // return view('happyView.all-customer', compact('user'));
     }
-
-
-
     public function getPhoneList(Request $request)
     {
         $search = $request->post('query');
@@ -926,7 +872,7 @@ class TicketController extends Controller
         $branchId = $request->get('branch_id') ?? session('branch_id');
 
         $value = DayPrice::where('branch_id', $branchId)->where('Hour', $request->get('option'))->first();
-        if($value == null){
+        if ($value == null) {
             $value = DayPrice::whereNull('branch_id')->where('Hour', $request->get('option'))->first();
         }
 
@@ -951,8 +897,6 @@ class TicketController extends Controller
             echo 0;
         }
     }
-
-
 
     public function addUser(Request $request)
     {
@@ -998,6 +942,29 @@ class TicketController extends Controller
             }
         } catch (Exception $e) {
             return response()->json(['success' => $e->getMessage()], 500);
+        }
+    }
+
+    public function sales(Request $request)
+    {
+        hasPermission('sales-report');
+        $branchId = !empty($request->branch_id) && count($request->branch_id) > 0 ? $request->branch_id : (auth('admin')->user()->branch_id ? [strval(auth('admin')->user()->branch_id)] : null);
+        if (isset($request->daterange) && $request->daterange != "") {
+            $daterange = explode("-", $request->daterange);
+            $daterange[0] = date('y-m-d', strtotime($daterange[0]));
+            $daterange[1] = date('y-m-d', strtotime($daterange[1]));
+            
+            $user_bookings = User::with('kids', 'userDetails', 'event', 'paymentInfo', 'branch')
+                ->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59'])
+                ->where('role', '!=', 0)
+                ->whereHas('userDetails', function ($q) {
+                    $q->where('membership_plan', 0);
+                })
+                ->when($branchId, function ($q) use ($branchId) {
+                    $q->whereIn('branch_id', (array) $branchId);
+                })->get();
+            // dd($user_bookings[0]->event->booking_date);
+            return view('happyView.sales-report', compact('user_bookings'));
         }
     }
 }
