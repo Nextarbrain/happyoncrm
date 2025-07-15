@@ -598,9 +598,15 @@ class AdminController extends Controller
             }
             $gst12 = $gst12->sum('gst12');
 
+            $payment_gst5 = PaymentMethod::select('gst5')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
+            if ($branchId) {
+                $payment_gst5->where('branch_id', $branchId);
+            }
+            $payment_gst5 = $payment_gst5->sum('gst5');
+
             $gst18 += $event_gst18 + $open_gst18;
             $gst12 += $event_gst12 + $open_gst12;
-            $gst5 += $open_gst5;
+            $gst5 += $open_gst5 + $payment_gst5;
             $member = User::with('membership', 'userDetails')
                 ->where('role', 2)
                 ->whereHas('membership', function ($query) {
@@ -916,9 +922,15 @@ class AdminController extends Controller
             }
             $gst12 = $gst12->sum('gst12');
 
+            $payment_gst5 = PaymentMethod::select('gst5')->whereDate('created_at', $today);
+            if ($branchId) {
+                $payment_gst5->where('branch_id', $branchId);
+            }
+            $payment_gst5 = $payment_gst5->sum('gst5');
+
             $gst18 += $event_gst18 + $open_gst18;
             $gst12 += $event_gst12 + $open_gst12;
-            $gst5 += $open_gst5;
+            $gst5 += $open_gst5 + $payment_gst5;
             $member = User::with('membership', 'userDetails')
                 ->where('role', 2)
                 ->whereHas('membership', function ($query) {
