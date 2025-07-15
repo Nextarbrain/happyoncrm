@@ -111,8 +111,8 @@
                                                         <td>{{ $user_booking->paymentInfo?->gst5 ?? '0:00' }}</td>
                                                         <td>{{ $hourSockTotal }}</td>
                                                         <td>{{ remaining_time($bookingDate, $start_datetime, $user_booking->kids[0]->hours) }}</td>
-                                                        <td>{{ count($user_booking->kids) }}</td>
-                                                        <td>{{ $user_booking->kids->sum('hours') }}</td>
+                                                        <td>{{ count($user_booking->kids) }}</td>                                                        
+                                                        <td>{{ $user_booking->kids[0]->hours ?? null }}</td>
                                                         <td>{{ $user_booking->paymentInfo?->payment_method ?? '' }}</td>
                                                         <td>{{ $user_booking->userDetails?->membership_plan == 1 ? 'Membership' : 'Ticket' }}</td>
                                                         <td>{{ $user_booking->branch?->name ?? '' }}</td>
