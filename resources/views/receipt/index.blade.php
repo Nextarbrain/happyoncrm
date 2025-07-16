@@ -38,478 +38,198 @@
                     <div class="col-md-12">
                         <div class="dashboard_left">
                             <button class="btn h_btn bg-primary text-light btn-sm" onclick="printReciept()">Print Reciept</button>
-                <div id="myContainer">
-                    <table cellpadding="0" cellspacing="0" border-collapse="0" style="width:100%; height:700px;">
-                       <tbody>
-                          <tr>
-                             <td style="text-align: center;"><img src="{{ asset('assets/images/happyon_logo.png') }}"
-                                alt="logo" style="height:60px"></td>
-                          </tr>
-                          <tr>
-                             <td style="
-                                font-size: 15px;
-                                font-weight: 600;
-                                text-align: center;
-                                ">HappyOn Private
-                                Limited
-                             </td>
-                          </tr>
-                          <tr>
-                             <td style="
-                                font-size: 15px;
-                                text-align: center;
-                                ">212 A, Times Square Grand, Sindhubhavan
-                                Road, Thaltej, <br>Ahmedabad -380059
-                             </td>
-                          </tr>
-                          <tr>
-                             <td style="
-                                font-size: 15px;
-                                text-align: center;
-                                ">Phone Number : +91 9328672178</td>
-                          </tr>
-                          <tr>
-                             <td style="
-                                font-size: 15px;
-                                text-align: center;
-                                ">GSTIN : 24AAGCH2076N1ZC</td>
-                          </tr>
-                          <tr>
-                             <td
-                                style="
-                                font-size: 15px;
-                                /* text-align: center; */
-                                border-top: 1px solid #000;
-                                border-bottom: 1px solid #000;
-                                text-transform: capitalize;
-                                ">
-                                Name : {{ $guardian_name }}
-                             </td>
-                          </tr>
-                          <tr>
-                             <td style="
-                                line-height: 37px;
-                                ">
-                                <table cellpadding="0" cellspacing="0" style="
-                                   width: 100%;    border-collapse: collapse;
-                                   ">
-                                   <tbody>
-                                      <tr>
-                                         <td style="
-                                            font-size: 15px;
-                                            ">Date :
-                                            {{ \Carbon\Carbon::parse($date)->format('d M, Y') }}
-                                         </td>
-                                         <td style="
-                                            font-size: 15px;
-                                            text-align: right;
-                                            ">Payment Method :
-                                            {{ $payment_method }}
-                                         </td>
-                                      </tr>
-                                      <tr>
-                                         <td style="
-                                            font-size: 15px;
-                                            ">Hours :
-                                            @foreach ($distinctHours as $val)
-                                             {{ $val }}
-                                            {{ $val == 'Unlimited |' ? '' : 'hr |' }}
-                                            @endforeach
-                                         </td>
-                                         <td style="
-                                            font-size: 15px;
-                                            text-align: right;
-                                            "></td>
-                                      </tr>
-                                      <tr>
-                                         <td style="
-                                            font-size: 15px;
-                                            ">In Time : {{ $time }}</td>
-                                         <td style="
-                                            font-size: 15px;
-                                            text-align: right;
-                                            "></td>
-                                      </tr>
-                                      <tr>
-                                         <td style="
-                                            font-size: 15px;
-                                            ">Out Time : {{ $end_time }}</td>
-                                         <td style="
-                                            font-size: 15px;
-                                            text-align: right;
-                                            "></td>
-                                      </tr>
-                                      <tr>
-                                         <td style="
-                                            font-size: 15px;
-                                            ">Cashier : HappyOn</td>
-                                         <td style="
-                                            font-size: 15px;
-                                            text-align: right;
-                                            ">Invoice No :
-                                            {{ $invoiceNo }}
-                                         </td>
-                                      </tr>
-                                   </tbody>
+                            <div id="myContainer">
+                                <table cellpadding="0" cellspacing="0" border-collapse="0" style="width:100%; height:700px;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align: center;"><img src="{{ asset('assets/images/happyon_logo.png') }}" alt="logo" style="height:60px"></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-size: 15px;font-weight: 600;text-align: center;">HappyOn Private Limited</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-size: 15px;text-align: center;">212 A, Times Square Grand, Sindhubhavan Road, Thaltej, <br>Ahmedabad -380059</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-size: 15px;text-align: center;">Phone Number : +91 9328672178</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-size: 15px;text-align: center;">GSTIN : 24AAGCH2076N1ZC</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-size: 15px;border-top: 1px solid #000;border-bottom: 1px solid #000;text-transform: capitalize;">Name : {{ $guardian_name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="line-height: 37px;">
+                                                <table cellpadding="0" cellspacing="0" style="width: 100%;border-collapse: collapse;">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td style="font-size: 15px;">Date : {{ \Carbon\Carbon::parse($date)->format('d M, Y') }}</td>
+                                                            <td style="font-size: 15px;text-align: right;">Payment Method : {{ $payment_method }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="font-size: 15px;">Hours :
+                                                                @foreach ($distinctHours as $val)
+                                                                    {{ $val }}
+                                                                    {{ $val == 'Unlimited |' ? '' : 'hr |' }}
+                                                                @endforeach
+                                                            </td>
+                                                            <td style="font-size: 15px;text-align: right;"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="font-size: 15px;">In Time : {{ $time }}</td>
+                                                            <td style="font-size: 15px;text-align: right;"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="font-size: 15px;">Out Time : {{ $end_time }}</td>
+                                                            <td style="font-size: 15px;text-align: right;"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="font-size: 15px;">Cashier : HappyOn</td>
+                                                            <td style="font-size: 15px;text-align: right;">Invoice No :{{ $invoiceNo }}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <table style="border-collapse: collapse;width: 100%;">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <table cellpadding="0" cellspacing="0" style="border-collapse: collapse;width: 100%;">
+                                                                    <tbody>
+                                                                        <tr style="border-top: 1px solid #000;">
+                                                                            <td style="width: 40%;font-size: 15px;">Item</td>
+                                                                            <td style="font-size: 15px;width: 20%;text-align: center;">Qty</td>
+                                                                            <td style="font-size: 15px;width: 20%;">Price</td>
+                                                                            <td style="font-size: 15px;width: 20%;text-align: right;">Amount</td>
+                                                                        </tr>
+                                                                        @foreach ($kidsInvoice as $kidsInv)
+                                                                            <tr style="border-top: 1px solid #000;">
+                                                                                <td style="font-size: 15px;">
+                                                                                    {{ $kidsInv['hours'] }}
+                                                                                    {{ $kidsInv['hours'] == 'Unlimited' ? '' : 'hr' }} Play Time
+                                                                                </td>
+                                                                                <td style="font-size: 15px;text-align: center;">{{ $kidsInv['quantity'] }}</td>
+                                                                                <td style="font-size: 15px;">{{ $kidsInv['price'] }}</td>
+                                                                                <td style="font-size: 15px;text-align: right;">
+                                                                                    {{ $kidsInv['subtotal'] }}
+                                                                                </td>
+                                                                            </tr>
+                                                                        @endforeach
+                                                                        @foreach ($userProducts as $prod)
+                                                                            <tr style="border-top: 1px solid #000;">
+                                                                                <td style="font-size: 15px;">{{ $prod->product_name }} </td>
+                                                                                @if ($prod->product_name == 'Socks')
+                                                                                    <td style="font-size: 15px;text-align: center;">{{ $prod->qty - $kidTotal }}</td>
+                                                                                    <td style="font-size: 15px;">{{ $prod->price }}</td>
+                                                                                    <td style="font-size: 15px;text-align: right;">{{ ($prod->qty - $kidTotal) * $prod->price }}</td>
+                                                                                @else
+                                                                                    <td style="font-size: 15px;text-align: center;">{{ $prod->qty }}</td>
+                                                                                    <td style="font-size: 15px;">{{ $prod->price }}</td>
+                                                                                    <td style="font-size: 15px;text-align: right;">{{ $prod->qty * $prod->price }}</td>
+                                                                                @endif
+                                                                            </tr>
+                                                                        @endforeach
+                                                                    </tbody>
+                                                                </table>
+                                                                <table style="width: 100%;">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td>
+                                                                                <table cellpadding="0" cellspacing="0" style="width: 100%;border-collapse: collapse;">
+                                                                                    <tbody>
+                                                                                        <tr style="border-top: 1px solid #000;">
+                                                                                            <td style="font-size: 15px;">Sub Total :</td>
+                                                                                            <td style="font-size: 15px;text-align: right;">{{ $subTotal }}</td>
+                                                                                        </tr>
+                                                                                        @if (isset($couponcode) && $couponcode != null)
+                                                                                            <tr style="border-top: 1px solid #000;">
+                                                                                                <td style="font-size: 15px;">Coupon ({{ $couponcode }}) : </td>
+                                                                                                <td style="font-size: 15px;text-align: right;">{{ $couponvalue }}</td>
+                                                                                            </tr>
+                                                                                        @endif
+                                                                                        @if (isset($gst18) && $gst18 != null && $gst18 != '0.00')
+                                                                                            <tr style="border-top: 1px solid #000;">
+                                                                                                <td style="font-size: 15px;">Exclude Gst@ 18% :</td>
+                                                                                                <td style="font-size: 15px;text-align: right;">{{ $gst18 }}</td>
+                                                                                            </tr>
+                                                                                            <tr style="border-top: 1px solid #000;">
+                                                                                                <td style="font-size: 15px;">Exclude Gst@ 5% :</td>
+                                                                                                <td style="font-size: 15px;text-align: right;">{{ $gst5 }}</td>
+                                                                                            </tr>
+                                                                                        @endif
+                                                                                        @if (isset($gst12) && $gst12 != null && $gst12 != '0.00')
+                                                                                            <tr style="border-top: 1px solid #000;">
+                                                                                                <td style="font-size: 15px;">Exclude Gst@ 12% :</td>
+                                                                                                <td style="font-size: 15px;text-align: right;">{{ $gst12 }}</td>
+                                                                                            </tr>
+                                                                                        @endif
+                                                                                        <tr style="border-top: 1px solid #000;">
+                                                                                            <td style="font-size: 15px;font-weight: 400;">Grant Total :</td>
+                                                                                            <td style="font-size: 15px;text-align: right;">{{ $totalAmount }}</td>
+                                                                                        </tr>
+                                                                                    </tbody>
+                                                                                </table>
+                                                                                <table style="width: 100%;border-collapse: collapse;">
+                                                                                    <tbody>
+                                                                                        <tr style="border-top: 1px solid #000;">
+                                                                                            <td style="font-size: 12px;text-align: center;">
+                                                                                                Note: This is a System Generated Invoice and
+                                                                                                does not required Signature
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                        <tr>
+                                                                                            <td style="text-align: center;font-size: 15px;font-weight: 600;">Thank you for visiting HappyON Party & Play</td>
+                                                                                        </tr>
+                                                                                        <tr>
+                                                                                            <td style="text-align: center;font-size: 15px;"><a href="www.happyonplay.com">www.happyonplay.com</a></td>
+                                                                                        </tr>
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </tbody>
                                 </table>
-                                <table style="    border-collapse: collapse;
-                                   width: 100%;
-                                   ">
-                                   <tbody>
-                                      <tr>
-                                         <td>
-                                            <table cellpadding="0" cellspacing="0"
-                                               style="    border-collapse: collapse;
-                                               width: 100%;
-                                               ">
-                                               <tbody>
-                                                  <tr style="
-                                                     border-top: 1px solid #000;
-                                                     ">
-                                                     <td style="
-                                                        width: 40%;
-                                                        font-size: 15px;
-                                                        ">Item</td>
-                                                     <td
-                                                        style="
-                                                        font-size: 15px;
-                                                        width: 20%;
-                                                        text-align: center;
-                                                        ">
-                                                        Qty
-                                                     </td>
-                                                     <td style="
-                                                        font-size: 15px;
-                                                        width: 20%;
-                                                        ">Price</td>
-                                                     <td
-                                                        style="
-                                                        font-size: 15px;
-                                                        width: 20%;
-                                                        text-align: right;
-                                                        ">
-                                                        Amount
-                                                     </td>
-                                                  </tr>
-                                                  {{-- <tr style="
-                                                     border-top: 1px solid #000;
-                                                     "> --}}
-                                                    @foreach ($kidsInvoice as $kidsInv)
-                                                    <tr style="
-                                                    border-top: 1px solid #000;
-                                                    ">
-                                                     <td style="
-                                                        font-size: 15px;
-                                                        ">{{ $kidsInv['hours'] }}
-                                                        {{ $kidsInv['hours'] == 'Unlimited' ? '' : 'hr' }} Play Time
-                                                     </td>
-                                                     <td style="
-                                                        font-size: 15px;
-                                                        text-align: center;
-                                                        ">
-                                                        {{ $kidsInv['quantity'] }}
-                                                     </td>
-                                                     <td style="
-                                                        font-size: 15px;
-                                                        ">{{ $kidsInv['price'] }}</td>
-                                                     <td style="
-                                                        font-size: 15px;
-                                                        text-align: right;
-                                                        ">
-                                                        {{ $kidsInv['subtotal'] }}
-                                                     </td>
-                                                    </tr>
-                                                     @endforeach
-                                                     @if ($adultNum != null)
-                                                  {{-- </tr> --}}
-
-                                                  <tr style="
-                                                     border-top: 1px solid #000;
-                                                     ">
-                                                     <td style="
-                                                        font-size: 15px;
-                                                        ">Adult </td>
-                                                     <td style="
-                                                        font-size: 15px;
-                                                        text-align: center;
-                                                        ">
-                                                        {{ $adultNum }}
-                                                     </td>
-                                                     <td style="
-                                                        font-size: 15px;
-                                                        ">{{ $adultPrice }}</td>
-                                                     <td style="
-                                                        font-size: 15px;
-                                                        text-align: right;
-                                                        ">
-                                                        {{ $adultPrice }}
-                                                     </td>
-                                                  </tr>
-                                                  @endif
-                                                  @if ($socksNum != null)
-                                                  <tr style="
-                                                     border-top: 1px solid #000;
-                                                     ">
-                                                     <td style="
-                                                        font-size: 15px;
-                                                        ">Socks </td>
-                                                     <td style="
-                                                        font-size: 15px;
-                                                        text-align: center;
-                                                        ">
-                                                        {{ $socksNum - $kidTotal}}
-                                                     </td>
-                                                     <td style="
-                                                        font-size: 15px;
-                                                        ">{{ $socksPrice }}</td>
-                                                     <td style="
-                                                        font-size: 15px;
-                                                        text-align: right;
-                                                        ">
-                                                        {{ $socksPrice }}
-                                                     </td>
-                                                  </tr>
-                                                  @endif
-                                                  @if ($extraTime != null)
-                                                  <tr style="
-                                                     border-top: 1px solid #000;
-                                                     ">
-                                                     <td style="
-                                                        font-size: 15px;
-                                                        ">Extra Time </td>
-                                                     <td style="
-                                                        font-size: 15px;
-                                                        text-align: center;
-                                                        "></td>
-                                                     <td style="
-                                                        font-size: 15px;
-                                                        ">{{ $extraTime }}</td>
-                                                     <td style="
-                                                        font-size: 15px;
-                                                        text-align: right;
-                                                        ">
-                                                        {{ $extraTime }}
-                                                     </td>
-                                                  </tr>
-                                                  @endif
-                                               </tbody>
-                                            </table>
-                                            <table style="
-                                               width: 100%;
-                                               ">
-                                               <tbody>
-                                                  <tr>
-                                                     <td>
-                                                        <table cellpadding="0" cellspacing="0"
-                                                           style="
-                                                           width: 100%;
-                                                           border-collapse: collapse;
-                                                           ">
-                                                           <tbody>
-                                                              <tr style="
-                                                                 border-top: 1px solid #000;
-                                                                 ">
-                                                                 <td style="
-                                                                    font-size: 15px;
-                                                                    ">Sub Total :</td>
-                                                                 <td
-                                                                    style="
-                                                                    font-size: 15px;
-                                                                    text-align: right;
-                                                                    ">
-                                                                    {{ $subTotal }}
-                                                                 </td>
-                                                              </tr>
-                                                              @if (isset($couponcode) && $couponcode != null)
-                                                              <tr style="
-                                                                 border-top: 1px solid #000;
-                                                                 ">
-                                                                 <td style="
-                                                                    font-size: 15px;
-                                                                    ">Coupon
-                                                                    ({{ $couponcode }}) :
-                                                                 </td>
-                                                                 <td
-                                                                    style="
-                                                                    font-size: 15px;
-                                                                    text-align: right;
-                                                                    ">
-                                                                    {{ $couponvalue }}
-                                                                 </td>
-                                                              </tr>
-                                                              @endif
-                                                              @if (isset($gst18) && $gst18 != null && $gst18 != '0.00')
-                                                              <tr style="
-                                                                 border-top: 1px solid #000;
-                                                                 ">
-                                                                 <td style="
-                                                                    font-size: 15px;
-                                                                    ">Exclude Gst
-                                                                    @ 18% :
-                                                                 </td>
-                                                                 <td
-                                                                    style="
-                                                                    font-size: 15px;
-                                                                    text-align: right;
-                                                                    ">
-                                                                    {{ $gst18 }}
-                                                                 </td>
-                                                              </tr>
-                                                              <tr style="
-                                                                 border-top: 1px solid #000;
-                                                                 ">
-                                                                 <td style="
-                                                                    font-size: 15px;
-                                                                    ">Exclude Gst
-                                                                    @ 5% :
-                                                                 </td>
-                                                                 <td
-                                                                    style="
-                                                                    font-size: 15px;
-                                                                    text-align: right;
-                                                                    ">
-                                                                    {{ $gst5 }}
-                                                                 </td>
-                                                              </tr>
-                                                              @endif
-                                                              @if (isset($gst12) && $gst12 != null && $gst12 != '0.00')
-                                                              <tr style="
-                                                                 border-top: 1px solid #000;
-                                                                 ">
-                                                                 <td style="
-                                                                    font-size: 15px;
-                                                                    ">Exclude Gst
-                                                                    @ 5% :
-                                                                 </td>
-                                                                 <td
-                                                                    style="
-                                                                    font-size: 15px;
-                                                                    text-align: right;
-                                                                    ">
-                                                                    {{ $gst12 }}
-                                                                 </td>
-                                                              </tr>
-                                                              @endif
-                                                              <tr style="
-                                                                 border-top: 1px solid #000;
-                                                                 ">
-                                                                 <td
-                                                                    style="
-                                                                    font-size: 15px;
-                                                                    font-weight: 400;
-                                                                    ">
-                                                                    Grant Total :
-                                                                 </td>
-                                                                 <td
-                                                                    style="
-                                                                    font-size: 15px;
-                                                                    text-align: right;
-                                                                    ">
-                                                                    {{ $totalAmount }}
-                                                                 </td>
-                                                              </tr>
-                                                           </tbody>
-                                                        </table>
-                                                        <table
-                                                           style="
-                                                           width: 100%;
-                                                           border-collapse: collapse;
-                                                           ">
-                                                           <tbody>
-                                                              <tr style="
-                                                                 border-top: 1px solid #000;
-                                                                 ">
-                                                                 <td
-                                                                    style="
-                                                                    font-size: 12px;
-                                                                    text-align: center;
-                                                                    ">
-                                                                    Note: This is a System Generated Invoice and
-                                                                    does not required Signature
-                                                                 </td>
-                                                              </tr>
-                                                              <tr>
-                                                                 <td
-                                                                    style="
-                                                                    text-align: center;
-                                                                    font-size: 15px;
-                                                                    font-weight: 600;
-                                                                    ">
-                                                                    Thank you for visiting HappyON Party & Play
-                                                                 </td>
-                                                              </tr>
-                                                              <tr>
-                                                                 <td
-                                                                    style="
-                                                                    text-align: center;
-                                                                    font-size: 15px;
-                                                                    ">
-                                                                    <a
-                                                                       href="www.happyonplay.com">www.happyonplay.com</a>
-                                                                 </td>
-                                                              </tr>
-                                                           </tbody>
-                                                        </table>
-                                                     </td>
-                                                  </tr>
-                                               </tbody>
-                                            </table>
-                                         </td>
-                                      </tr>
-                                   </tbody>
-                                </table>
-                             </td>
-                          </tr>
-                       </tbody>
-                    </table>
-                    <div>
-                    <div>
-                    <div>
-                    <div>
-
-
-            </div>
-            <script>
-
-                function printReciept() {
-                 var container = document.getElementById('myContainer');
-                  var containerContent = container.innerHTML;
-                    var printWindow = window.open('', '', 'width=600,height=600');
-                    printWindow.document.write('<html><head><title>Print</title></head><body>');
-                    printWindow.document.write(containerContent);
-                    printWindow.document.write('</body></html>');
-                    printWindow.document.close();
-                    printWindow.print();
-
-
-                }
-                </script>
-                   {{-- //   // Print the window
-                   //   printWindow.print(); --}}
-            <!--start overlay-->
-            <div class="overlay toggle-icon"></div>
-            <!--end overlay-->
-            <!--Start Back To Top Button-->
-            <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
-        </div>
-
-        <!--end page wrapper -->
-        <!--start overlay-->
-        <div class="overlay toggle-icon"></div>
-        <!--end overlay-->
-        <!--Start Back To Top Button-->
-        <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
-        <!--End Back To Top Button-->
-    </div>
-    <!--end wrapper-->
-    <!-- Bootstrap JS -->
-    <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
-    <!--plugins-->
-    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
-    <script src="{{ asset('assets/plugins/simplebar/js/simplebar.min.js') }}"></script>
-    <script src="{{ asset('assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js') }}"></script>
-    <!--app JS-->
-
-    <script src="{{ asset('assets/js/app.js') }}"></script>
-    {{-- <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script> --}}
-
+                                <div>
+                                    <div>
+                                        <script>
+                                            function printReciept() {
+                                                var container = document.getElementById('myContainer');
+                                                var containerContent = container.innerHTML;
+                                                var printWindow = window.open('', '', 'width=600,height=600');
+                                                printWindow.document.write('<html><head><title>Print</title></head><body>');
+                                                printWindow.document.write(containerContent);
+                                                printWindow.document.write('</body></html>');
+                                                printWindow.document.close();
+                                                printWindow.print();
+                                            }
+                                        </script>
+                                        <!--start overlay-->
+                                        <div class="overlay toggle-icon"></div>
+                                        <!--end overlay-->
+                                        <!--Start Back To Top Button-->
+                                        <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
+                                    </div>
+                                    <!--end page wrapper -->
+                                    <!--start overlay-->
+                                    <div class="overlay toggle-icon"></div>
+                                    <!--end overlay-->
+                                    <!--Start Back To Top Button-->
+                                    <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
+                                    <!--End Back To Top Button-->
+                                </div>
+                                <!--end wrapper-->
+                                <!-- Bootstrap JS -->
+                                <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
+                                <!--plugins-->
+                                <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+                                <script src="{{ asset('assets/plugins/simplebar/js/simplebar.min.js') }}"></script>
+                                <script src="{{ asset('assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js') }}"></script>
+                                <!--app JS-->

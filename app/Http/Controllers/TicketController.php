@@ -108,7 +108,6 @@ class TicketController extends Controller
         $userSave->email = $request->input('name_of_kid') . rand(10000, 999999);
         $userSave->role = 1;
         $userSave->save();
-
         if ($userSave->id) {
             $event = new Event();
             $event->user_id = $userSave->id;
@@ -130,39 +129,33 @@ class TicketController extends Controller
                 $i = 0;
                 $num_of_kid = 1;
                 foreach ($kidsName as $row) {
+                    $kidsDetails = new Kid();
+                    $kidsDetails->user_id = $userSave->id;
+                    $kidsDetails->branch_id = $branchId;
+                    $kidsDetails->name = ucfirst($row);
+                    $kidsDetails->kidPrice = $request->input('kid_price')[$i];
+                    $kidsDetails->hours = $request->input('hours')[$i];
                     if ($request->input('hours')[$i] > 0) {
-                        $kidsDetails = new Kid();
-                        $kidsDetails->user_id = $userSave->id;
-                        $kidsDetails->branch_id = $branchId;
-                        $kidsDetails->name = ucfirst($row);
-                        $kidsDetails->kidPrice = $request->input('kid_price')[$i];
-                        $kidsDetails->hours = $request->input('hours')[$i];
                         $end_time = Carbon\Carbon::parse(now()->format('H:i'))->addHour($request->input('hours')[$i]);
                         $time_str = $end_time->toTimeString();
                         $kidsDetails->end_time = $time_str;
-                        $kidsDetails->save();
-                        $num_of_kid++;
                     } elseif ($request->input('hours')[$i] == "Unlimited") {
-                        $kidsDetails = new Kid();
-                        $kidsDetails->user_id = $userSave->id;
-                        $kidsDetails->branch_id = $branchId;
-                        $kidsDetails->name = $row;
-                        $kidsDetails->kidPrice = $request->input('kid_price')[$i];
-                        $kidsDetails->hours = $request->input('hours')[$i];
                         $kidsDetails->end_time = "Unlimited";
-                        $kidsDetails->save();
-                        $num_of_kid++;
                     }
+                    $kidsDetails->save();
+                    $num_of_kid++;
                     $i++;
                 }
             }
+
+            /* add on product in user_product table */
             if (isset($request->product_quantity)) {
                 foreach ($request->product_quantity as $key => $val) {
                     $product_add = new UserProduct();
                     $product_add->user_id = $userSave->id;
                     $product_add->branch_id = $branchId;
-                    $product_add->product_name = $request->product_name[$key];
-                    $product_add->price = $request->price[$key];
+                    $product_add->product_name = $request->product_name[$key];                    
+                    $product_add->price = $request->price[$key] / $val;
                     $product_add->qty = ($request->product_name[$key] == 'Socks') ? $val + count($kidsName) : $val;
                     $product_add->save();
                 }
@@ -204,29 +197,21 @@ class TicketController extends Controller
             //invoice generate
             $id = $userSave->id;
             $user = User::with('membership', 'userDetails', 'event', 'kid', 'paymentInfo')->where('id', $id)->first();
-            $kidValue = Kid::where('user_id', $id);
-
-            $kidTotal = $kidValue->count();
-            $adultQty = UserProduct::where(['user_id' => $id, 'product_name' => 'Adult'])->first();
             $paymentMethod = PaymentMethod::where('user_id', $id)->first();
+
+            $kidValue = Kid::where('user_id', $id);
+            $kidTotal = $kidValue->count();
             $totalHours = $kidValue->first();
-            $socksQty = UserProduct::where(['user_id' => $id, 'product_name' => 'Socks'])->first();
-            $ExtraTime = UserProduct::where(['user_id' => $id, 'product_name' => 'Extra Time'])->first();
             $totalKidPrice = $kidValue->sum('kidPrice');
             $KidPrices = $kidValue->select('kidPrice')->first();
 
-            $adultQtyQty = $adultQty ? $adultQty->qty : null;
-            $socksQtyQty = $socksQty ? $socksQty->qty : null;
-            $adultPrice = $adultQty ? $adultQty->price : null;
-            $socksPrice = $socksQty ? $socksQty->price : null;
-            $extraTime =  $ExtraTime ? $ExtraTime->price : null;
+            $userProducts = UserProduct::where(['user_id' => $id])->latest()->get();
 
             $in_time = strtotime($user['event']->Hours);
             $in_time = date("h:i A", $in_time);
 
             if (isset($user['kid']->end_time)) {
                 if ($user['kid']->end_time == "Unlimited") {
-
                     $out_time = "Unlimited";
                 } else {
                     $out_time = strtotime($user['kid']->end_time);
@@ -260,34 +245,24 @@ class TicketController extends Controller
                 "totalKidPrice" => $totalKidPrice,
                 "KidPrice" => $KidPrices['kidPrice'],
                 "playtime" => $totalHours,
-                "adultNum" => $adultQtyQty,
-                "socksNum" => $socksQtyQty,
-                "adultPrice" => $adultPrice,
-                "socksPrice" => $socksPrice,
-                "extraTime" => $extraTime,
                 "subTotal" => $subTotal,
                 "gst18" => $paymentMethod->gst18,
                 "gst12" => $paymentMethod->gst12,
                 "totalAmount" => $paymentMethod->amounts,
                 'kidsInvoice' => $kidsInvoice,
                 "distinctHours" => $distinctHour,
-
+                "userProducts" => $userProducts
             ];
-
-
             $mobile = "91" . $request->input('phone');
             $time_in = now()->format('h:i:s A');
 
             if ($user['kid']->end_time == "Unlimited") {
-
                 $time_out = "Unlimited";
             } else {
                 $time_out = strtotime($user['kid']->end_time);
                 $time_out = date("h:i A", $time_out);
             }
 
-
-            //$time_out = $user['kid']->end_time;
             $date = $request->input('date');
             $amount = $request->input('totalAmount');
             $msg = "Welcome to HappyOn Party & Play! You have been registered with the below details: Date: $date, Time-In: $time_in, Time-Out: $time_out Amount Paid: $amount., Have a Gadget Free time at HappyOn Play!";
@@ -296,13 +271,9 @@ class TicketController extends Controller
                 sendsms($mobile, $msg, $template_id);
             } catch (Exception $e) {
             }
-
-
-
             $user__id = User::max('id');
             $customerKey = str_pad($user__id, 10, '0', STR_PAD_LEFT);
             $items = [];
-
             if (isset($request->kidName)) {
                 for ($i = 0; $i < count($request["kidName"]); $i++) {
                     $items[] = [
@@ -316,8 +287,6 @@ class TicketController extends Controller
                     ];
                 }
             }
-
-
             if (isset($request->product_name)) {
                 for ($i = 0; $i < count($request["product_name"]); $i++) {
                     $items[] = [
@@ -389,7 +358,6 @@ class TicketController extends Controller
                     "order_from" => "POS"
                 ]
             ];
-
             // Make the POST request
             $response = Http::post('https://api.reelo.io/v1/pos/integrations/e7499eb1-3ef1-4162-8dfb-8b5a55d3e6ba/bill/customer', $postData);
             //invoice generate end
@@ -686,71 +654,35 @@ class TicketController extends Controller
     {
         $id = $request->id;
         $user = User::with('membership', 'userDetails', 'event', 'paymentInfo')->where('id', $id)->latest()->first();
-
-        $kidValue = Kid::where('user_id', $id);
-
-        $kid = $kidValue->get();
-        //"kids" => $kid->pluck('name')->toArray(),
-        $kidTotal = $kidValue->count();
-
-        $adultQty = UserProduct::where(['user_id' => $id, 'product_name' => 'Adult'])->latest()->first();
         $paymentMethod = PaymentMethod::where('user_id', $id)->first();
-        $totalHours = $kidValue->first();
-        $socksQty = UserProduct::where(['user_id' => $id, 'product_name' => 'Socks'])->latest()->first();
-        $ExtraTime = UserProduct::where(['user_id' => $id, 'product_name' => 'Extra Time'])->latest()->first();
-        $totalKidPrice = $kidValue->sum('kidPrice');
-        $KidPrices = $kidValue->select('kidPrice')->first();
-        $adultQtyQty = $adultQty ? $adultQty->qty : null;
-        $socksQtyQty = $socksQty ? $socksQty->qty : null;
-        $adultPrice = $adultQty ? $adultQty->price : null;
-        $socksPrice = $socksQty ? $socksQty->price : null;
-        $extraTime =  $ExtraTime ? $ExtraTime->price : null;
 
         if ($user['userDetails']->membership_plan == 1) {
-            $in_time = strtotime($user['membership']->time);
-            $in_time = date("h:i A", $in_time);
-
-            if ($user['kid']->end_time == "Unlimited") {
-
-                $out_time = "Unlimited";
-            } else {
-                $out_time = strtotime($user['kid']->end_time);
-                $out_time = date("h:i A", $out_time);
-            }
             $data = [
                 'guardian_name' => $user->name,
                 "payment_method" => $paymentMethod->payment_method,
                 "date" => $user['membership']->date,
                 "package_name" => $user['membership']->plan,
-                "time" => $in_time,
-                "end_time" => $out_time,
-                "hours" => $user['kid']->hours,
                 "couponcode" => $user['paymentInfo']->couponcode,
                 "couponvalue" => $user['paymentInfo']->couponvalue,
                 "invoiceNo" => $paymentMethod->id,
-                "kidTotal" => $kidTotal,
-                "totalKidPrice" => $totalKidPrice,
-                "KidPrice" => $KidPrices['kidPrice'],
-                "playtime" => $totalHours,
-                "adultNum" => $adultQtyQty,
-                "socksNum" => $socksQtyQty,
-                "adultPrice" => $adultPrice,
-                "socksPrice" => $socksPrice,
-                "extraTime" => $extraTime,
                 "subTotal" => $paymentMethod->subTotal,
                 "gst18" => $paymentMethod->gst18,
                 "gst12" => $paymentMethod->gst12,
                 "totalAmount" => $paymentMethod->amounts,
-
             ];
             return view('receipt.membership-invoice', $data);
         } else {
+            $kidValue = Kid::where('user_id', $id);
+            $totalHours = $kidValue->first();
+            $KidPrices = $kidValue->select('kidPrice')->first();
+            $kidTotal = $kidValue->count();
+            $totalKidPrice = $kidValue->sum('kidPrice');
 
+            $userProducts = UserProduct::where(['user_id' => $id])->latest()->get();
             $in_time = strtotime($user['event']->Hours);
             $in_time = date("h:i A", $in_time);
 
             if ($user['kid']->end_time == "Unlimited") {
-
                 $out_time = "Unlimited";
             } else {
                 $out_time = strtotime($user['kid']->end_time);
@@ -782,17 +714,13 @@ class TicketController extends Controller
                 "totalKidPrice" => $totalKidPrice,
                 "KidPrice" => $KidPrices['kidPrice'],
                 "playtime" => $totalHours,
-                "adultNum" => $adultQtyQty,
-                "socksNum" => $socksQtyQty,
-                "adultPrice" => $adultPrice,
-                "socksPrice" => $socksPrice,
-                "extraTime" => $extraTime,
                 "subTotal" => $paymentMethod->subTotal,
                 "gst18" => $paymentMethod->gst18,
                 "gst5" => $paymentMethod->gst5,
                 "gst12" => $paymentMethod->gst12,
                 "totalAmount" => $paymentMethod->amounts,
-                'kidsInvoice' => $kidsInvoice
+                'kidsInvoice' => $kidsInvoice,
+                'userProducts' => $userProducts
             ];
             return view('receipt.index', $data);
         }
@@ -953,7 +881,7 @@ class TicketController extends Controller
             $daterange = explode("-", $request->daterange);
             $daterange[0] = date('y-m-d', strtotime($daterange[0]));
             $daterange[1] = date('y-m-d', strtotime($daterange[1]));
-            
+
             $user_bookings = User::with('kids', 'userDetails', 'event', 'paymentInfo', 'branch')
                 ->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59'])
                 ->where('role', '!=', 0)
