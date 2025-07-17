@@ -465,10 +465,12 @@
                     if (response && response.price) {
                         $('#plan_value').val(response.price);
                         var fullPrice = parseFloat(response.price);
-                        var total = (parseFloat(response.subtotal) * 18) / 100;
+                        var total = response.subtotal / 1.18;
+                        total = total.toFixed(2);                        
                         $('#subtotal').val(parseFloat(response.subtotal));
                         /* plan price should be the same  gstTotal */
                         let stGSTC = response.subtotal - total;
+                        stGSTC = stGSTC.toFixed(2);                        
                         $('#gst').html("Includes Gst @18% on ₹ " + response.subtotal);
                         let couponDiscountAmount = 0;
                         if (response && response.coupan_name) {
@@ -482,11 +484,15 @@
                             $('#couponCodeShow').html("Coupon");
                             $('#couponValueShow').html('');
                         }
-                        stGSTC -= couponDiscountAmount.toFixed(2);
-                        $('#price').text('₹ ' + stGSTC);
-                        var total = (parseFloat(response.subtotal) * 18) / 100;
-                        $('#gstTotal').html(total);
-                        $('#gst18').val(total);
+                        console.log('stGSTC : 1 ', stGSTC);
+                        console.log('couponDiscountAmount: ', couponDiscountAmount);
+                        
+                        total -= couponDiscountAmount.toFixed(2);
+                        console.log('stGSTC : 2 ', stGSTC);
+                        $('#price').text('₹ ' + total);
+                        var total = parseFloat(response.subtotal / 1.18);
+                        $('#gstTotal').html(stGSTC);
+                        $('#gst18').val(stGSTC);
                         let totalAmount = parseFloat(response.subtotal) - couponDiscountAmount;
                         $('#totalAmount').html('₹ ' + totalAmount);
                         $('#wholeAMount').val(totalAmount);

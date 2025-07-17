@@ -172,7 +172,7 @@ class MembershipController extends Controller
             }
         }
 
-        $gstAmount = ($data->price * 18) / 100;
+        $gstAmount = ($data->price / 1.18);
         $planAfterGST = $data->price - $gstAmount;
 
         if (isset($coupon) && !is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
