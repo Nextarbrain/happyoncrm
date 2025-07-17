@@ -606,19 +606,20 @@
                         var val = parseFloat($(this).val()) || 0;
                         sum += val;
                     });
-                    var gstKid = (sum * 18) / 100;
-                    var totalDeductGst = sum - gstKid;
-                    $('#subtotal').text("₹ " + totalDeductGst.toFixed(2));
-                    $('#subtotlSave').val(totalDeductGst.toFixed(2));
+                    var gstKid = (sum / 1.18); // 762.71
+                    console.log('gstKid : ', gstKid);
+                    var totalDeductGst = sum - gstKid; //137.28
+                    console.log('totalDeductGst : ', totalDeductGst);
+                    $('#subtotal').text("₹ " + gstKid.toFixed(2));
+                    $('#subtotlSave').val(gstKid.toFixed(2));
                     document.getElementById('gstOn').innerHTML = "Includes Gst @18% on " + sum.toFixed(
                         2);
                     $('#gst18On').val(sum.toFixed(2));
-                    document.getElementById('gstValue').innerHTML = '' + gstKid.toFixed(2);
-                    // var finalAmount = sum + gstKid;
+                    document.getElementById('gstValue').innerHTML = '' + totalDeductGst.toFixed(2);                   
                     let finalAmount = sum;
                     document.getElementById('totalAmount').innerHTML = '₹ ' + finalAmount.toFixed(2);
                     $("#chargeAmount").val(finalAmount.toFixed(2));
-                    $('#gst18').val(gstKid.toFixed(2));
+                    $('#gst18').val(totalDeductGst.toFixed(2));
                 },
                 error: function(xhr, status, error) {
                     console.log(error);
@@ -685,18 +686,6 @@
             event.target.style.display = 'none';
         }
 
-        // $(document).ready(function() {
-        //     $(document).on('change', '#adult_qty', function() {
-        //         alert('Adt Qty INPUT BOX');
-        //         calculateTotal();
-        //     });
-        //     // Listen for changes to the second select box
-        //     $(document).on('change', '#socks_qty', function() {
-        //         calculateTotal();
-        //     });
-
-        // });
-
         function calculateTotal() {
             var sum = 0;
             var totalPrice = 0;
@@ -740,7 +729,8 @@
             });
             $('input[name="kid_price[]"]').each(function(index) {
                 var val = parseFloat($(this).val()) || 0;
-                var taxAmount = (val * 18) / 100;
+                console.log('val : ', val);
+                var taxAmount = (val - (val / 1.18));
                 taxAmount18 += taxAmount;
             });
             $('.final_price').each(function(index) {
@@ -810,6 +800,7 @@
                 },
                 success: function(data) {
                     let sum = $("#chargeAmount").val();
+                    console.log("sum: ", sum);
                     let sumamount = 0;
                     if (data.status === 400) {
                         $('#couponmsg').css('color', 'red').text(data.msg);
@@ -821,54 +812,22 @@
                     }
                     if (data != '') {
                         let discount = removeCouponDiscountAmt = data.discount;
+                        console.log("discount: ", discount);
                         removeCouponType = data.discount_type;
                         $('#remove-coupon').removeClass('disabled');
                         $('#couponCodebutton').addClass('disabled');
                         $('#couponmsg').css('color', '#0A5F59').text('Apply Coupon Successful!');
 
-
-                        // // Get the value of the first select box
-                        // var select1Value = parseInt($('#adult_qty').val());
-                        // console.log('select1Value', select1Value);
-                        // var adult_price = document.getElementById('adult_price_backend').value;
-                        // var finalAdultPrice = parseFloat(adult_price) * parseFloat(select1Value);
-
-                        // // Get the value of the second select box
-                        // var select2Value = parseInt($('#socks_qty').val());
-                        // console.log('select2Value', select2Value);
-                        // var socks_price = document.getElementById('socks_price_backend').value;
-                        // var finalSocksPrice = parseFloat(socks_price) * parseFloat(select2Value);
-
-                        // $("#socks_price").val(finalSocksPrice.toFixed(2));
-
-                        // if (isNaN(finalSocksPrice) && isNaN(finalAdultPrice)) {
-                        //     finalSocksPrice = 0;
-                        //     finalAdultPrice = 0;
-                        //     var taxSum = sum + finalAdultPrice;
-                        //     var gstKid = (taxSum * 18) / 100;
-                        //     sumamount += (finalAdultPrice + finalSocksPrice);                            
-                        //     $("#adult_price").val(finalAdultPrice.toFixed(2));
-                        // } else if (!isNaN(finalSocksPrice) && !isNaN(finalAdultPrice)) {
-                        //     var taxSum = sum + finalAdultPrice;
-                        //     var gstKid = (taxSum * 18) / 100;
-                        //     sumamount += (finalAdultPrice + finalSocksPrice);                            
-                        //     $("#adult_price").val(finalAdultPrice.toFixed(2));
-                        // } else if (!isNaN(finalAdultPrice)) {                            
-                        //     var taxSum = sum + finalAdultPrice;
-                        //     var gstKid = (taxSum * 18) / 100;
-                        //     sumamount += finalAdultPrice;
-                        //     $("#adult_price").val(finalAdultPrice.toFixed(2));
-                        // } else if (!isNaN(finalSocksPrice)) {
-                        //     sumamount += finalSocksPrice;
-                        // }
-
-                        // GST deduction                        
+                        // GST deduction
                         let subTotalLessGST = parseFloat(sum);
+                        console.log("subTotalLessGST: ", subTotalLessGST);
 
                         ["#gst5", "#gst18", "#gst12"].forEach(id => {
                             let gst = parseFloat($(id).val()) || 0;
                             subTotalLessGST -= gst;
                         });
+
+                         console.log("AFTER GST LOOP subTotalLessGST: ", subTotalLessGST);
 
                         $('#subtotal').text("₹ " + subTotalLessGST.toFixed(2));
                         $('#subtotlSave').val(subTotalLessGST.toFixed(2));
@@ -893,6 +852,8 @@
                             sum = sum - percentDiscount.toFixed(2);
                         }
                         document.getElementById('totalAmount').innerHTML = '₹ ' + sum.toFixed(2);
+                         console.log("AFTER CC : ", sum);
+
                         $("#chargeAmount").val(sum.toFixed(2));
                     } else {
                         // Get the value of the first select box
