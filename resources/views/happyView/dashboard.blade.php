@@ -475,9 +475,9 @@
     <script src="assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
     <script src="assets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js"></script>
     <script src="assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js"></script>
-    <script src="assets/plugins/chartjs/js/Chart.min.js"></script>
+    {{-- <script src="assets/plugins/chartjs/js/Chart.min.js"></script>
     <script src="assets/plugins/chartjs/js/Chart.extension.js"></script>
-    <script src="assets/js/index.js"></script>
+    <script src="assets/js/index.js"></script> --}}
     <script src="assets/plugins/moment/moment.min.js"></script>
     <script src="assets/plugins/daterangepicker/daterangepicker.js"></script>
     <!--app JS-->

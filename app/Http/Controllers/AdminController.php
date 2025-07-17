@@ -391,6 +391,24 @@ class AdminController extends Controller
                 $couponvalue->where('branch_id', $branchId);
             }
             $couponvalue = $couponvalue->sum('couponvalue');
+
+            /* edit coupon info - START */
+            $coupon_O_Bill = OpenBilling::query()
+                ->where('couponcode', '!=', '')
+                ->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59'])
+                ->when($branchId, fn($q) => $q->where('branch_id', $branchId))
+                ->selectRaw('COUNT(*) AS count, SUM(couponvalue) AS value')
+                ->first();
+            $coupon_E_Book = EventBooking::query()
+                ->where('couponcode', '!=', '')
+                ->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59'])
+                ->when($branchId, fn($q) => $q->where('branch_id', $branchId))
+                ->selectRaw('COUNT(*) AS count, SUM(couponvalue) AS value')
+                ->first();
+            $couponcodes   += (int)  $coupon_O_Bill->count + (int)  $coupon_E_Book->count;
+            $couponvalue   += $coupon_O_Bill->value + $coupon_E_Book->value;
+
+
             $ticketSale = User::with('paymentInfo')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59'])->where('role', 1);
             if ($branchId) {
                 $ticketSale->where('branch_id', $branchId);
@@ -752,6 +770,22 @@ class AdminController extends Controller
             }
             $couponvalue = $couponvalue->sum('couponvalue');
 
+            /* edit coupon info - START */
+            $coupon_O_Bill = OpenBilling::query()
+                ->where('couponcode', '!=', '')
+                ->whereDate('created_at', $today)
+                ->when($branchId, fn($q) => $q->where('branch_id', $branchId))
+                ->selectRaw('COUNT(*) AS count, SUM(couponvalue) AS value')
+                ->first();
+            $coupon_E_Book = EventBooking::query()
+                ->where('couponcode', '!=', '')
+                ->whereDate('created_at', $today)
+                ->when($branchId, fn($q) => $q->where('branch_id', $branchId))
+                ->selectRaw('COUNT(*) AS count, SUM(couponvalue) AS value')
+                ->first();
+            $couponcodes   += (int)  $coupon_O_Bill->count + (int)  $coupon_E_Book->count;
+            $couponvalue   += $coupon_O_Bill->value + $coupon_E_Book->value;
+
             $ticketSale = User::with('paymentInfo')->whereDate('created_at', $today)->where('role', 1);
             if ($branchId) {
                 $ticketSale->where('branch_id', $branchId);
@@ -927,15 +961,12 @@ class AdminController extends Controller
                 $payment_gst5->where('branch_id', $branchId);
             }
             $payment_gst5 = $payment_gst5->sum('gst5');
-
             $gst18 += $event_gst18 + $open_gst18;
             $gst12 += $event_gst12 + $open_gst12;
             $gst5 += $open_gst5 + $payment_gst5;
             $member = User::with('membership', 'userDetails')
                 ->where('role', 2)
                 ->whereHas('membership', function ($query) {
-                    //     $query->where('credit_left', '>', 0)->where('credit_left', '<', 5)->whereBetween('renewal_date', [
-                    //   Carbon\Carbon::now()->subDays(365), Carbon\Carbon::now() ]);
                     $query->whereBetween('credit_left', [1, 4])->whereBetween('date', [Carbon\Carbon::now()->subDays(365), Carbon\Carbon::now()]);
                 });
             if ($branchId) {
