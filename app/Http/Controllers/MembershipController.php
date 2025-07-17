@@ -180,7 +180,7 @@ class MembershipController extends Controller
             $data->price = number_format($finalCoupanPrice, 2, '.', '');
             $data->discounted_amt = number_format($coupon->discount, 2, '.', '');
         } elseif (isset($coupon) && !is_null($coupon) && $coupon->discount_type === 'percent') {
-            $finalCoupanPrice = ($coupon->discount / 100) * $planAfterGST;
+            $finalCoupanPrice = ($coupon->discount / 100) * $gstAmount;
             $data->price = $data->discounted_amt = number_format($finalCoupanPrice, 2, '.', '');
         }
         $data->coupan_name = $coupon->coupon_name ?? '';
