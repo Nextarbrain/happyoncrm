@@ -329,10 +329,20 @@
                     let price = parseFloat(item_price[i]) || 0;
                     let taxRate = parseFloat(item_tax[i]) || 0;
 
-                    let rowtotal = price * qty;
-                    let gstAmt = (rowtotal * taxRate) / 100;
-                    rowtotal -= gstAmt;
-                    subTotal += rowtotal;
+                    let rowtotal = price * qty;                    
+                    let gstAmt = 0;
+                    let basicAmt = 0;
+
+                    const taxRatesList = {
+                        '18': 1.18,
+                        '12': 1.12,
+                        '5': 1.05
+                    };
+                    if (taxRatesList.hasOwnProperty(taxRate)) {
+                        basicAmt = rowtotal / taxRatesList[taxRate];
+                        gstAmt = rowtotal - basicAmt;
+                    }                   
+                    subTotal += basicAmt;
 
                     if (taxRate === 18) gst18total += gstAmt;
                     else if (taxRate === 12) gst12total += gstAmt;
@@ -374,13 +384,41 @@
                 $('#couponValueShow').html(discountTotal.toFixed(2));
             }
         }
+
+        function updateTotalsOnUI_old({
+            subTotal,
+            gst18total,
+            gst12total,
+            gst5total
+        }, discountTotal = 0, couponData = null) {
+            const totalAmount = (subTotal + gst18total + gst12total + gst5total) - discountTotal;
+
+            $('#subtotal').text(subTotal.toFixed(2));
+            $('#valueGst18').text(gst18total.toFixed(2));
+            $('#valueGst12').text(gst12total.toFixed(2));
+            $('#valueGst5').text(gst5total.toFixed(2));
+            $('#totalAmount').text(totalAmount.toFixed(2));
+
+            $('#subtotalSave').val(subTotal.toFixed(2));
+            $('#gst18').val(gst18total.toFixed(2));
+            $('#gst12').val(gst12total.toFixed(2));
+            $('#gst5').val(gst5total.toFixed(2));
+            $('#chargeAmount').val(totalAmount.toFixed(2));
+
+            if (couponData) {
+                $('#couponValue').val(discountTotal.toFixed(2));
+                $('#couponCodeShow').html(`Coupon Code (${couponData.coupon_name})`);
+                $('#couponValueShow').html(discountTotal.toFixed(2));
+            }
+        }
     </script>
 
     {{-- {{NEW CALCULATION FLOW...END}} --}}
     <script>
         var loop_item_count = 1;
+
         function add_item_more() {
-            loop_item_count++;            
+            loop_item_count++;
             var html =
                 '<div class="row items_' + loop_item_count +
                 '"><div class="col-md-3 input_wrap"><div class="mb-4"><label>Item</label><input type="text" id="item_name' +
@@ -396,9 +434,9 @@
                 '" class="form-select"><option value="18">18%</option><option value="12">12%</option><option value="5">5% </option><option value="0">0% </option></select></div></div><div class="col-md-1"><i class="fa fa-trash fs-4 btn btn-danger" onclick="remove_image_more(' +
                 loop_item_count + ')" aria-hidden="true"></i></div></div>';
             jQuery('#item_box').append(html);
-        }       
+        }
 
-        function appendProductData(id) {          
+        function appendProductData(id) {
             $.ajax({
                 type: "get",
                 url: '{{ route('productByID') }}',
@@ -421,7 +459,7 @@
                     }
                 }
             });
-        }      
+        }
 
         function remove_image_more(loop_image_count) {
             jQuery('.items_' + loop_image_count).remove();
@@ -534,4 +572,5 @@
         }
     </script>
 </body>
+
 </html>

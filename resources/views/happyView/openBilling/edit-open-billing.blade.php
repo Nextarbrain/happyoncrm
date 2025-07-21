@@ -343,10 +343,20 @@
                     let price = parseFloat(item_price[i]) || 0;
                     let taxRate = parseFloat(item_tax[i]) || 0;
 
-                    let rowtotal = price * qty;
-                    let gstAmt = (rowtotal * taxRate) / 100;
-                    rowtotal -= gstAmt;
-                    subTotal += rowtotal;
+                    let rowtotal = price * qty;                    
+                    let gstAmt = 0;
+                    let basicAmt = 0;
+                    
+                    const taxRatesList = {
+                        '18': 1.18,
+                        '12': 1.12,
+                        '5': 1.05
+                    };
+                    if (taxRatesList.hasOwnProperty(taxRate)) {
+                        basicAmt = rowtotal / taxRatesList[taxRate];
+                        gstAmt = rowtotal - basicAmt;
+                    }                   
+                    subTotal += basicAmt;
 
                     if (taxRate === 18) gst18total += gstAmt;
                     else if (taxRate === 12) gst12total += gstAmt;
