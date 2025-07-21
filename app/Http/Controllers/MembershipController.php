@@ -65,7 +65,7 @@ class MembershipController extends Controller
         $id = $request->id;
         $user = User::with('membership', 'userDetails', 'event', 'paymentInfo')->where('id', $id)->latest()->first();
 
-        $paymentMethod = PaymentMethod::where('user_id', $id)->latest()->first();       
+        $paymentMethod = PaymentMethod::where('user_id', $id)->latest()->first();
 
         // $paymentMethod->subTotal
         $subTotalWithoutDiscount = $paymentMethod->subTotal + ($paymentMethod->couponvalue ?? 0);
@@ -83,7 +83,7 @@ class MembershipController extends Controller
             "couponvalue" => $user['paymentInfo']->couponvalue,
             "invoiceNo" => $paymentMethod->id,
 
-            "subTotal" => $subTotal,
+            "subTotal" => $paymentMethod->subTotal,
             "gst18" => $paymentMethod->gst18,
 
             "totalAmount" => $paymentMethod->amounts,
@@ -191,8 +191,6 @@ class MembershipController extends Controller
     public function addMembershipPlan(Request $request)
     {
         hasPermission('membership-add');
-        //  dd($request->input('totalamount'));
-        // dd($request->input('subtotal'));
         $userdetail = UserDetail::with('user')->where('phone_no', $request->input('phone'))->where('membership_plan', 1)->first();
         $getPlan = MembershipPlan::where('id', $request->input('membershipPlan'))->first();
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
@@ -201,7 +199,6 @@ class MembershipController extends Controller
         }
 
         if (isset($userdetail)) {
-
             $member = MembershipBuy::where('user_id', $userdetail->user_id)->latest()->first();
             if (isset($member)) {
                 if ($member->credit_left > 0) {
@@ -217,7 +214,6 @@ class MembershipController extends Controller
 
 
                     $member->plan = $getPlan->plan_name;
-
                     $user_total_creadit = $member->credit_left + $getPlan->credits;
 
                     $member->credit_left = $user_total_creadit;
@@ -276,12 +272,9 @@ class MembershipController extends Controller
                     if (!is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
                         $amount->couponvalue = $coupon->discount;
                         $amount->couponcode = $request->coupon_code;
-                        $amount->subTotal = $request->input('subtotal') - $coupon->discount;
                     } elseif (!is_null($coupon) && $coupon->discount_type === 'percent') {
-                        $totalAfterGST = $amount->subTotal - $request->input('gst18');
-                        $amount->couponvalue = ($coupon->discount / 100) * $totalAfterGST;
+                        $amount->couponvalue = $request->input('couponDis');
                         $amount->couponcode = $request->coupon_code;
-                        $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
                     }
                     couponCountUpdate($request->coupon_code);
                     $amount->save();
@@ -380,15 +373,23 @@ class MembershipController extends Controller
                             }
                             $coupon = $coupon->first();
                         }
+                        // if (!is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
+                        //     $amount->couponvalue = $coupon->discount;
+                        //     $amount->couponcode = $request->coupon_code;
+                        //     $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
+                        // } elseif (!is_null($coupon) && $coupon->discount_type === 'percent') {
+                        //     $totalAfterGST = $amount->subTotal - $request->input('gst18');
+                        //     $amount->couponvalue = ($coupon->discount / 100) * $totalAfterGST;
+                        //     $amount->couponcode = $request->coupon_code;
+                        //     $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
+                        // }
+
                         if (!is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
                             $amount->couponvalue = $coupon->discount;
                             $amount->couponcode = $request->coupon_code;
-                            $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
                         } elseif (!is_null($coupon) && $coupon->discount_type === 'percent') {
-                            $totalAfterGST = $amount->subTotal - $request->input('gst18');
-                            $amount->couponvalue = ($coupon->discount / 100) * $totalAfterGST;
+                            $amount->couponvalue = $request->input('couponDis');
                             $amount->couponcode = $request->coupon_code;
-                            $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
                         }
                         couponCountUpdate($request->coupon_code);
                         $amount->save();
@@ -488,13 +489,10 @@ class MembershipController extends Controller
                     }
                     if (!is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
                         $amount->couponvalue = $coupon->discount;
-                        $amount->couponcode = $request->coupon_code;
-                        $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
+                        $amount->couponcode = $request->coupon_code;                        
                     } elseif (!is_null($coupon) && $coupon->discount_type === 'percent') {
-                        $totalAfterGST = $amount->subTotal - $request->input('gst18');
-                        $amount->couponvalue = ($coupon->discount / 100) * $totalAfterGST;
-                        $amount->couponcode = $request->coupon_code;
-                        $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
+                        $amount->couponvalue = $request->input('couponDis');
+                        $amount->couponcode = $request->coupon_code;                        
                     }
                     couponCountUpdate($request->coupon_code);
                     $amount->save();
@@ -593,15 +591,12 @@ class MembershipController extends Controller
                     $coupon = $coupon->first();
                 }
                 if (!is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
-                    $amount->couponvalue = $coupon->discount;
-                    $amount->couponcode = $request->coupon_code;
-                    $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
-                } elseif (!is_null($coupon) && $coupon->discount_type === 'percent') {
-                    $totalAfterGST = $amount->subTotal - $request->input('gst18');
-                    $amount->couponvalue = ($coupon->discount / 100) * $totalAfterGST;
-                    $amount->couponcode = $request->coupon_code;
-                    $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
-                }
+                        $amount->couponvalue = $coupon->discount;
+                        $amount->couponcode = $request->coupon_code;                        
+                    } elseif (!is_null($coupon) && $coupon->discount_type === 'percent') {
+                        $amount->couponvalue = $request->input('couponDis');
+                        $amount->couponcode = $request->coupon_code;                        
+                    }
                 couponCountUpdate($request->coupon_code);
                 $amount->save();
 

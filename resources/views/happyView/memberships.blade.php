@@ -284,6 +284,7 @@
                                 <div class="gst1">
                                     <p id="couponCodeShow">Coupon </span></p>
                                     <p id="couponValueShow"></p>
+                                    <input type="hidden" id="couponDis" name="couponDis">
                                 </div>
                                 <hr>
                                 <div class="gst">
@@ -470,30 +471,31 @@
                         $('#subtotal').val(parseFloat(response.subtotal));
                         /* plan price should be the same  gstTotal */
                         let stGSTC = response.subtotal - total;
-                        stGSTC = stGSTC.toFixed(2);                        
+                        // stGSTC = stGSTC.toFixed(2);
                         $('#gst').html("Includes Gst @18% on ₹ " + response.subtotal);
                         let couponDiscountAmount = 0;
                         if (response && response.coupan_name) {
                             $('#remove-coupon').removeClass('disabled');
                             $('#apply-coupon').addClass('disabled');
-                            couponDiscountAmount = parseFloat(response.discounted_amt);
+                            couponDiscountAmount = parseFloat(response.discounted_amt);                             
                             $('#couponCodeShow').html("Coupon Code (" + response.coupan_name + ")");
                             $('#couponValueShow').html(couponDiscountAmount.toFixed(2));
+                            $('#couponDis').val(couponDiscountAmount.toFixed(2));
                         } else {
                             couponDiscountAmount = 0;
                             $('#couponCodeShow').html("Coupon");
-                            $('#couponValueShow').html('');
-                        }
-                        console.log('stGSTC : 1 ', stGSTC);
-                        console.log('couponDiscountAmount: ', couponDiscountAmount);
-                        
-                        total -= couponDiscountAmount.toFixed(2);
-                        console.log('stGSTC : 2 ', stGSTC);
-                        $('#price').text('₹ ' + total);
-                        var total = parseFloat(response.subtotal / 1.18);
+                            $('#couponValueShow').html('');                            
+                        }                        
+                        total -= couponDiscountAmount.toFixed(2);                        
+                        $('#price').text('₹ ' + total.toFixed(2));
+                        $('#subtotal').val(total.toFixed(2));
+                        // var total = parseFloat(response.subtotal / 1.18);
+                        stGSTC = (total * 18)/100;
+                        stGSTC = stGSTC.toFixed(2);                        
                         $('#gstTotal').html(stGSTC);
                         $('#gst18').val(stGSTC);
-                        let totalAmount = parseFloat(response.subtotal) - couponDiscountAmount;
+                        // let totalAmount = parseFloat(response.subtotal) - couponDiscountAmount;                        
+                        let totalAmount = parseFloat(total) + parseFloat(stGSTC);                        
                         $('#totalAmount').html('₹ ' + totalAmount);
                         $('#wholeAMount').val(totalAmount);
                     } else {
