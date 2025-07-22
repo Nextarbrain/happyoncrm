@@ -14,13 +14,42 @@ class TrashController extends Controller
 {
     public function index()
     {
-        $users = User::onlyTrashed()->get();
+        $branchId = auth('admin')->user()->branch_id ?? null;
+        $users = User::query();
+        if($branchId) {
+            $users->where('branch_id', $branchId);
+        }
+        $users = $users->onlyTrashed()->get();
         $mps = MembershipPlan::onlyTrashed()->get();
-        $mhs = MembershipHistory::with('singleUser')->onlyTrashed()->get();
-        $mbs = MembershipBuy::with('singleUser')->onlyTrashed()->get();
-        $eventItems = EventItem::onlyTrashed()->get();
-        $events = EventBooking::onlyTrashed()->get();
-        $billings = OpenBilling::onlyTrashed()->get();
+        $mhs = MembershipHistory::with('singleUser');
+        if($branchId) {
+            $mhs->where('branch_id', $branchId);
+        }
+        $mhs = $mhs->onlyTrashed()->get();
+
+        $mbs = MembershipBuy::with('singleUser');
+        if($branchId) {
+            $mbs->where('branch_id', $branchId);
+        }
+        $mbs = $mbs->onlyTrashed()->get();
+
+        $eventItems = EventItem::query();
+        if($branchId) {
+            $eventItems->where('branch_id', $branchId);
+        }
+        $eventItems = $eventItems->onlyTrashed()->get();
+
+        $events = EventBooking::query();
+        if($branchId) {
+            $events->where('branch_id', $branchId);
+        }
+        $events = $events->onlyTrashed()->get();
+
+        $billings = OpenBilling::query();
+        if($branchId) {
+            $billings->where('branch_id', $branchId);
+        }
+        $billings = $billings->onlyTrashed()->get();
         return view('happyView.trash', compact('users', 'mps', 'mhs', 'mbs', 'events', 'billings', 'eventItems'));
     }
     public function restore($id, $model)

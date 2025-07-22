@@ -62,10 +62,19 @@
                             </nav>
                             {{ Form::open(['route' => ['admin.admin.role.edit', request()->route('id')], 'files' => false, 'method' => 'PUT']) }}
                             {{ Form::label('name', ucwords('name')) }}
-                            {!! Form::text('name', $user->name, ['class' => 'form-control']) !!}
+                            {!! Form::text('name', $user->name, ['class' => 'form-control', 'readonly' => true]) !!}
                             @error('name')
                                 <span class="text-danger font-weight-bold text-capitalize">{{ $message }}</span>
                             @enderror
+                            @if(!auth('admin')->user()->branch_id != null)
+                                {{ Form::label('branch_id', 'Branch') }}
+                                {!! Form::select('branch_id', $branches, $user->branch_id ?? $user->branch_id , ['class' => 'form-control']) !!}
+                                @error('branch_id')
+                                    <span class="text-danger font-weight-bold text-capitalize">{{ $message }}</span>
+                                @enderror
+                            @else
+                                {!! Form::hidden('branch_id', auth('admin')->user()->branch_id ?? null) !!}
+                            @endif
                             @php
                                 $current = null;
                                 $index = 0;

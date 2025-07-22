@@ -41,7 +41,7 @@
             <div class="page-content">
                 <div class="row mb-3">
                     <div class="col-md-12">
-  
+
                         <!-- Modal -->
                         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
@@ -54,25 +54,59 @@
                             <form action="{{url('/tickets-booking-report')}}" method="post">
                             @elseif($_GET['key'] == "Membership")
                             <form action="{{url('/membership-booking-report')}}" method="post">
+                            @elseif($_GET['key'] == "MembershipUsage")
+                            <form action="{{url('/membership-booking-usage')}}" method="post">
                             @elseif($_GET['key'] == "Event")
                             <form action="{{url('/event-booking-report')}}" method="post">
+                            @elseif($_GET['key'] == "Sales")
+                            <form action="{{url('/sales-report')}}" method="post">
                             @else
 							<form action="{{url('/open-billing-report')}}" method="post">
 							@endif
-                            <div class="modal-body">
-                                
-                                    @csrf
-                                    <label>Analysis date wise:</label>
-                                    <div class="d-flex">
-                                        <input type="text" name="daterange" class="form-control float-right"
-                                            id="reservation">
-                                        
-                                    </div>
-                                
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary" name="submit">Apply</button>
+                                <div class="modal-body">
+                                    @if($_GET['key'] == "MembershipUsage")
+                                        @csrf
+                                         @if (auth('admin')->user()->branch_id == null)
+                                            <label>Branches:</label>
+                                             <select name="branch_id[]" class="selectpicker form-control" style="margin-bottom: 15px;" title="Select Branch" id="branchMembershipUser" required multiple>
+                                                @foreach ($branches as $branch)
+                                                    <option value="{{ $branch['id'] }}">{{ $branch['name'] }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        @endif
+                                     @if (auth('admin')->user()->branch_id != null)
+                                        <label>Membership User:</label>
+                                        <div class="d-flex">
+                                            <select name="membership_user" class="form-control selectpicker" data-live-search="true" required>
+                                                <option value="">-- Select Membership User --</option>
+                                                @foreach ($membershipUsers as $user)
+                                                    <option value="{{ $user->user->id }}">{{ $user->user->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    @endif
+                                    @else
+                                        @csrf
+                                        @if (auth('admin')->user()->branch_id == null)
+                                            <label>Branches:</label>
+                                            <select name="branch_id[]" class="selectpicker form-control" style="margin-bottom: 15px;" data-live-search="true" title="Select Branch" required multiple>
+                                                @foreach ($branches as $branch)
+                                                    <option value="{{ $branch['id'] }}">{{ $branch['name'] }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        @endif
+                                        <label>Analysis date wise:</label>
+                                        <div class="d-flex">
+                                            <input type="text" name="daterange" class="form-control float-right"
+                                                id="reservation">
+                                        </div>
+                                        @endif
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary" name="submit">Apply</button>
+                                </div>
                             </div>
                             </form>
                             </div>
@@ -80,9 +114,9 @@
                         </div>
 
                     </div>
-                   
+
                 </div>
-               
+
             </div>
         </div>
         <!--end page wrapper -->
@@ -105,17 +139,14 @@
     <script src="assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
     <script src="assets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js"></script>
     <script src="assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js"></script>
-    <script src="assets/plugins/chartjs/js/Chart.min.js"></script>
-    <script src="assets/plugins/chartjs/js/Chart.extension.js"></script>
-    <script src="assets/js/index.js"></script>
     <script src="assets/plugins/moment/moment.min.js"></script>
 
     <script src="assets/plugins/daterangepicker/daterangepicker.js"></script>
     <!--app JS-->
-    <script src="assets/js/circle-progress.min.js"></script>
-    <script src="assets/js/app.js"></script>
+    
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.0/js/toastr.js"></script>
+    <script src="assets/js/bootstrap-select.min.js"></script>
 
     <script>
         $('#reservation').daterangepicker({
@@ -127,8 +158,37 @@
     $('.modal').modal('show');
     });
     </script>
+    <script>
+        $(document).on('change', '#branchMembershipUser', function() {
+            var baseUrl = "{{ URL::to('/') }}";
+            var selectedBranches = $('#branchMembershipUser').val();
+            console.log(selectedBranches, '--selectedBranches---');
+            $.ajax({
+                url: baseUrl + '/get-membership-users-by-branch',
+                type: 'GET',
+                data: {
+                    branches: selectedBranches
+                },
+                success: function(response) {
+                    if(response && response.data) {
+                        let $dropdown = $('select[name="membership_user"]');
+                        $dropdown.selectpicker('destroy');
+                        $dropdown.empty();
+                        $dropdown.append('<option value="">-- Select Membership User --</option>');
+                        response.data.forEach(function(user) {
+                            $dropdown.append(`<option value="${user.user.id}">${user.user.name}</option>`);
+                        });
+                        $dropdown.selectpicker();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log(error);
+                }
+            });
+        });
+    </script>
 
-  
+
     <script>
         $(document).ready(function() {
             toastr.options.timeOut = 10000;
@@ -137,6 +197,10 @@
             @elseif (Session::has('success'))
                 toastr.success('{{ Session::get('success') }}');
             @endif
+        });
+        $(document).ready(function() {
+            $('.selectpicker').selectpicker();
+            $('select[name="membership_user"]').selectpicker();
         });
     </script>
 </body>

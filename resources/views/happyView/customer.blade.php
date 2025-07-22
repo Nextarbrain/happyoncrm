@@ -169,13 +169,13 @@
                                                             @endif
                                                             <td>{{ isset($users['userDetails']->phone_no) ? $users['userDetails']->phone_no : '' }}
                                                             </td>
-                                                            <td>{{ number_format($users['paymentInfo']->gst18 / 2, 2) }}
+                                                            <td>{{ isset($users['paymentInfo']) && $users['paymentInfo']->gst18 ?? number_format($users['paymentInfo']->gst18 / 2, 2) }}
                                                             </td>
-                                                            <td>{{ number_format($users['paymentInfo']->gst18 / 2, 2) }}
+                                                            <td>{{ isset($users['paymentInfo']) && $users['paymentInfo']->gst18 ?? number_format($users['paymentInfo']->gst18 / 2, 2) }}
                                                             </td>
-                                                            <td>{{ number_format($users['paymentInfo']->gst5 / 2, 2) }}
+                                                            <td>{{ isset($users['paymentInfo']) && $users['paymentInfo']->gst5 ??  number_format($users['paymentInfo']->gst5 / 2, 2) }}
                                                             </td>
-                                                            <td>{{ number_format($users['paymentInfo']->gst5 / 2, 2) }}
+                                                            <td>{{ isset($users['paymentInfo']) && $users['paymentInfo']->gst5 ??  number_format($users['paymentInfo']->gst5 / 2, 2) }}
                                                             </td>
 
                                                             @if (isset($users['paymentInfo']) && $users['paymentInfo']->payment_method == 'Card')
@@ -469,7 +469,7 @@
             });
             console.log(selectedItems);
             var baseUrl = "{{ URL::to('/') }}";
-            if (selectedItems.length > 0 && confirm('Are you Sure to Delete Data?')) {
+            if (selectedItems.length > 0 && confirm('Are you sure you want to delete this data?')) {
                 $.ajax({
                     type: 'Delete',
                     url: baseUrl + '/delete-customer',

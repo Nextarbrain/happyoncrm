@@ -10,6 +10,7 @@ use App\Models\DeleteActivity;
 use App\Models\EventItem;
 
 use App\Models\OpenBillingItem;
+use App\Models\Branch;
 
 
 use Illuminate\Http\Request;
@@ -27,18 +28,27 @@ class OpenBillingController extends Controller
     public function openBillingReport(Request $request)
     {
         if (isset($request->daterange) && $request->daterange != "") {
+            $branchId = !empty($request->branch_id) && count($request->branch_id) > 0 ? $request->branch_id : (auth('admin')->user()->branch_id ? [strval(auth('admin')->user()->branch_id)]: null);
             $daterange = explode("-", $request->daterange);
             $daterange[0] = date('y-m-d', strtotime($daterange[0]));
             $daterange[1] = date('y-m-d', strtotime($daterange[1]));
-            $open_billings = OpenBilling::whereBetween('created_at', [$daterange[0], $daterange[1]])->get();
+            $open_billings = OpenBilling::with('branch')->whereBetween('created_at', [$daterange[0], $daterange[1]]);
+            if ($branchId) {
+                $open_billings->whereIn('branch_id', $branchId);
+            }
+            $open_billings = $open_billings->get();
             return view('happyView.openBilling.open-billing-report', compact('open_billings'));
         }
     }
 
     public function openBilling()
     {
-        $open_billings = OpenBilling::latest()->get();
-
+        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        $open_billings = OpenBilling::with('branch');
+        if ($branchId) {
+            $open_billings->where('branch_id', $branchId);
+        }
+        $open_billings = $open_billings->latest()->get();
         return view('happyView.openBilling.index', ['open_billings' => $open_billings]);
     }
 
@@ -46,8 +56,8 @@ class OpenBillingController extends Controller
 
     public function addOpenBillingView(Request $request)
     {
-
-        return view('happyView.openBilling.add-open-billing');
+        $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
+        return view('happyView.openBilling.add-open-billing', compact('branches'));
     }
 
     public function editOpenBillingView(Request $request)
@@ -55,9 +65,9 @@ class OpenBillingController extends Controller
 
         $open_billing = OpenBilling::where('id', $request->id)->first();
         $open_billing_items = OpenBillingItem::where('open_billing_id', $request->id)->get();
+        $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
 
-
-        return view('happyView..openBilling.edit-open-billing', compact('open_billing', 'open_billing_items'));
+        return view('happyView..openBilling.edit-open-billing', compact('open_billing', 'open_billing_items','branches'));
     }
 
     public function invoiceOpenBilling(Request $request)
@@ -73,6 +83,16 @@ class OpenBillingController extends Controller
     public function editOpenBillingPost(Request $request)
     {
         // dd(count($request->open_billing_item_ids));
+        $request->merge([
+            'billing_name' => trim($request->input('billing_name')),
+        ]);
+         $request->validate([
+            'billing_name' => 'required',
+        ]);
+        $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
+        if(!$branchId) {
+            return redirect()->back()->with('error', 'Please select a branch first.');
+        }
         $id = $request->id;
         $openbilling = OpenBilling::where('id', $id)->first();
 
@@ -80,6 +100,7 @@ class OpenBillingController extends Controller
         $openbilling->bill_name = $request->billing_name;
 
         $openbilling->payment_method = $request->payment_method;
+        $openbilling->branch_id = $branchId;
 
         $openbilling->couponcode = $request->couponcode;
         couponCountUpdate($request->couponcode);
@@ -102,30 +123,44 @@ class OpenBillingController extends Controller
             $item_tax = $request->item_tax;
             $open_billing_item_ids = $request->open_billing_item_ids;
 
+            if($open_billing_item_ids !== null) {
+                for ($i = 0; $i <= count($open_billing_item_ids) - 1; $i++) {
 
-            for ($i = 0; $i <= count($open_billing_item_ids) - 1; $i++) {
+                    if ($open_billing_item_ids[$i] > 0 && $open_billing_item_ids[$i] != null) {
+                        $event_item = OpenBillingItem::where('id', $open_billing_item_ids[$i])->first();
+                    } else {
+                        $event_item = new OpenBillingItem();
+                    }
 
-                if ($open_billing_item_ids[$i] > 0 && $open_billing_item_ids[$i] != null) {
-                    $event_item = OpenBillingItem::where('id', $open_billing_item_ids[$i])->first();
-                } else {
-                    $event_item = new OpenBillingItem();
-                }
-
-                if (isset($item_name[$i])) {
-                    $event_item->open_billing_id = $id;
-                    $event_item->item_name = $item_name[$i];
-                    $event_item->item_price = $item_price[$i];
-                    $event_item->item_qty = $item_qty[$i];
-                    $event_item->item_tax = $item_tax[$i];
-                    $event_item->save();
+                    if (isset($item_name[$i])) {
+                        $event_item->open_billing_id = $id;
+                        $event_item->item_name = $item_name[$i];
+                        $event_item->item_price = $item_price[$i];
+                        $event_item->item_qty = $item_qty[$i];
+                        $event_item->item_tax = $item_tax[$i];
+                        $event_item->branch_id = $branchId;
+                        $event_item->save();
+                    }
                 }
             }
+
         }
         return redirect('/open-billing')->with('success', 'Successfully Updated!');
     }
 
     public function addOpenBillingPost(Request $request)
     {
+        $request->merge([
+            'billing_name' => trim($request->input('billing_name')),
+        ]);
+         $request->validate([
+            'billing_name' => 'required',
+        ]);
+        // $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
+        if(!$branchId) {
+            return redirect()->back()->with('error', 'Please select a branch first.');
+        }
         $openbilling = new OpenBilling();
 
 
@@ -133,6 +168,7 @@ class OpenBillingController extends Controller
         $openbilling->bill_name = $request->billing_name;
 
         $openbilling->payment_method = $request->payment_method;
+        $openbilling->branch_id = $branchId;
 
         $openbilling->couponcode = $request->couponcode;
         $openbilling->couponvalue = $request->couponvalue;
@@ -162,6 +198,7 @@ class OpenBillingController extends Controller
                     $open_billing_item->item_price = $item_price[$i];
                     $open_billing_item->item_qty = $item_qty[$i];
                     $open_billing_item->item_tax = $item_tax[$i];
+                    $open_billing_item->branch_id = $branchId;
                     $open_billing_item->save();
                 }
             }
@@ -174,12 +211,14 @@ class OpenBillingController extends Controller
         if ($request->input('item_name') == null) {
             return back()->with('error', 'Please Provide item Name');
         }
+        $branchId = auth('admin')->user()->branch_id ? auth('admin')->user()->branch_id : null;
         $item = new EventItem();
         $item->item_name = $request->input('item_name');
         $item->item_price = $request->input('price');
         $item->item_qty = $request->input('qty');
         $item->item_tax = $request->input('tax');
         $item->item_description = $request->input('item_name');
+        $item->branch_id = $branchId;
         $item->save();
         if ($item->id) {
             return back()->with('success', 'Success! item created');
@@ -188,10 +227,12 @@ class OpenBillingController extends Controller
 
     public function editEventItemPost(Request $request)
     {
+        $branchId = auth('admin')->user()->branch_id ? auth('admin')->user()->branch_id : null;
         $item = EventItem::where('id', $request->eventItemId)->first();
         $item->item_price = $request->editprice;
         $item->item_qty = $request->editqty;
         $item->item_tax = $request->tax;
+        $item->branch_id = $branchId;
         $item->save();
 
         session()->flash('success', 'Event item Updated successfully!');

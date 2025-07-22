@@ -22,8 +22,11 @@ class UserDataTable extends DataTable
      */
     public function dataTable($query)
     {
-
+        $branchId = auth('admin')->user()->branch_id ?? null;
         $users = User::query();
+        if ($branchId) {
+            $users->where('branch_id', $branchId);
+        }
         $userData = $users->with('paymentInfo', 'kid', 'event', 'userDetails')->latest();
         return DataTables::of($userData)
             ->addColumn('checkbox', function ($user) {
@@ -202,6 +205,9 @@ class UserDataTable extends DataTable
             ->addColumn('payment_method', function ($user) {
                 return isset($user->paymentInfo->payment_method) ? $user->paymentInfo->payment_method : '';
             })
+            ->addColumn('branch', function ($user) {
+                return isset($user->branch->name) ? $user->branch->name : '';
+            })
             ->editColumn('action', function ($user) {
                 $actions = '';
                 if (can('tickets-edit')) {
@@ -224,9 +230,13 @@ class UserDataTable extends DataTable
      */
     public function query(User $model)
     {
-        return $model->with('membership', 'firstKid', 'userDetails', 'event', 'paymentInfo')
-            ->where('role', '!=', 0)
-            ->latest();
+        $branchId = auth('admin')->user()->branch_id ?? null;
+        $model = $model->with('membership', 'firstKid', 'userDetails', 'event', 'paymentInfo', 'branch')->where('role', '!=', 0);
+        if ($branchId) {
+            $model->where('branch_id', $branchId);
+        }
+        $model = $model->latest();
+        return $model;
     }
 
     /**
@@ -240,16 +250,23 @@ class UserDataTable extends DataTable
             ->setTableId('customer-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
-            ->dom('lBfrtip')
+            ->dom(
+                "<'row mb-2 align-items-center'" .
+                    "<'col-md-auto d-flex align-items-center gap-2'B>" .
+                    "<'col-md d-flex justify-content-end align-items-center gap-2'f<'#custom-toolbar'>>" .
+                    ">" .
+                    "<'row'<'col-sm-12'tr>>" .
+                    "<'row mt-2'<'col-sm-4'i><'col-sm-4 text-center'l><'col-sm-4 text-end'p>>"
+            )
             ->orderBy(1)
             ->buttons([
-                'extend' => 'reload',
+                // 'extend' => 'reload',
                 ['extend' => 'csv', 'className' => 'btn btn-sm btn-primary'],
                 ['extend' => 'copy', 'className' => 'btn btn-sm btn-primary'],
                 ['extend' => 'excel', 'className' => 'btn btn-sm btn-primary'],
                 ['extend' => 'print', 'className' => 'btn btn-sm btn-primary'],
                 ['extend' => 'pdf', 'className' => 'btn btn-sm btn-primary'],
-                'colvis'
+                ['extend' => 'colvis', 'className' => 'btn btn-sm btn-primary'],
             ])
             ->columnDefs([
                 ['checkboxes' => true, 'render' => '<input  type="checkbox">', 'target' => 0, 'selectRow' => true]
@@ -263,7 +280,8 @@ class UserDataTable extends DataTable
             ])
             ->languageSearchPlaceholder('Search...')
             ->language([
-                'searchPlaceholder' => "Search All Columns..."
+                'searchPlaceholder' => "Search All Columns...",
+                'search' => '',
             ]);
     }
 
@@ -285,6 +303,7 @@ class UserDataTable extends DataTable
             Column::make('kids'),
             Column::make('hours'),
             Column::make('payment_method'),
+            Column::make('branch'),
             Column::computed('action')
                 ->exportable(false)
                 ->printable(false)

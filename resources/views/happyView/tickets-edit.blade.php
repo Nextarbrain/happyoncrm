@@ -73,9 +73,27 @@
                                                 }
                                             </style>
                                             <div id="paid" class="container tab-pane active" role="tabpanel"><br>
+                                                @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                    <form method="GET" action="{{ route('tickets') }}">
+                                                        <div class="col-md-12">
+                                                            <div class="mb-4 input_wrap">
+                                                                <label>Branch <span>*</span></label>
+                                                                <select name="branch_id" id="branchId"
+                                                                    class="form-select" onchange="this.form.submit()" disabled>
+                                                                    @foreach ($branches as $branch)
+                                                                        <option value="{{ $branch['id'] }}" {{ $branch['id'] == $user['branch_id']  ? 'selected' : ""}}>{{ $branch['name'] }}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                @endif
                                                 <form action="{{ url('/update-tickets') }}" method="post">
                                                     @csrf
                                                     <div class="row">
+                                                        @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                            <input type="hidden" name="branch_id" value="{{ $user['branch_id'] }}" id="hiddenBranchId">
+                                                        @endif
                                                         <input type="hidden" value="{{ $user->id }}"
                                                             name="id">
                                                         <div class="col-md-6">
@@ -98,16 +116,6 @@
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap">
-                                                                <label>Guardian Name <span>*</span></label>
-                                                                <input type="text" class="form-control"
-                                                                    placeholder="Name of Kid" name="name_of_kid"
-                                                                    id="nameOfKid"
-                                                                    value="{{ isset($user->name) ? $user->name : '' }}"
-                                                                    required readonly>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="mb-4 input_wrap">
                                                                 <label for="phone">Phone <span>*</span></label>
                                                                 <input type="tel" class="form-control"
                                                                     placeholder="Phone" name="phone" id="phone"
@@ -117,7 +125,16 @@
                                                             </div>
                                                         </div>
 
-
+                                                        <div class="col-md-6">
+                                                            <div class="mb-4 input_wrap">
+                                                                <label>Guardian Name <span>*</span></label>
+                                                                <input type="text" class="form-control"
+                                                                    placeholder="Name of Kid" name="name_of_kid"
+                                                                    id="nameOfKid"
+                                                                    value="{{ isset($user->name) ? $user->name : '' }}"
+                                                                    required readonly>
+                                                            </div>
+                                                        </div>
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap">
                                                                 <label>Number of kids <span>*</span></label>
@@ -605,7 +622,7 @@
                                                         <label>Phone Number</label>
                                                         <input type="text" class="form-control"
                                                             placeholder="+91 0123456789" onkeyup="calculatePlan()"
-                                                            id="mobile_no">
+                                                            id="mobile_no" maxlength="10">
                                                         <div id="resultmembership" class="shadow phone-list">
                                                         </div>
                                                         <div class="happy_card">
@@ -742,7 +759,7 @@
                                                                 <button class="btn btn-primary" type="submit"
                                                                     id="submit-button">Use <span
                                                                         id="credit"></span>
-                                                                    hrs Credit</button>
+                                                                    hours Credit</button>
 
                                                                 {{-- <button class="btn btn-dark" type="submit"
                                                                 id="left_credit"> left Credit </button> --}}
@@ -887,12 +904,13 @@
     <script>
         //Coupon Apply code
         $("#couponCodebutton").on("click", function() {
-
+            var branchId = $("#hiddenBranchId").val();
             $.ajax({
                 url: baseUrl + '/get-coupon',
                 type: 'GET',
                 data: {
-                    option: $("#couponCode").val()
+                    option: $("#couponCode").val(),
+                    branch: branchId
                 },
                 success: function(data) {
 
@@ -1330,7 +1348,13 @@
                         },
 
                         success: function(data) {
-                            $('#resultmembership').html(data);
+                            if(data) {
+                                $('#submit-button').prop('disabled', false);
+                                $('#resultmembership').html(data);
+                            } else {
+                                $('#submit-button').prop('disabled', true);
+                                toastr.error('Member User Not Found.');
+                            }
                         }
                     });
                 } else {
@@ -1357,23 +1381,28 @@
                     },
 
                     success: function(response) {
+                        if(response && response.user) {
+                            $('#submit-button').prop('disabled', false);
+                            document.getElementById('nameCustomer').innerHTML = "" + response.user.name;
+                            if (response.renewal_date) {
+                                document.getElementById('planDate').innerHTML = "" + response.renewal_date;
+                            } else {
+                                document.getElementById('planDate').innerHTML = "";
+                            }
 
-                        document.getElementById('nameCustomer').innerHTML = "" + response.user.name;
-                        if (response.renewal_date) {
-                            document.getElementById('planDate').innerHTML = "" + response.renewal_date;
+                            document.getElementById("mobile_no").value = response.user_details.phone_no;
+                            document.getElementById("credit_left").value = response.credit_left;
+                            document.getElementById("kidsName2").value = response.user.name;
+                            var hrs = document.getElementById('hrs').value;
+
+
+                            document.getElementById("user_id").value = response.user.id;
+                            document.getElementById("credit").value = hrs;
+                            $('#resultmembership').css("display", "none");
                         } else {
-                            document.getElementById('planDate').innerHTML = "";
+                            $('#submit-button').prop('disabled', true);
+                            toastr.error('No membership found for this user.');
                         }
-
-                        document.getElementById("mobile_no").value = response.user_details.phone_no;
-                        document.getElementById("credit_left").value = response.credit_left;
-                        document.getElementById("kidsName2").value = response.user.name;
-                        var hrs = document.getElementById('hrs').value;
-
-
-                        document.getElementById("user_id").value = response.user.id;
-                        document.getElementById("credit").value = hrs;
-                        $('#resultmembership').css("display", "none");
                     }
                 });
             }
