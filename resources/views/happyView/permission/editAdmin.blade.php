@@ -57,7 +57,7 @@
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page">Permission</li>
+                                    <li class="breadcrumb-item active" aria-current="page">Edit User</li>
                                 </ol>
                             </nav>
                             {{ Form::open(['route' => ['admin.admin.edit', request()->route('id')], 'files' => false, 'method' => 'PUT']) }}
@@ -86,16 +86,31 @@
                                 <span class="text-danger font-weight-bold text-capitalize d-block">{{ $message }}</span>
                             @enderror
 
-                            {{ Form::label('roles', ucwords('Assign Role')) }}
-                            {!! Form::select('roles', $roles, $userRole, [
-                                'class' => 'form-control' . ($errors->has('roles') ? ' form-error' : null),
-                            ]) !!}
-                            @error('roles')
-                                <span class="text-danger font-weight-bold text-capitalize d-block">{{ $message }}</span>
-                                @enderrorger font-weight-bold text-capitalize">{{ $message }}</span>
-                            @enderror
-                            <button type="submit" class="d-block my-3 btn btn-primary">Update</button>
-                            {!! Form::close() !!}
+                            {{-- @if(!auth('admin')->user()->branch_id != null)
+                                {{ Form::label('branch_id', 'Branch') }}
+                                {!! Form::select('branch_id', $branches, $user->branch_id ?? $user->branch_id , ['class' => 'form-control']) !!}
+                                @error('branch_id')
+                                    <span class="text-danger font-weight-bold text-capitalize">{{ $message }}</span>
+                                @enderror
+                            @else
+                                {!! Form::hidden('branch_id', auth('admin')->user()->branch_id ?? null) !!}
+                            @endif
+                            @if(!$user->isSuperAdmin)
+                                {{ Form::label('roles', ucwords('Assign Role')) }}
+                                {!! Form::select('roles', $roles, $userRole, [
+                                    'class' => 'form-control' . ($errors->has('roles') ? ' form-error' : null),
+                                ]) !!}
+                                @error('roles')
+                                    <span class="text-danger font-weight-bold text-capitalize d-block">{{ $message }}</span>
+                                    @enderrorger font-weight-bold text-capitalize">{{ $message }}</span>
+                                @enderror
+                            @endif --}}
+                            <div class="d-flex gap-2 my-3">
+                                <button type="submit" class="btn btn-primary">Update</button>
+
+                                <a href="{{ route('admin.admin.permission') }}" class="btn btn-secondary">Cancel</a>
+                            </div>
+                        {!! Form::close() !!}
                         </div>
                     </div>
                 </div>

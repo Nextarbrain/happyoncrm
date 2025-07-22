@@ -11,7 +11,6 @@
                     <div class="mobile-toggle-menu">
                         <i class="fa fa-bars" aria-hidden="true"></i>
                     </div>
-
                     <div class="top-menu ms-auto">
                         <ul class="navbar-nav align-items-center">
                             <li class="nav-item dropdown dropdown-large">
@@ -28,11 +27,9 @@
                             </li>
                         </ul>
                     </div>
-
                 </nav>
             </div>
         </header>
-
         <!--start page wrapper -->
         <div class="page-wrapper">
             <div class="page-content">
@@ -74,12 +71,34 @@
                                                         border-bottom: 2px solid red;
                                                     }
                                                 </style>
+                                                @if (auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                    <form method="GET" action="{{ route('tickets') }}">
+                                                        <div class="col-md-12">
+                                                            <div class="mb-4 input_wrap">
+                                                                <label for='branchId'>Branch <span>*</span></label>
+                                                                <select name="branch_id" id="branchId"
+                                                                    class="form-select" onchange="this.form.submit()"
+                                                                    required>
+                                                                    @foreach ($branches as $branch)
+                                                                        <option value="{{ $branch['id'] }}"
+                                                                            {{ $branch['id'] == $branchId ? 'selected' : '' }}>
+                                                                            {{ $branch['name'] }}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                @endif
                                                 <form action="{{ url('/add-tickets') }}" method="post">
                                                     @csrf
+                                                    @if (auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                        <input type="hidden" name="branch_id"
+                                                            value="{{ $branchId }}" id="hiddenBranchId">
+                                                    @endif
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap dark">
-                                                                <label>Date</label>
+                                                                <label for='date'>Date</label>
                                                                 <input type="date" class="form-control"
                                                                     placeholder="date" name="date" id="date"
                                                                     required readonly>
@@ -87,7 +106,7 @@
                                                         </div>
                                                         <div class="col-md-6 input_wrap dark time">
                                                             <div class="mb-4">
-                                                                <label>Time</label>
+                                                                <label for="time">Time</label>
                                                                 <input type="time" class="form-control"
                                                                     placeholder="Time" name="time" id="time"
                                                                     required readonly>
@@ -95,7 +114,17 @@
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap">
-                                                                <label>Guardian Name <span>*</span></label>
+                                                                <label for="phone">Phone <span>*</span></label>
+                                                                <input type="tel" class="form-control"
+                                                                    placeholder="Phone" name="phone" id="phone"
+                                                                    pattern="[0-9]{10}" maxlength="10" required>
+                                                                <div id="result" class="shadow phone-list"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="mb-4 input_wrap">
+                                                                <label for="nameOfKid">Guardian Name
+                                                                    <span>*</span></label>
                                                                 <input type="text" class="form-control"
                                                                     placeholder="Name of Guardian" name="name_of_kid"
                                                                     id="nameOfKid" required>
@@ -103,95 +132,36 @@
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap">
-                                                                <label for="phone">Phone <span>*</span></label>
-                                                                <input type="tel" class="form-control"
-                                                                    placeholder="Phone" name="phone" id="phone"
-                                                                    pattern="[0-9]{10}" required>
-                                                                <div id="result" class="shadow phone-list"></div>
-                                                            </div>
-                                                        </div>
-
-
-                                                        <div class="col-md-6">
-                                                            <div class="mb-4 input_wrap">
-                                                                <label>Number of kids <span>*</span></label>
+                                                                <label for="kidsQty">Number of kids
+                                                                    <span>*</span></label>
                                                                 <select name="kids" id="kidsQty"
                                                                     class="form-select" required>
-                                                                    <option value="0">0</option>
-                                                                    <option value="1">1</option>
-                                                                    <option value="2">2</option>
-                                                                    <option value="3">3</option>
-                                                                    <option value="4">4</option>
-                                                                    <option value="5">5</option>
-                                                                    <option value="6">6</option>
-                                                                    <option value="7">7</option>
-                                                                    <option value="8">8</option>
-                                                                    <option value="9">9</option>
-                                                                    <option value="10">10</option>
-                                                                    <option value="11">11</option>
-                                                                    <option value="12">12</option>
-                                                                    <option value="13">13</option>
-                                                                    <option value="14">14</option>
-                                                                    <option value="15">15</option>
-                                                                    <option value="16">16</option>
-                                                                    <option value="17">17</option>
-                                                                    <option value="18">18</option>
-                                                                    <option value="19">19</option>
-                                                                    <option value="20">20</option>
-                                                                    <option value="21">21</option>
-                                                                    <option value="22">22</option>
-                                                                    <option value="23">23</option>
-                                                                    <option value="24">24</option>
-                                                                    <option value="25">25</option>
-                                                                    <option value="26">26</option>
-                                                                    <option value="27">27</option>
-                                                                    <option value="28">28</option>
-                                                                    <option value="29">29</option>
-                                                                    <option value="30">30</option>
-                                                                    <option value="31">31</option>
-                                                                    <option value="32">32</option>
-                                                                    <option value="33">33</option>
-                                                                    <option value="34">34</option>
-                                                                    <option value="35">35</option>
-                                                                    <option value="36">36</option>
-                                                                    <option value="37">37</option>
-                                                                    <option value="38">38</option>
-                                                                    <option value="39">39</option>
-                                                                    <option value="40">40</option>
-                                                                    <option value="41">41</option>
-                                                                    <option value="42">42</option>
-                                                                    <option value="43">43</option>
-                                                                    <option value="44">44</option>
-                                                                    <option value="45">45</option>
-                                                                    <option value="46">46</option>
-                                                                    <option value="47">47</option>
-                                                                    <option value="48">48</option>
-                                                                    <option value="49">49</option>
-                                                                    <option value="50">50</option>
+                                                                    <option value="">0</option>
+                                                                    @for ($i = 1; $i <= 50; $i++)
+                                                                        <option value="{{ $i }}">
+                                                                            {{ $i }}</option>
+                                                                    @endfor
                                                                 </select>
                                                             </div>
                                                         </div>
-
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap">
-                                                                <label for="phone">Kid DOB <span>*</span></label>
+                                                                <label for="dob">Kid DOB <span>*</span></label>
                                                                 <input type="date" class="form-control"
                                                                     placeholder="DOB" name="dob" id="dob"
                                                                     required>
-
                                                             </div>
                                                         </div>
-
                                                         <div class="col-md-12" id="parent-div">
 
                                                         </div>
 
-                                                        <div class="col-md-12 add_adults">
+                                                        {{-- <div class="col-md-12 add_adults">
 
                                                         </div>
                                                         <div class="col-md-12 add_sock">
 
-                                                        </div>
+                                                        </div> --}}
                                                         <table id="dataRow">
 
                                                         </table>
@@ -200,24 +170,16 @@
                                                                 <div class="h_btn">
                                                                     <a href="javascript:void(0)"
                                                                         onclick="AddItems(event, '{{ $pro->product_name }}', '{{ $pro->product_price }}', '{{ $pro->product_tax }}')"
-                                                                        class="more_adult">+
+                                                                        class="more_adult"
+                                                                        id="{{ Str::slug($pro->product_name) }}">+
                                                                         {{ $pro->product_name }}</a>
                                                                 </div>
                                                             @endforeach
-                                                            {{-- <div class="h_btn">
-                                                                <a href="javascript:void(0)" class="more_adult">+
-                                                                    Adult</a>
-                                                            </div>
-                                                            <div class="h_btn">
-                                                                <a href="javascript:void(0)" class="more_socks">+
-                                                                    Socks</a>
-                                                            </div> --}}
                                                         </div>
-
                                                         <hr>
                                                         <div class="col-md-12">
                                                             <div class="mb-4 input_wrap">
-                                                                <label>Payment Mode</label>
+                                                                <label for="services">Payment Mode</label>
                                                                 <select name="payment_mode" id="services"
                                                                     class="form-select">
                                                                     <option value="2">Cash</option>
@@ -228,7 +190,7 @@
                                                         </div>
                                                         <div class="col-md-12">
                                                             <div class="mb-4 input_wrap">
-                                                                <label>COUPON CODE</label>
+                                                                <label for="couponCode">COUPON CODE</label>
                                                                 <div class="d-flex">
                                                                     <input type="text" name="couponcode"
                                                                         class="form-control" id="couponCode"
@@ -236,11 +198,13 @@
                                                                     <input type="hidden" name="couponvalue"
                                                                         id="couponValue">
                                                                     <button type="button" id="couponCodebutton"
-                                                                        class="btn btn-primary">Apply</button>
+                                                                        class="btn btn-sm btn-primary ms-2">Apply</button>
+                                                                    <button type="button"
+                                                                        class="btn btn-sm btn-warning ms-2 disabled d-none"
+                                                                        id="remove-coupon">Remove</button>
                                                                 </diV>
                                                                 <p id="couponmsg"></p>
                                                             </div>
-
                                                         </div>
                                                         <div class="total_wrap">
                                                             <div class="subtotal">
@@ -267,7 +231,6 @@
                                                                 <p id="gstSock">Includes Gst @5% </p>
                                                                 <p id="valueGst"></p>
                                                             </div>
-
                                                             <hr>
                                                             <div class="amount">
                                                                 <p>Total Amount</p>
@@ -277,7 +240,8 @@
                                                                 <input type="hidden" name="subTotal"
                                                                     id="subtotlSave">
                                                                 <input type="hidden" name="gst18" id="gst18">
-                                                                 <input type="hidden" name="gst5" id="gst5">
+                                                                <input type="hidden" name="gst18On" id="gst18On">
+                                                                <input type="hidden" name="gst5" id="gst5">
                                                                 <input type="hidden" name="gst12" id="gst12">
                                                                 <input type="hidden" id="adult_price_backend"
                                                                     value="{{ isset($result[0]['Adult']) ? $result[0]['Adult'] : 200 }}">
@@ -287,7 +251,7 @@
                                                             <hr>
                                                         </div>
                                                         <div class="tearm_condition">
-                                                            <input type="checkbox" id="" name=""
+                                                            <input type="checkbox" id="term" name="term"
                                                                 value="" checked="checked">
                                                             <p>By Agreeing to the <b>Terms and Condition</b> of HappyOn
                                                             </p>
@@ -305,10 +269,25 @@
                                                     id="my-form">
                                                     @csrf
                                                     <div class="col-md-12">
+                                                        @if (auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                            <div class="col-md-12 ">
+                                                                <div class="mb-4 input_wrap">
+                                                                    <label for="branch_id">Branch<span>*</span></label>
+                                                                    <select name="branch_id" id="branch_id"
+                                                                        class="form-select" required>
+                                                                        @foreach ($branches as $branch)
+                                                                            <option value="{{ $branch['id'] }}">
+                                                                                {{ $branch['name'] }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        @endif
                                                         <div class="mb-4 input_wrap">
-                                                            <label>Phone Number</label>
+                                                            <label for="mobile_no">Phone Number</label>
                                                             <input type="text" class="form-control"
-                                                                placeholder="+91 0123456789" id="mobile_no">
+                                                                placeholder="+91 0123456789" id="mobile_no"
+                                                                maxlength="10">
                                                             <div id="resultmembership" class="shadow phone-list">
                                                             </div>
                                                             <div class="happy_card">
@@ -377,7 +356,7 @@
                                                         <div class="row">
                                                             <div class="col-md-6">
                                                                 <div class="mb-4 input_wrap dark">
-                                                                    <label>Credit Left</label>
+                                                                    <label for="credit_left">Credit Left</label>
                                                                     <input type="text" class="form-control"
                                                                         placeholder="22 hrs" id="credit_left"
                                                                         name="credit_left" readonly>
@@ -387,7 +366,7 @@
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <div class="mb-4 input_wrap dark">
-                                                                    <label>Kids Name</label>
+                                                                    <label for="kidsName2">Kids Name</label>
                                                                     <input type="text" class="form-control"
                                                                         placeholder="Kids Name" id="kidsName2"
                                                                         name="kidsName2" readonly>
@@ -395,7 +374,7 @@
                                                             </div>
                                                             <div class="col-md-6 ">
                                                                 <div class="mb-4 input_wrap">
-                                                                    <label>Number of Kids</label>
+                                                                    <label for="numberKids">Number of Kids</label>
                                                                     <select name="number_of_kids" id="numberKids"
                                                                         class="form-select">
                                                                         <option value="1">1</option>
@@ -413,7 +392,7 @@
                                                             </div>
                                                             <div class="col-md-6 ">
                                                                 <div class="mb-4 input_wrap">
-                                                                    <label>Number of Hrs</label>
+                                                                    <label for="hrs">Number of Hrs</label>
                                                                     <select name="hrs" id="hrs"
                                                                         class="form-select">
                                                                         <option value="1">1</option>
@@ -432,12 +411,14 @@
                                                             <div class="col-md-12">
                                                                 <div class="input_button">
                                                                     <div class="mb-4 input_wrap">
-                                                                        <label>Credit Left</label>
-                                                                        <input type="number" class="form-control"
-                                                                            placeholder="Enter OTP"
-                                                                            name="response_otp" required>
+                                                                        <label for="response_otp">OTP</label>
+                                                                        <input type="text" class="form-control"
+                                                                            placeholder="Enter OTP" id="response_otp"
+                                                                            name="response_otp" maxlength="6"
+                                                                            pattern="\d*" inputmode="numeric"
+                                                                            required>
                                                                         <div class="h_btn">
-                                                                            <a href="#"
+                                                                            <a href="javascript:void(0)"
                                                                                 onclick="verifyMember()">Send</a>
                                                                         </div>
                                                                     </div>
@@ -445,9 +426,8 @@
                                                                 <div class="h_btn s_btn">
                                                                     <button class="btn btn-primary" type="submit"
                                                                         id="submit-button">Use <span
-                                                                            id="credit"></span> hrs Credit</button>
-
-                                                                    {{-- <button class="btn btn-dark" type="submit" id="left_credit"> left Credit </button> --}}
+                                                                            id="credit"></span> hours
+                                                                        Credit</button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -455,15 +435,11 @@
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
-
-
             </div>
         </div>
         <!--end page wrapper -->
@@ -473,7 +449,6 @@
         <!--Start Back To Top Button-->
         <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
         <!--End Back To Top Button-->
-
     </div>
     <!--end wrapper-->
 
@@ -481,29 +456,21 @@
     <script src="assets/js/bootstrap.bundle.min.js"></script>
     <!--plugins-->
     <script src="assets/js/jquery.min.js"></script>
-
     <script src="assets/plugins/simplebar/js/simplebar.min.js"></script>
     <script src="assets/plugins/metismenu/js/metisMenu.min.js"></script>
     <script src="assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
     <script src="assets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js"></script>
     <script src="assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js"></script>
-    <script src="assets/plugins/chartjs/js/Chart.min.js"></script>
-    <script src="assets/plugins/chartjs/js/Chart.extension.js"></script>
-    <script src="assets/js/index.js"></script>
-    <!--app JS-->
-    <script src="assets/js/circle-progress.min.js"></script>
-    <script src="assets/js/app.js"></script>
-
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.0/js/toastr.js"></script>
 
 
     <script>
+        let removeCouponDiscountAmt = '';
+        let removeCouponType = '';
         //Get Phone List from Tickets
         $(document).ready(function() {
-
             var baseUrl = "{{ URL::to('/') }}";
-
             $('#phone').keyup(function() {
                 var search = $(this).val();
                 if (search.length > 0) {
@@ -520,6 +487,9 @@
                         },
 
                         success: function(data) {
+                            $('#nameOfKid').val('');
+                            $('#kidsQty').val('');
+                            $('#parent-div').empty();
                             $('#result').html(data);
                         }
                     });
@@ -533,7 +503,6 @@
         function fetchuserDetail(user) {
             if (user != "") {
                 $.ajax({
-
                     type: 'Post',
                     url: baseUrl + '/get-user-detail',
                     headers: {
@@ -545,7 +514,6 @@
 
                     success: function(data) {
                         var arr = JSON.parse(data);
-
                         $("#nameOfKid").val(arr.name);
                         $("#phone").val(arr.phone_no);
                         $("#dob").val(arr.dob);
@@ -561,7 +529,7 @@
                             i +
                             '" onkeyup="calculate()" readonly></div></div><div class="col-md-4 "><div class="mb-4 input_wrap"> <label>Hours <span>*</span></label><select onchange="calculateTotal()" name="hours[]" id="kid_hrs' +
                             i +
-                            '" class="form-select hours"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="Unlimited">Unlimited</option></select></div></div></div> ';
+                            '" class="form-select hours" required><option value="">0</option><option value="1">1</option><option value="2">2</option><option value="Unlimited">Unlimited</option></select></div></div></div> ';
                         $("#parent-div").append(childDiv);
                         $('#result').css("display", "none");
 
@@ -576,6 +544,32 @@
         $("#kidsQty").on("change", function() {
             var numDivs = $(this).val(); // Get the selected value
             $('#parent-div').empty();
+            document.getElementById('gstOn').innerHTML = "Includes Gst @18%";
+            document.getElementById('gstValue').innerHTML = '';
+            document.getElementById('totalAmount').innerHTML = '';
+            document.getElementById('couponCodeShow').innerHTML = 'Coupon';
+            document.getElementById('couponValueShow').innerHTML = '';
+            document.getElementById("couponCode").value = '';
+            document.getElementById("couponValue").value = '';
+            $('#couponmsg').removeAttr('style').text('');
+            $('#couponCodebutton').prop('disabled', false);
+            $('#subtotal').text("");
+
+            if (!numDivs) {
+                $('#subtotal').text("");
+                $('#subtotlSave').val('0');
+                $("#chargeAmount").val('0');
+                document.getElementById('gstOn').innerHTML = "Includes Gst @18% on 0";
+                document.getElementById('gstValue').innerHTML = '0';
+                document.getElementById('totalAmount').innerHTML = '₹ 0';
+                $('#valueGst').text("₹ 0");
+                $('#gst18').val('0');
+                $('#dataRow').empty();
+                $('#extra-time').css("display", "block");
+                $('#socks').css("display", "block");
+                $('#adult').css("display", "block");
+            }
+
             for (var i = 1; i <= numDivs; i++) {
                 var childDiv =
                     '<div class="row child-div"><div class="col-md-4"><div class="mb-4 input_wrap dark"><label>Kid Name <span>*</span></label><input type="text" class="form-control" placeholder="Kid Name " name="kidName[]" id ="kidName' +
@@ -584,7 +578,7 @@
                     i +
                     '" readonly></div></div><div class="col-md-4 "><div class="mb-4 input_wrap"> <label>Hours <span>*</span></label><select name="hours[]" id="kid_hrs' +
                     i +
-                    '" class="form-select hours" ><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="Unlimited">Unlimited</option></select></div></div></div> ';
+                    '" class="form-select hours" required><option value="">0</option><option value="1">1</option><option value="2">2</option><option value="Unlimited">Unlimited</option></select></div></div></div>';
                 $("#parent-div").append(childDiv);
             }
         });
@@ -594,20 +588,17 @@
         //Kids Hours Options
         $(document).on('change', 'select[id^="kid_hrs"]', function() {
             var selectBoxId = $(this);
-
-            console.log(selectBoxId);
             var inputTag = selectBoxId.closest('.child-div').find('.kid_price');
-            console.log(inputTag);
             // Make the AJAX call to fetch data from the server
             var baseUrl = "{{ URL::to('/') }}";
             $.ajax({
                 url: baseUrl + '/get-price-kids',
                 type: 'GET',
                 data: {
-                    option: $(this).val()
+                    option: $(this).val(),
+                    branch_id: $('#hiddenBranchId').val(),
                 },
                 success: function(data) {
-
                     // Update the input tags with the received data
                     inputTag.val(data);
                     var sum = 0;
@@ -615,19 +606,20 @@
                         var val = parseFloat($(this).val()) || 0;
                         sum += val;
                     });
-
-
-                    $('#subtotal').text("₹ " + sum.toFixed(2));
-                    $('#subtotlSave').val(sum.toFixed(2));
+                    var gstKid = (sum / 1.18); // 762.71
+                    console.log('gstKid : ', gstKid);
+                    var totalDeductGst = sum - gstKid; //137.28
+                    console.log('totalDeductGst : ', totalDeductGst);
+                    $('#subtotal').text("₹ " + gstKid.toFixed(2));
+                    $('#subtotlSave').val(gstKid.toFixed(2));
                     document.getElementById('gstOn').innerHTML = "Includes Gst @18% on " + sum.toFixed(
                         2);
-                    var gstKid = (sum * 18) / 100;
-                    document.getElementById('gstValue').innerHTML = '' + gstKid.toFixed(2);
-                    var finalAmount = sum + gstKid;
+                    $('#gst18On').val(sum.toFixed(2));
+                    document.getElementById('gstValue').innerHTML = '' + totalDeductGst.toFixed(2);                   
+                    let finalAmount = sum;
                     document.getElementById('totalAmount').innerHTML = '₹ ' + finalAmount.toFixed(2);
                     $("#chargeAmount").val(finalAmount.toFixed(2));
-                    $('#gst18').val(gstKid.toFixed(2));
-
+                    $('#gst18').val(totalDeductGst.toFixed(2));
                 },
                 error: function(xhr, status, error) {
                     console.log(error);
@@ -694,17 +686,6 @@
             event.target.style.display = 'none';
         }
 
-        $(document).ready(function() {
-            $(document).on('change', '#adult_qty', function() {
-                calculateTotal();
-            });
-            // Listen for changes to the second select box
-            $(document).on('change', '#socks_qty', function() {
-                calculateTotal();
-            });
-
-        });
-
         function calculateTotal() {
             var sum = 0;
             var totalPrice = 0;
@@ -712,6 +693,8 @@
             var taxAmount12 = 0;
             var taxAmount5 = 0;
             var finalPriceEach = [];
+            var socksPrice = 0;
+            var paddlePrice = 0;
             $('.kid_price').each(function() {
                 var val = parseFloat($(this).val()) || 0;
                 sum += val;
@@ -726,188 +709,153 @@
                 var val = parseFloat($(this).val()) || 0;
                 adult_price.push(val);
             });
+            var itemPrice = [];
+
             $('input[name="price[]"]').each(function(index) {
                 var finalAdultPrice = parseFloat(select1Value[index]) * parseFloat(adult_price[index]);
                 totalPrice += finalAdultPrice;
                 finalPriceEach.push(finalAdultPrice);
                 $(this).val(finalAdultPrice);
             });
+
             $('input[name="kid_price[]"]').each(function(index) {
                 var val = parseFloat($(this).val()) || 0;
                 totalPrice += val;
             });
-            var tax = [];
+            let tax = [];
             $('select[name="tax[]"]').each(function(index) {
                 var val = parseFloat($(this).val()) || 0;
                 tax.push(val);
             });
             $('input[name="kid_price[]"]').each(function(index) {
                 var val = parseFloat($(this).val()) || 0;
-                var taxAmount = (val * 18) / 100;
+                console.log('val : ', val);
+                var taxAmount = (val - (val / 1.18));
                 taxAmount18 += taxAmount;
             });
             $('.final_price').each(function(index) {
-
                 var taxAmount = (finalPriceEach[index] * tax[index]) / 100;
                 if (tax[index] == 18) {
                     taxAmount18 += taxAmount;
                 }
                 if (tax[index] == 5) {
                     taxAmount5 += taxAmount;
+                    socksPrice = finalPriceEach[index];
                 }
                 if (tax[index] == 12) {
                     taxAmount12 += taxAmount;
+                    paddlePrice = finalPriceEach[index];
                 }
                 var total = (finalPriceEach[index] + taxAmount).toFixed(2);
                 $(this).val(total);
             });
-            $('#subtotal').text("₹ " + totalPrice.toFixed(2));
-            $('input[name="subTotal"]').val(totalPrice.toFixed(2));
+
+            var subTotalPrice = totalPrice - taxAmount18 - socksPrice - paddlePrice;
+            var sockePriceDeductGst = socksPrice - taxAmount5;
+            subTotalPrice += sockePriceDeductGst
+            var peddalPriceDeductGst = paddlePrice - taxAmount12;
+            subTotalPrice += peddalPriceDeductGst
+
+            $('#subtotal').text("₹ " + subTotalPrice.toFixed(2));
+            $('input[name="subTotal"]').val(subTotalPrice.toFixed(2));
             $('input[name="totalAmount"]').text(totalPrice.toFixed(2));
-
+            let priceWith18Gst = 0;
+            tax.forEach((value, index) => {
+                if (value === 18) {
+                    priceWith18Gst += adult_price[index] * select1Value[index];
+                }
+            });
+            let gstOnPrice = sum + priceWith18Gst;
+            document.getElementById('gstOn').innerHTML = "Includes Gst @18% on " + gstOnPrice.toFixed(2);
+            $('#gst18On').val(gstOnPrice.toFixed(2));
             $('#gstValue').text("₹ " + taxAmount18.toFixed(2));
-
-
             $('input[name="gst18"]').val(taxAmount18.toFixed(2));
-
-
             $('#valueGst').text("₹ " + taxAmount5.toFixed(2));
             $('input[name="gst5"]').val(taxAmount5.toFixed(2));
 
-            if(taxAmount12 > 0){
-            document.querySelector('#gst12Container').classList.remove('d-none');
-            }else{
+            if (taxAmount12 > 0) {
+                document.querySelector('#gst12Container').classList.remove('d-none');
+            } else {
                 document.querySelector('#gst12Container').classList.add('d-none');
             }
             $('#gst12PercentVal').text("₹ " + taxAmount12.toFixed(2));
             $('input[name="gst12"]').val(taxAmount12.toFixed(2));
-
             var totalwithTax = (totalPrice + taxAmount18 + taxAmount5 + taxAmount12).toFixed(2);
-            $('#totalAmount').text("₹ " + totalwithTax);
-            $('input[name="totalAmount"]').val(totalwithTax);
+            var totalwithOutTax = totalPrice.toFixed(2);
+            $('#totalAmount').text("₹ " + totalwithOutTax);
+            $('input[name="totalAmount"]').val(totalwithOutTax);
             $('input[name="subTotal"]').text(totalPrice.toFixed(2));
         }
     </script>
 
     <script>
-        //Coupon Code
         $("#couponCodebutton").on("click", function() {
-            var sum = $("#subtotlSave").val();
+            var branchId = $("#hiddenBranchId").val();
             $.ajax({
                 url: baseUrl + '/get-coupon',
                 type: 'GET',
                 data: {
-                    option: $("#couponCode").val()
+                    option: $("#couponCode").val(),
+                    branch: branchId
                 },
                 success: function(data) {
-                    var discount = 0;
+                    let sum = $("#chargeAmount").val();
+                    console.log("sum: ", sum);
+                    let sumamount = 0;
+                    if (data.status === 400) {
+                        $('#couponmsg').css('color', 'red').text(data.msg);
+                        return false;
+                    }
+                    if (!sum) {
+                        toastr.error("Please select Number of kids & Hours");
+                        return false;
+                    }
                     if (data != '') {
+                        let discount = removeCouponDiscountAmt = data.discount;
+                        console.log("discount: ", discount);
+                        removeCouponType = data.discount_type;
+                        $('#remove-coupon').removeClass('disabled');
+                        $('#couponCodebutton').addClass('disabled');
+                        $('#couponmsg').css('color', '#0A5F59').text('Apply Coupon Successful!');
+
+                        // GST deduction
+                        let subTotalLessGST = parseFloat(sum);
+                        console.log("subTotalLessGST: ", subTotalLessGST);
+
+                        ["#gst5", "#gst18", "#gst12"].forEach(id => {
+                            let gst = parseFloat($(id).val()) || 0;
+                            subTotalLessGST -= gst;
+                        });
+
+                         console.log("AFTER GST LOOP subTotalLessGST: ", subTotalLessGST);
+
+                        $('#subtotal').text("₹ " + subTotalLessGST.toFixed(2));
+                        $('#subtotlSave').val(subTotalLessGST.toFixed(2));
+
+                        let gst18Ded = parseFloat($('#gst18').val()) || 0;
+                        let gst18OnVal = parseFloat($('#gst18On').val()) || 0;
+                        document.getElementById('gstOn').innerHTML = "Includes Gst @18% on " +
+                            gst18OnVal.toFixed(2);
+                        document.getElementById('gstValue').innerHTML = gst18Ded.toFixed(2);
+
+                        // coupon discount deduction  AFTER GST deducated
                         if (data.discount_type == 'flat') {
-                            var discount = data.discount;
                             $('#couponValue').val(discount.toFixed(2));
-                            $('#couponCodeShow').html("Coupon Code (" +
-                                data.coupon_name + ")");
-                            $('#couponValueShow').html(discount.toFixed(
-                                2));
-                            var sumamount = sum - discount;
-
+                            $('#couponCodeShow').html("Coupon Code (" + data.coupon_name + ")");
+                            $('#couponValueShow').html(discount.toFixed(2));
+                            sum = sum - discount.toFixed(2);
                         } else if (data.discount_type == 'percent') {
-                            var discount = data.discount;
-                            var discount = (sum * discount) / 100;
-                            $('#couponValue').val(discount.toFixed(2));
-                            $('#couponCodeShow').html("Coupon Code (" +
-                                data.coupon_name + ")");
-                            $('#couponValueShow').html(discount.toFixed(
-                                2));
-                            var sumamount = sum - discount;
-
+                            let percentDiscount = (subTotalLessGST.toFixed(2) * discount) / 100;
+                            $('#couponValue').val(percentDiscount.toFixed(2));
+                            $('#couponCodeShow').html("Coupon Code (" + data.coupon_name + ")");
+                            $('#couponValueShow').html(percentDiscount.toFixed(2));
+                            sum = sum - percentDiscount.toFixed(2);
                         }
-                        $('#couponmsg').html(
-                            "<p>Apply Coupon Successfull!</p>");
+                        document.getElementById('totalAmount').innerHTML = '₹ ' + sum.toFixed(2);
+                         console.log("AFTER CC : ", sum);
 
-                        // Get the value of the first select box
-                        var select1Value = parseInt($('#adult_qty')
-                            .val());
-                        var adult_price = document.getElementById(
-                            'adult_price_backend').value;
-                        var finalAdultPrice = parseFloat(adult_price) *
-                            parseFloat(select1Value);
-
-                        //   var taxSum = sum+finalAdultPrice;
-                        // 	$("#adult_price").val(finalAdultPrice);
-
-                        // Get the value of the second select box
-                        var select2Value = parseInt($('#socks_qty')
-                            .val());
-                        var socks_price = document.getElementById(
-                            'socks_price_backend').value;
-                        var finalSocksPrice = parseFloat(socks_price) *
-                            parseFloat(select2Value);
-                        // console.log(select2Value);
-                        $("#socks_price").val(finalSocksPrice.toFixed(
-                            2));
-
-                        // Add the values of the select boxes to the sum
-                        console.log(finalAdultPrice);
-
-                        if (isNaN(finalSocksPrice) && isNaN(
-                                finalAdultPrice)) {
-                            finalSocksPrice = 0;
-                            finalAdultPrice = 0;
-
-
-                            var taxSum = sum + finalAdultPrice;
-                            var gstKid = (taxSum * 18) / 100;
-                            sumamount += (finalAdultPrice +
-                                finalSocksPrice);
-                            //alert(sum);
-                            $("#adult_price").val(finalAdultPrice
-                                .toFixed(2));
-                        } else if (!isNaN(finalSocksPrice) && !isNaN(
-                                finalAdultPrice)) {
-
-                            var taxSum = sum + finalAdultPrice;
-                            var gstKid = (taxSum * 18) / 100;
-                            sumamount += (finalAdultPrice +
-                                finalSocksPrice);
-                            //alert(sum);
-                            $("#adult_price").val(finalAdultPrice
-                                .toFixed(2));
-                        } else if (!isNaN(finalAdultPrice)) {
-                            //finalAdultPrice = 0;
-                            var taxSum = sum + finalAdultPrice;
-                            var gstKid = (taxSum * 18) / 100;
-                            sumamount += finalAdultPrice;
-                            //alert(finalAdultPrice);
-
-                            $("#adult_price").val(finalAdultPrice
-                                .toFixed(2));
-                        } else if (!isNaN(finalSocksPrice)) {
-
-                            sumamount += finalSocksPrice;
-                        }
-                        console.log(sumamount);
-                        // Display the sum on the screen
-                        //$('#total').text(sum);
-                        $('#subtotal').text("₹ " + sumamount.toFixed(
-                            2));
-                        $('#subtotlSave').val(sumamount.toFixed(2));
-                        document.getElementById('gstOn').innerHTML =
-                            "Includes Gst @18% on " + sumamount.toFixed(
-                                2);
-                        var gstKid = (sumamount * 18) / 100;
-                        document.getElementById('gstValue').innerHTML =
-                            '' + gstKid.toFixed(2);
-                        var finalAmount = sumamount + gstKid;
-                        document.getElementById('totalAmount')
-                            .innerHTML = '₹ ' + finalAmount.toFixed(2);
-                        $("#chargeAmount").val(finalAmount.toFixed(2));
-                        $('#gst18').val(gstKid.toFixed(2));
-
+                        $("#chargeAmount").val(sum.toFixed(2));
                     } else {
-
-                        console.log(sum);
-
                         // Get the value of the first select box
                         var select1Value = parseInt($('#adult_qty')
                             .val());
@@ -915,10 +863,6 @@
                             'adult_price_backend').value;
                         var finalAdultPrice = parseFloat(adult_price) *
                             parseFloat(select1Value);
-
-                        //   var taxSum = sum+finalAdultPrice;
-                        // 	$("#adult_price").val(finalAdultPrice);
-
                         // Get the value of the second select box
                         var select2Value = parseInt($('#socks_qty')
                             .val());
@@ -926,40 +870,32 @@
                             'socks_price_backend').value;
                         var finalSocksPrice = parseFloat(socks_price) *
                             parseFloat(select2Value);
-                        // console.log(select2Value);
                         $("#socks_price").val(finalSocksPrice.toFixed(
                             2));
-
                         // Add the values of the select boxes to the sum
                         if (isNaN(finalAdultPrice)) {
                             var taxSum = sumamount + finalAdultPrice;
                             var gstKid = (taxSum * 18) / 100;
                             sumamount += finalAdultPrice;
-
                             $("#adult_price").val(finalAdultPrice
                                 .toFixed(2));
                         }
-                        // Display the sum on the screen
-                        //$('#total').text(sum);
-
                         $('#subtotal').text("₹ " + sum.toFixed(2));
-
-
-
                         $('#subtotlSave').val(sum.toFixed(2));
-                        document.getElementById('gstOn').innerHTML =
-                            "Includes Gst @18% on " + sum.toFixed(2);
+                        document.getElementById('gstOn').innerHTML = "Includes Gst @18% on " + sum
+                            .toFixed(2);
                         var gstKid = (sum * 18) / 100;
-                        document.getElementById('gstValue').innerHTML =
-                            '' + gstKid.toFixed(2);
+                        document.getElementById('gstValue').innerHTML = '' + gstKid.toFixed(2);
                         var finalAmount = sum + gstKid;
+                        if (!isNaN(finalSocksPrice)) {
+                            var gstSocks = (socks_price * 5) / 100;
+                            finalAmount += gstSocks;
+                        }
                         document.getElementById('totalAmount')
                             .innerHTML = '₹ ' + finalAmount.toFixed(2);
                         $("#chargeAmount").val(finalAmount.toFixed(2));
                         $('#gst18').val(gstKid.toFixed(2));
-
                     }
-
                 },
                 error: function(xhr, status, error) {
                     console.log(error);
@@ -967,22 +903,48 @@
             });
         });
     </script>
+    <script>
+        //Coupon Code remove
+        $("#remove-coupon").on("click", function() {
+            const sum = $("#chargeAmount").val();
+            console.log('sum : ', sum);
+            const branchId = $("#hiddenBranchId").val();
+            let revertedSumAmt = 0;
 
-
+            if (removeCouponDiscountAmt !== '' || removeCouponType !== '') {
+                $('#couponCodeShow').html("Coupon");
+                $('#couponCodebutton').removeClass('disabled');
+                $('#remove-coupon').addClass('disabled');
+                $('#couponmsg').removeAttr('style').text('');
+                $('#couponValue').val('');
+                $('#couponCode').val('');                
+                $('#couponValueShow').text('');
+                if (removeCouponType == 'flat') {                    
+                    revertedSumAmt = parseFloat(sum) + parseFloat(removeCouponDiscountAmt);                    
+                } else if (removeCouponType == 'percent') {
+                    console.log('sum : ', sum);
+                    console.log('removeCouponDiscountAmt : ', removeCouponDiscountAmt);
+                    revertedSumAmt = parseFloat(sum) / (1 - (parseFloat(removeCouponDiscountAmt) / 100));
+                    console.log('revertedSumAmt : ', revertedSumAmt);
+                } else {    
+                    return false;
+                }
+                revertedSumAmt = parseFloat(revertedSumAmt);                
+                console.log('revertedSumAmt : ', revertedSumAmt);
+                $('#totalAmount').text('₹ ' + revertedSumAmt.toFixed(2));
+            }
+        });
+    </script>
 
     <script>
-        //Auto Fetch Membership Program
-
         $(document).ready(function() {
-
             var baseUrl = "{{ URL::to('/') }}";
-
+            let errorShown = false;
             $('#mobile_no').keyup(function() {
                 var search = $(this).val();
                 if (search.length > 0) {
                     $('#resultmembership').css("display", "block");
                     $.ajax({
-
                         type: 'Post',
                         url: baseUrl + '/get-membership-phone-list',
                         headers: {
@@ -993,11 +955,23 @@
                         },
 
                         success: function(data) {
-                            $('#resultmembership').html(data);
+                            if (data) {
+                                $('#submit-button').prop('disabled', false);
+                                $('#resultmembership').html(data);
+                                errorShown = false;
+                            } else {
+                                $('#submit-button').prop('disabled', true);
+                                if (!errorShown) {
+                                    toastr.error('Member User Not Found.');
+                                    errorShown = true;
+                                }
+                            }
+
                         }
                     });
                 } else {
                     $('#resultmembership').css("display", "none");
+                    errorShown = false;
                 }
 
             });
@@ -1018,25 +992,30 @@
                     data: {
                         mobile: user
                     },
-
                     success: function(response) {
+                        if (response && response.user) {
+                            $('#submit-button').prop('disabled', false);
+                            document.getElementById('nameCustomer').innerHTML = "" + response.user.name;
+                            if (response.renewal_date) {
+                                document.getElementById('planDate').innerHTML = "" + response.renewal_date;
+                            } else {
+                                document.getElementById('planDate').innerHTML = "";
+                            }
 
-                        document.getElementById('nameCustomer').innerHTML = "" + response.user.name;
-                        if (response.renewal_date) {
-                            document.getElementById('planDate').innerHTML = "" + response.renewal_date;
+                            document.getElementById("mobile_no").value = response.user_details.phone_no;
+                            document.getElementById("credit_left").value = response.credit_left;
+                            document.getElementById("kidsName2").value = response.user.name;
+                            var hrs = document.getElementById('hrs').value;
+
+
+                            document.getElementById("user_id").value = response.user.id;
+                            document.getElementById("credit").value = hrs;
+                            $('#resultmembership').css("display", "none");
                         } else {
-                            document.getElementById('planDate').innerHTML = "";
+                            $('#submit-button').prop('disabled', true);
+                            toastr.error('No membership found for this user.');
                         }
 
-                        document.getElementById("mobile_no").value = response.user_details.phone_no;
-                        document.getElementById("credit_left").value = response.credit_left;
-                        document.getElementById("kidsName2").value = response.user.name;
-                        var hrs = document.getElementById('hrs').value;
-
-
-                        document.getElementById("user_id").value = response.user.id;
-                        document.getElementById("credit").value = hrs;
-                        $('#resultmembership').css("display", "none");
                     }
                 });
             }
@@ -1090,6 +1069,8 @@
                     }
 
                 });
+            } else {
+                toastr.error('Mobile number can’t be empty');
             }
 
         }
@@ -1132,7 +1113,6 @@
             var minute = parseInt(time[1]);
             var now1 = new Date();
             var datetime = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour, minute);
-            console.log(datetime);
             if (datetime < now1) {
                 alert('Please select current or future date and time');
 
@@ -1161,7 +1141,6 @@
             const credit = form.querySelector('[name="credit_left"]').value;
 
             const hrs = form.querySelector('[name="hrs"]').value;
-            console.log(hrs);
 
             // Validate the form data
             if (parseInt(credit) < parseInt(hrs)) {

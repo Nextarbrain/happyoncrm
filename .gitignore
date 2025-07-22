@@ -13,3 +13,4 @@ yarn-error.log
 .well-known
 changes.txt
 composer.lock
+storage/framework/views

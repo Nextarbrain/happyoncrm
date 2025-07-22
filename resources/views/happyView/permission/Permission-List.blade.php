@@ -33,7 +33,6 @@
         <!--end header -->
         <!--start page wrapper -->
         <div class="page-wrapper">
-
             <div class="page-content">
                 <div class="row">
                     <div class="col-md-12">
@@ -45,28 +44,20 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="alert"
                                         aria-label="Close"></button>
                                 </div>
-                            @endif
-                            <nav aria-label="breadcrumb">
-                                <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page">Permission</li>
-                                </ol>
-                            </nav>
+                            @endif                            
                             <button type="button" class="btn btn-primary btn-sm my-2" data-bs-toggle="modal"
                                 data-bs-target="#addNew">
                                 Add New
                             </button>
-
                             <div class="container">
                                 <div class="row table-responsive">
                                     <div class="data_table">
-
                                         <table id="example1" class="table table-striped" style="width:100%">
                                             <thead>
                                                 <tr>
                                                     <th>ID</th>
                                                     <th>Name</th>
-                                                    <th>Guard</th>
+                                                    {{-- <th>Guard</th> --}}
                                                     <th>Created</th>
                                                     <th>Last Updated</th>
                                                 </tr>
@@ -76,7 +67,7 @@
                                                     <tr>
                                                         <td>{{ $permission->id }}</td>
                                                         <td>{{ $permission->name }}</td>
-                                                        <td>{{ $permission->guard_name }}</td>
+                                                        {{-- <td>{{ $permission->guard_name }}</td> --}}
                                                         <td>{{ $permission->created_at }}</td>
                                                         <td>{{ $permission->updated_at }}</td>
                                                     </tr>
@@ -100,7 +91,7 @@
                                     </div>
                                     <div class="modal-body">
                                         {{ Form::label('Name', ucwords('Name')) }}
-                                        {{ Form::text('name', null, ['class' => 'form-control' . ($errors->has('name') ? ' form-error' : null), 'placeholder' => 'Enter Permission Name']) }}
+                                        {{ Form::text('name', null, ['class' => 'form-control' . ($errors->has('name') ? ' form-error' : null), 'placeholder' => 'Enter Permission Name', "required" => true]) }}
                                         @error('name')
                                             <span class="text-danger font-weight-bold text-capitalize">{{ $message }}</span>
                                         @enderror
@@ -123,7 +114,6 @@
             <!--Start Back To Top Button-->
             <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
         </div>
-
         <!--end page wrapper -->
         <!--start overlay-->
         <div class="overlay toggle-icon"></div>
@@ -140,11 +130,4 @@
 	<script src="{{asset('assets/plugins/simplebar/js/simplebar.min.js')}}"></script>
 	<script src="{{asset('assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js')}}"></script>
 	<!--app JS-->
-
-	<script src="{{asset('assets/js/app.js')}}"></script>
 	{{-- <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script> --}}
-
-
-
-
-

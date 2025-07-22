@@ -1,5 +1,4 @@
 @include('happyView.includes.head')
-
 <body>
     <!--wrapper-->
     <div class="wrapper">
@@ -33,7 +32,6 @@
         <!--end header -->
         <!--start page wrapper -->
         <div class="page-wrapper">
-
             <div class="page-content">
                 <div class="row">
                     <div class="col-md-12">
@@ -45,18 +43,11 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="alert"
                                         aria-label="Close"></button>
                                 </div>
-                            @endif
-                            <nav aria-label="breadcrumb">
-                                <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page">Manage Role</li>
-                                </ol>
-                            </nav>
+                            @endif                            
                             <button type="button" class="btn btn-primary btn-sm my-2" data-bs-toggle="modal"
                                 data-bs-target="#addNew">
                                 Add New
                             </button>
-
                             <div class="container">
                                 <div class="row table-responsive">
                                     <div class="data_table">
@@ -66,9 +57,10 @@
                                                     <th>Sl.No.</th>
                                                     <th>Name</th>
                                                     <th>Permissions</th>
-                                                    <th>Guard</th>
+                                                    {{-- <th>Guard</th> --}}
                                                     <th>Created</th>
                                                     <th>Last Updated</th>
+                                                    <th>Branch</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -85,9 +77,10 @@
                                                                 [{{ $value['name'] }}]
                                                             @endforeach
                                                         </td>
-                                                        <td>{{ $role->guard_name }}</td>
+                                                        {{-- <td>{{ $role->guard_name }}</td> --}}
                                                         <td>{{ $role->created_at }}</td>
                                                         <td>{{ $role->updated_at }}</td>
+                                                         <td>{{ branchName($role->branch_id); }}</td>
                                                         <td>
                                                             <a href="{{ route('admin.admin.role.edit', ['id' => $role->id]) }}"
                                                                 class="btn btn-info text-light rounded-btn"><i
@@ -110,6 +103,16 @@
                                             color: #fff;
                                             font-size: 12px;
                                         }
+                                        #example1 th, #example1 td {
+                                            white-space: normal !important;
+                                            word-wrap: break-word;
+                                        }
+                                        #example1 td:nth-child(3) {
+                                            max-width: 450px;
+                                        }
+                                        .table-wrapper {
+                                            overflow-x: auto;
+                                        }
                                     </style>
                                     <div class="modal fade" id="addNew" tabindex="-1"
                                         aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -128,6 +131,19 @@
                                                         <span
                                                             class="text-danger font-weight-bold text-capitalize">{{ $message }}</span>
                                                     @enderror
+                                                    @error('permission')
+                                                        <span
+                                                            class="text-danger font-weight-bold text-capitalize">{{ $message }}</span>
+                                                    @enderror
+                                                    @if(!auth('admin')->user()->branch_id != null)
+                                                        {{ Form::label('branch_id', 'Branch') }}
+                                                        {!! Form::select('branch_id', $branches, null, ['class' => 'form-control']) !!}
+                                                        @error('branch_id')
+                                                            <span class="text-danger font-weight-bold text-capitalize">{{ $message }}</span>
+                                                        @enderror
+                                                    @else
+                                                        {!! Form::hidden('branch_id', auth('admin')->user()->branch_id ?? null) !!}
+                                                    @endif
                                                     @php
                                                         $current = null;
                                                         $index = 0;
@@ -151,10 +167,6 @@
                                                         $current = $array[0];
                                                     @endphp
                                                     @endforeach
-                                                    @error('permission')
-                                                        <span
-                                                            class="text-danger font-weight-bold text-capitalize">{{ $message }}</span>
-                                                    @enderror
                                                 </div>
                                                 <div class="modal-footer mt-3">
                                                     <button type="button" class="btn btn-secondary"
@@ -171,15 +183,12 @@
                     </div>
                 </div>
             </div>
-
-
             <!--start overlay-->
             <div class="overlay toggle-icon"></div>
             <!--end overlay-->
             <!--Start Back To Top Button-->
             <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
         </div>
-
         <!--end page wrapper -->
         <!--start overlay-->
         <div class="overlay toggle-icon"></div>
@@ -196,16 +205,7 @@
     <script src="{{ asset('assets/plugins/simplebar/js/simplebar.min.js') }}"></script>
     <script src="{{ asset('assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js') }}"></script>
     <!--app JS-->
-
-    <script src="{{ asset('assets/js/app.js') }}"></script>
     {{-- <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script> --}}
-
-
-
-
-
-
-
     @error('name')
         <script>
             var permission = new bootstrap.Modal(document.getElementById('addNew'), {

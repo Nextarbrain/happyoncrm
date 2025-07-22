@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\BranchController;
 use App\Http\Controllers\AdminPermission;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\StaffController;
@@ -14,8 +15,9 @@ use App\Http\Controllers\OpenBillingController;
 use App\Http\Controllers\TrashController;
 
 Route::get('/', [AdminController::class, 'index'])->name('login');
-
+Route::get('/logout-g', [AdminController::class, 'logout'])->name('logoutA');
 Route::post('/auth', [AdminController::class, 'auth'])->name('auth');
+
 
 
 Route::group(['middleware' => 'admin_auth'], function () {
@@ -34,12 +36,13 @@ Route::group(['middleware' => 'admin_auth'], function () {
     //     return redirect('/')->with('success', 'Logged out successfully.');
     // });
 
-    Route::get('/logout-g', [AdminController::class, 'logout'])->name('logoutA');
 
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/get-branch-role', [AdminPermission::class, 'getBranchRole'])->name('getBranchRole');
 
 
     Route::post('/datawise-record-show', [AdminController::class, 'dashboard'])->name('datawiseRecordShow');
+    Route::post('/branch-wise-data', [AdminController::class, 'dashboard'])->name('branchWiseData');
 
     Route::get('/admin', [AdminController::class, 'adminPlansView'])->name('admin');
 
@@ -108,10 +111,12 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::delete('/delete-customer', [TicketController::class, 'deleteCustomer']);
     Route::get('/customer-filter', [TicketController::class, 'filterCustomer']);
     Route::get('/upcomingbirthdays', [TicketController::class, 'upcomingBirthdaysView'])->name('upcomingBirthdays');
+    Route::post('/sales-report', [TicketController::class, 'sales'])->name('sales-report');    
 
     /******************* Membership Routes **************/
 
     Route::post('/membership-booking-report', [MembershipController::class, 'membershipBookingReport'])->name('membershipBookingReport');
+    Route::post('/membership-booking-usage', [MembershipController::class, 'membershipBookingUser'])->name('membershipBookingUser');
     Route::post('/get-membership-phone-list', [MembershipController::class, 'getMembershipPhoneList']);
     Route::get('/invoice-membership-pdf/{id}', [MembershipController::class, 'invoiceMembershipGenerate']);
     Route::get('/membership-history/{id}', [MembershipController::class, 'membershipHistoryView']);
@@ -128,6 +133,8 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::delete('/delete-membership', [MembershipController::class, 'deleteMembership']);
     Route::delete('/delete-membership-buy', [MembershipController::class, 'deleteMembershipBuyers']);
     Route::delete('/delete-membership-history', [MembershipController::class, 'deleteMembershipHistory']);
+
+    Route::get('/get-branch-plan', [MembershipController::class, 'getBranchPlan']);
 
     /******************* Event Routes **************/
 
@@ -165,6 +172,18 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::get('/trashed', [TrashController::class, 'index'])->name('trash');
     Route::get('/restore/{id}/{model}', [TrashController::class, 'restore'])->name('restore');
     Route::get('/delete/{id}/{model}', [TrashController::class, 'delete'])->name('delete');
+
+    //BRANCH ROUTES
+    Route::get('/get-membership-users-by-branch', [BranchController::class, 'getMembershipUserByBranch']);
+    Route::get('/create-branch', [BranchController::class, 'branchView'])->name('branchView');
+    Route::get('/edit-branch/{id}', [BranchController::class, 'editBranchView'])->name('editBranchView');
+    Route::post('/edit-branch-post', [BranchController::class, 'editBranchPost'])->name('editBranchPost');
+    Route::get('/branch', [BranchController::class, 'branch'])->name('branch');
+    Route::post('/add-branch', [BranchController::class, 'addBranch'])->name('addBranch');
+    Route::delete('/delete-branch', [BranchController::class, 'deleteBranch'])->name('deleteBranch');
+
+
+
 
 });
 
