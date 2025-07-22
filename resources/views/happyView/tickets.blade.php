@@ -604,8 +604,6 @@
             var taxAmount12 = 0;
             var taxAmount5 = 0;
             var finalPriceEach = [];
-            var socksPrice = 0;
-            var paddlePrice = 0;
             $('.kid_price').each(function() {
                 var val = parseFloat($(this).val()) || 0;
                 sum += val;
@@ -624,14 +622,8 @@
 
             $('input[name="price[]"]').each(function(index) {
                 var finalAdultPrice = parseFloat(select1Value[index]) * parseFloat(adult_price[index]);
-                totalPrice += finalAdultPrice;
                 finalPriceEach.push(finalAdultPrice);
                 $(this).val(finalAdultPrice);
-            });
-
-            $('input[name="kid_price[]"]').each(function(index) {
-                var val = parseFloat($(this).val()) || 0;
-                totalPrice += val;
             });
             let tax = [];
             $('select[name="tax[]"]').each(function(index) {
@@ -640,35 +632,45 @@
             });
             $('input[name="kid_price[]"]').each(function(index) {
                 var val = parseFloat($(this).val()) || 0;
-                var taxAmount = (val - (val / 1.18));
+                var bAmt = val / 1.18;
+                totalPrice += bAmt;
+                var taxAmount = (val - bAmt);
                 taxAmount18 += taxAmount;
             });
+            const taxRatesList = {
+                '18': 1.18,
+                '12': 1.12,
+                '5': 1.05,
+                '0': 1.00
+            };
             $('.final_price').each(function(index) {
-                var taxAmount = (finalPriceEach[index] * tax[index]) / 100;
-                if (tax[index] == 18) {
-                    taxAmount18 += taxAmount;
+                const rate = tax[index];
+                const finalPrice = finalPriceEach[index];
+                const divisor = taxRatesList[rate];
+                const basicAmount = finalPrice / divisor;
+                totalPrice += basicAmount;
+                const taxAmount = finalPrice - basicAmount;
+
+                switch (rate) {
+                    case 18:
+                        taxAmount18 += taxAmount;
+                        break;
+                    case 12:
+                        taxAmount12 += taxAmount;
+                        break;
+                    case 5:
+                        taxAmount5 += taxAmount;
+                        break;
                 }
-                if (tax[index] == 5) {
-                    taxAmount5 += taxAmount;
-                    socksPrice = finalPriceEach[index];
-                }
-                if (tax[index] == 12) {
-                    taxAmount12 += taxAmount;
-                    paddlePrice = finalPriceEach[index];
-                }
-                var total = (finalPriceEach[index] + taxAmount).toFixed(2);
-                $(this).val(total);
+                $(this).val((finalPrice + taxAmount).toFixed(2));
             });
+            let subTotalPrice = 0;
+            subTotalPrice = totalPrice + taxAmount18 + taxAmount12 + taxAmount5;
+            $('#subtotal').text("₹ " + totalPrice.toFixed(2));
+            $('input[name="subTotal"]').val(totalPrice.toFixed(2));
+            $('input[name="totalAmount"]').val(subTotalPrice.toFixed(2));
+            $('#totalAmount').text("₹ " + subTotalPrice.toFixed(2));
 
-            var subTotalPrice = totalPrice - taxAmount18 - socksPrice - paddlePrice;
-            var sockePriceDeductGst = socksPrice - taxAmount5;
-            subTotalPrice += sockePriceDeductGst
-            var peddalPriceDeductGst = paddlePrice - taxAmount12;
-            subTotalPrice += peddalPriceDeductGst
-
-            $('#subtotal').text("₹ " + subTotalPrice.toFixed(2));
-            $('input[name="subTotal"]').val(subTotalPrice.toFixed(2));
-            $('input[name="totalAmount"]').text(totalPrice.toFixed(2));
             let priceWith18Gst = 0;
             tax.forEach((value, index) => {
                 if (value === 18) {
@@ -677,6 +679,7 @@
             });
             let gstOnPrice = sum + priceWith18Gst;
             document.getElementById('gstOn').innerHTML = "Includes Gst @18% on " + gstOnPrice.toFixed(2);
+
             $('#gst18On').val(gstOnPrice.toFixed(2));
             $('#gstValue').text("₹ " + taxAmount18.toFixed(2));
             $('input[name="gst18"]').val(taxAmount18.toFixed(2));
@@ -692,9 +695,9 @@
             $('input[name="gst12"]').val(taxAmount12.toFixed(2));
             var totalwithTax = (totalPrice + taxAmount18 + taxAmount5 + taxAmount12).toFixed(2);
             var totalwithOutTax = totalPrice.toFixed(2);
-            $('#totalAmount').text("₹ " + totalwithOutTax);
-            $('input[name="totalAmount"]').val(totalwithOutTax);
-            $('input[name="subTotal"]').text(totalPrice.toFixed(2));
+            // $('#totalAmount').text("₹ EXF" + subTotalPrice);
+            // $('input[name="totalAmount"]').val(subTotalPrice);
+            // $('input[name="subTotal"]').text(totalPrice.toFixed(2));
         }
     </script>
 
