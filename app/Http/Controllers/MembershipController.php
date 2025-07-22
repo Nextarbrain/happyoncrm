@@ -67,28 +67,33 @@ class MembershipController extends Controller
 
         $paymentMethod = PaymentMethod::where('user_id', $id)->latest()->first();
 
-        // $paymentMethod->subTotal
-        $subTotalWithoutDiscount = $paymentMethod->subTotal + ($paymentMethod->couponvalue ?? 0);
+        $branchId = $paymentMethod->branch_id;
+        $planName = $user['membership']->plan;
 
-        $subTotal = ($subTotalWithoutDiscount - $paymentMethod->gst18);
+        $reqPlan = MembershipPlan::where('plan_name', $planName)
+            ->when($branchId, fn($query) => $query->where('branch_id', $branchId), fn($query) => $query->whereNull('branch_id'))
+            ->get();
+        if ($reqPlan->isEmpty() && $branchId) {
+            $reqPlan = MembershipPlan::where('plan_name', $planName)->whereNull('branch_id')->get();
+        }
+        $credit = $reqPlan[0]->credits ?? 0;
+
+        // $subTotalWithoutDiscount = $paymentMethod->subTotal + ($paymentMethod->couponvalue ?? 0);
+        // $subTotal = ($subTotalWithoutDiscount - $paymentMethod->gst18);
         $data = [
             'guardian_name' => $user->name,
             "payment_method" => $paymentMethod->payment_method,
             "date" => $user['membership']->date,
-            "package_name" => $user['membership']->plan,
+            "package_name" => $planName,
             "amount" => $user['membership']->amount,
-            "total_credit" => $user['membership']->total_credit,
-
+            "total_credit" => $credit,
             "couponcode" => $user['paymentInfo']->couponcode,
             "couponvalue" => $user['paymentInfo']->couponvalue,
             "invoiceNo" => $paymentMethod->id,
-
             "subTotal" => $paymentMethod->subTotal,
             "gst18" => $paymentMethod->gst18,
-
             "totalAmount" => $paymentMethod->amounts,
-
-        ];
+        ];        
         return view('receipt.membership-invoice', $data);
     }
 
@@ -197,6 +202,14 @@ class MembershipController extends Controller
         if (!$branchId) {
             return redirect()->back()->with('error', 'Please select a branch first.');
         }
+        $payment_method = 'Card';
+        if ($request->input('payment_mode') == 1) {
+            $payment_method = "UPI";
+        } elseif ($request->input('payment_mode') == 2) {
+            $payment_method = "Cash";
+        } else {
+            $payment_method = "Debit/Credit";
+        }
 
         if (isset($userdetail)) {
             $member = MembershipBuy::where('user_id', $userdetail->user_id)->latest()->first();
@@ -219,14 +232,7 @@ class MembershipController extends Controller
                     $member->credit_left = $user_total_creadit;
                     $member->total_credit = $user_total_creadit;
                     $member->amount = $request->input('totalamount');
-
-                    if ($request->input('payment_mode') == 1) {
-                        $member->payment_method = "UPI";
-                    } elseif ($request->input('payment_mode') == 2) {
-                        $member->payment_method = "Cash";
-                    } else {
-                        $member->payment_method = "Debit/Credit";
-                    }
+                    $member->payment_method = $payment_method;
                     $member->date = $request->input('date');
                     $date = Carbon\Carbon::parse($request->input('date'));
                     $dateAfter1Year = $date->addYear();
@@ -236,20 +242,11 @@ class MembershipController extends Controller
                     $member->time = now()->format('H:i');
                     $member->save();
 
-                    $paymentMethod = '';
-                    if ($request->input('payment_mode') == 1) {
-                        $paymentMethod = "UPI";
-                    } elseif ($request->input('payment_mode') == 2) {
-                        $paymentMethod = "Cash";
-                    } else {
-                        $paymentMethod = "Debit/Credit";
-                    }
-
                     $membershipRenewabel = new MembershipBuyRenewable();
                     $membershipRenewabel->amount = $request->input('totalamount');
                     $membershipRenewabel->branch_id = $branchId;
                     $membershipRenewabel->user_id = $userdetail->user_id;
-                    $membershipRenewabel->payment_method = $paymentMethod;
+                    $membershipRenewabel->payment_method = $payment_method;
                     $membershipRenewabel->created_at = now();
                     $membershipRenewabel->save();
 
@@ -259,7 +256,7 @@ class MembershipController extends Controller
                     $amount->branch_id = $branchId;
                     $amount->gst18 = $request->input('gst18');
                     $amount->amounts = $request->input('totalamount');
-                    $amount->payment_method = "Card";
+                    $amount->payment_method = $payment_method;
 
                     $coupon = null;
                     if ($request->coupon_code) {
@@ -325,13 +322,7 @@ class MembershipController extends Controller
                         $member->credit_left = $getPlan->credits;
                         $member->total_credit = $getPlan->credits;
                         $member->amount = $request->input('totalamount');
-                        if ($request->input('payment_mode') == 1) {
-                            $member->payment_method = "UPI";
-                        } elseif ($request->input('payment_mode') == 2) {
-                            $member->payment_method = "Cash";
-                        } else {
-                            $member->payment_method = "Debit/Credit";
-                        }
+                        $member->payment_method = $payment_method;
                         $member->date = $request->input('date');
                         $date = Carbon\Carbon::parse($request->input('date'));
                         $dateAfter1Year = $date->addYear();
@@ -340,21 +331,11 @@ class MembershipController extends Controller
                         // $member->time = $request->input('time');
                         $member->time = now()->format('H:i');
                         $member->save();
-
-                        $paymentMethod = '';
-                        if ($request->input('payment_mode') == 1) {
-                            $paymentMethod = "UPI";
-                        } elseif ($request->input('payment_mode') == 2) {
-                            $paymentMethod = "Cash";
-                        } else {
-                            $paymentMethod = "Debit/Credit";
-                        }
-
                         $membershipRenewabel = new MembershipBuyRenewable();
                         $membershipRenewabel->amount = $request->input('totalamount');
                         $membershipRenewabel->branch_id = $branchId;
                         $membershipRenewabel->user_id = $userSave->id;
-                        $membershipRenewabel->payment_method = $paymentMethod;
+                        $membershipRenewabel->payment_method = $payment_method;
                         $membershipRenewabel->created_at = now();
                         $membershipRenewabel->save();
 
@@ -364,7 +345,7 @@ class MembershipController extends Controller
                         $amount->subTotal = $request->input('subtotal');
                         $amount->gst18 = $request->input('gst18');
                         $amount->amounts = $request->input('totalamount');
-                        $amount->payment_method = "Card";
+                        $amount->payment_method = $payment_method;
                         $coupon = null;
                         if ($request->coupon_code) {
                             $coupon = Coupon::where('coupon_name', $request->coupon_code);
@@ -373,17 +354,6 @@ class MembershipController extends Controller
                             }
                             $coupon = $coupon->first();
                         }
-                        // if (!is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
-                        //     $amount->couponvalue = $coupon->discount;
-                        //     $amount->couponcode = $request->coupon_code;
-                        //     $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
-                        // } elseif (!is_null($coupon) && $coupon->discount_type === 'percent') {
-                        //     $totalAfterGST = $amount->subTotal - $request->input('gst18');
-                        //     $amount->couponvalue = ($coupon->discount / 100) * $totalAfterGST;
-                        //     $amount->couponcode = $request->coupon_code;
-                        //     $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
-                        // }
-
                         if (!is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
                             $amount->couponvalue = $coupon->discount;
                             $amount->couponcode = $request->coupon_code;
@@ -393,7 +363,6 @@ class MembershipController extends Controller
                         }
                         couponCountUpdate($request->coupon_code);
                         $amount->save();
-
 
                         $mobile = "91" . $request->input('phone');
                         $package = $getPlan->plan_name;
@@ -439,36 +408,19 @@ class MembershipController extends Controller
                     $member->credit_left = $getPlan->credits;
                     $member->total_credit = $getPlan->credits;
                     $member->amount = $request->input('totalamount');
-                    if ($request->input('payment_mode') == 1) {
-                        $member->payment_method = "UPI";
-                    } elseif ($request->input('payment_mode') == 2) {
-                        $member->payment_method = "Cash";
-                    } else {
-                        $member->payment_method = "Debit/Credit";
-                    }
+                    $member->payment_method = $payment_method;
                     $member->date = $request->input('date');
                     $date = Carbon\Carbon::parse($request->input('date'));
                     $dateAfter1Year = $date->addYear();
                     $member->renewal_date = $dateAfter1Year->format('Y-m-d');
-
-                    // $member->time = $request->input('time');
                     $member->time = now()->format('H:i');
                     $member->save();
-
-                    $paymentMethod = '';
-                    if ($request->input('payment_mode') == 1) {
-                        $paymentMethod = "UPI";
-                    } elseif ($request->input('payment_mode') == 2) {
-                        $paymentMethod = "Cash";
-                    } else {
-                        $paymentMethod = "Debit/Credit";
-                    }
 
                     $membershipRenewabel = new MembershipBuyRenewable();
                     $membershipRenewabel->amount = $request->input('totalamount');
                     $membershipRenewabel->branch_id = $branchId;
                     $membershipRenewabel->user_id = $userSave->id;
-                    $membershipRenewabel->payment_method = $paymentMethod;
+                    $membershipRenewabel->payment_method = $payment_method;
                     $membershipRenewabel->created_at = now();
                     $membershipRenewabel->save();
 
@@ -478,7 +430,7 @@ class MembershipController extends Controller
                     $amount->subTotal = $request->input('subtotal');
                     $amount->gst18 = $request->input('gst18');
                     $amount->amounts = $request->input('totalamount');
-                    $amount->payment_method = "Card";
+                    $amount->payment_method = $payment_method;
                     $coupon = null;
                     if ($request->coupon_code) {
                         $coupon = Coupon::where('coupon_name', $request->coupon_code);
@@ -489,14 +441,13 @@ class MembershipController extends Controller
                     }
                     if (!is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
                         $amount->couponvalue = $coupon->discount;
-                        $amount->couponcode = $request->coupon_code;                        
+                        $amount->couponcode = $request->coupon_code;
                     } elseif (!is_null($coupon) && $coupon->discount_type === 'percent') {
                         $amount->couponvalue = $request->input('couponDis');
-                        $amount->couponcode = $request->coupon_code;                        
+                        $amount->couponcode = $request->coupon_code;
                     }
                     couponCountUpdate($request->coupon_code);
                     $amount->save();
-
 
                     $mobile = "91" . $request->input('phone');
                     $package = $getPlan->plan_name;
@@ -542,36 +493,19 @@ class MembershipController extends Controller
                 $member->credit_left = $getPlan->credits;
                 $member->total_credit = $getPlan->credits;
                 $member->amount = $request->input('totalamount');
-                if ($request->input('payment_mode') == 1) {
-                    $member->payment_method = "UPI";
-                } elseif ($request->input('payment_mode') == 2) {
-                    $member->payment_method = "Cash";
-                } else {
-                    $member->payment_method = "Debit/Credit";
-                }
+                $member->payment_method = $payment_method;
                 $member->date = $request->input('date');
                 $date = Carbon\Carbon::parse($request->input('date'));
                 $dateAfter1Year = $date->addYear();
                 $member->renewal_date = $dateAfter1Year->format('Y-m-d');
-
-                // $member->time = $request->input('time');
                 $member->time = now()->format('H:i');
                 $member->save();
-
-                $paymentMethod = '';
-                if ($request->input('payment_mode') == 1) {
-                    $paymentMethod = "UPI";
-                } elseif ($request->input('payment_mode') == 2) {
-                    $paymentMethod = "Cash";
-                } else {
-                    $paymentMethod = "Debit/Credit";
-                }
 
                 $membershipRenewabel = new MembershipBuyRenewable();
                 $membershipRenewabel->amount = $request->input('totalamount');
                 $membershipRenewabel->branch_id = $branchId;
                 $membershipRenewabel->user_id = $userSave->id;
-                $membershipRenewabel->payment_method = $paymentMethod;
+                $membershipRenewabel->payment_method = $payment_method;
                 $membershipRenewabel->created_at = now();
                 $membershipRenewabel->save();
 
@@ -581,7 +515,7 @@ class MembershipController extends Controller
                 $amount->subTotal = $request->input('subtotal');
                 $amount->gst18 = $request->input('gst18');
                 $amount->amounts = $request->input('totalamount');
-                $amount->payment_method = "Card";
+                $amount->payment_method = $payment_method;
                 $coupon = null;
                 if ($request->coupon_code) {
                     $coupon = Coupon::where('coupon_name', $request->coupon_code);
@@ -591,15 +525,14 @@ class MembershipController extends Controller
                     $coupon = $coupon->first();
                 }
                 if (!is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
-                        $amount->couponvalue = $coupon->discount;
-                        $amount->couponcode = $request->coupon_code;                        
-                    } elseif (!is_null($coupon) && $coupon->discount_type === 'percent') {
-                        $amount->couponvalue = $request->input('couponDis');
-                        $amount->couponcode = $request->coupon_code;                        
-                    }
+                    $amount->couponvalue = $coupon->discount;
+                    $amount->couponcode = $request->coupon_code;
+                } elseif (!is_null($coupon) && $coupon->discount_type === 'percent') {
+                    $amount->couponvalue = $request->input('couponDis');
+                    $amount->couponcode = $request->coupon_code;
+                }
                 couponCountUpdate($request->coupon_code);
                 $amount->save();
-
 
                 $mobile = "91" . $request->input('phone');
                 $package = $getPlan->plan_name;
