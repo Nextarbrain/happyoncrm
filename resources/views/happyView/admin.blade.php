@@ -68,12 +68,14 @@
                                                         <div id="paid" class="container tab-pane active show"
                                                             role="tabpanel"><br>
                                                             <div class="data_table admin_table table-responsive">
-                                                                @if (can('admin-hours-edit'))
-                                                                    <div class="count" id="day_price_edit"
-                                                                        style="text-align: right">
-                                                                        <i class="fa fa-pencil" aria-hidden="true"></i>
-                                                                    </div>
-                                                                @endif
+                                                                {{-- @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1) --}}
+                                                                    @if (can('admin-hours-edit'))
+                                                                        <div class="count" id="day_price_edit"
+                                                                            style="text-align: right">
+                                                                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                                                                        </div>
+                                                                    @endif
+                                                                {{-- @endif --}}
                                                                 <div class="modal fade" id="editDayPriceModal"
                                                                     tabindex="-1" role="dialog"
                                                                     aria-labelledby="editDayPriceLabel"
@@ -144,7 +146,7 @@
                                                                     <thead>
                                                                         <tr>
                                                                             <th><input type="checkbox"
-                                                                                    onclick="checkAll(this)"></th>
+                                                                                    onclick="checkWeekendAll(this)"></th>
                                                                             <th>Hour</th>
                                                                             <th>Monday</th>
                                                                             <th>Tue</th>
@@ -279,10 +281,12 @@
                                         <div class="data_table admin_table table-responsive">
                                             <div class="table_header">
                                                 <div class="a_add_btn">
+                                                @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
                                                     @if(can('admin-membership-add'))
                                                     <button type="button" class="btn" data-toggle="modal"
                                                         data-target="#membershipModal">Add Membership Plan +</button>
                                                     @endif
+                                                @endif
                                                     <!-- Modal -->
                                                     <div class="modal fade" id="membershipModal" tabindex="-1"
                                                         role="dialog" aria-labelledby="membershipModalLabel"
@@ -327,16 +331,20 @@
                                                     </div>
 
                                                 </div>
-                                                @if(can('admin-membership-delete'))
-                                                <div class="count" id="membership_div">
-                                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
-                                                </div>
+                                                 @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                    @if(can('admin-membership-delete'))
+                                                    <div class="count" id="membership_div">
+                                                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                                    </div>
+                                                    @endif
                                                 @endif
-                                                @if(can('admin-membership-edit'))
-                                                <div class="count" id="membership_edit">
-                                                    <i class="fa fa-pencil" aria-hidden="true"></i>
-                                                </div>
-                                                @endif
+                                                {{-- @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1) --}}
+                                                    @if(can('admin-membership-edit'))
+                                                    <div class="count" id="membership_edit">
+                                                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                                                    </div>
+                                                    @endif
+                                                {{-- @endif --}}
                                                 <div class="modal fade" id="editMemberModal" tabindex="-1"
                                                     role="dialog" aria-labelledby="editMemberModalLabel"
                                                     aria-hidden="true">
@@ -344,7 +352,7 @@
                                                         <div class="modal-content">
                                                             <div class="modal-header">
                                                                 <h5 class="modal-title" id="editMemberModalLabel">Edit
-                                                                    Product</h5>
+                                                                    Membership Plan</h5>
                                                                 <button type="button" class="close"
                                                                     onClick="modalClose();" aria-label="Close">
                                                                     <span aria-hidden="true">&times;</span>
@@ -362,10 +370,10 @@
                                                                     <input type="number" class="form-control"
                                                                         id="editPlanPrice" placeholder="Price"
                                                                         name="editPlanPrice" step="0.01" required>
-                                                                    <label for="editquantityModalForm">Entry</label>
+                                                                    <label for="editquantityModalForm">Entry</label>                                                                    
                                                                     <input type="number" class="form-control"
                                                                         id="editPlanEntry" placeholder="Entry"
-                                                                        name="editPlanEntry" required>
+                                                                        name="editPlanEntry" required {{ session('branch_id') > 0 ? 'readonly' : '' }}>
                                                                     <input type="hidden" id="memberId"
                                                                         name="memberId">
                                                                 </div>
@@ -383,7 +391,7 @@
                                             <table class="table table-striped text-center" style="width:100%">
                                                 <thead>
                                                     <tr>
-                                                        <th><input type="checkbox" onclick="checkAll(this)"></th>
+                                                        <th><input type="checkbox" onclick="checkMemberShipAll(this)"></th>
                                                         <th>Plan</th>
                                                         <th>Price</th>
                                                         <th>Entry</th>
@@ -426,7 +434,7 @@
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
                                                                     <h5 class="modal-title" id="productModalLabel">Add
-                                                                        New Coupon</h5>
+                                                                        New Product</h5>
                                                                     <button type="button" class="close"
                                                                         data-dismiss="modal" aria-label="Close">
                                                                         <span aria-hidden="true">&times;</span>
@@ -436,14 +444,23 @@
                                                                     method="post">
                                                                     @csrf
                                                                     <div class="modal-body">
+                                                                        @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                                            <label>Branch <span style="color: red">*</span></label>
+                                                                            <select name="branch_id" id="addProductBranchId"
+                                                                                class="form-select" required>
+                                                                                @foreach ($branches as $branch)
+                                                                                    <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                        @endif
                                                                         <label for="productNameModalForm">Product
                                                                             Name</label>
                                                                         <input type="text" class="form-control"
                                                                             id="productNameModalForm"
-                                                                            placeholder="Product Name"
+                                                                            placeholder="Extra Time, Adult, Socks"
                                                                             name="product_name" required>
                                                                         <label for="priceModalForm">Price</label>
-                                                                        <input type="number" class="form-control"
+                                                                        <input type="text" class="form-control"
                                                                             id="priceModalForm" placeholder="Price"
                                                                             name="price" required>
                                                                         <label for="quantityModalForm">Qty</label>
@@ -494,6 +511,15 @@
                                                                 method="post">
                                                                 @csrf
                                                                 <div class="modal-body">
+                                                                    @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                                        <label>Branch <span style="color: red">*</span></label>
+                                                                        <select name="branch_id" id="editProductBranchId"
+                                                                            class="form-select" required>
+                                                                            @foreach ($branches as $branch)
+                                                                                <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    @endif
                                                                     <label for="editProductName">Product Name</label>
                                                                     <input type="text" class="form-control"
                                                                         id="editProductName"
@@ -527,11 +553,12 @@
                                             <table class="table table-striped text-center" style="width:100%">
                                                 <thead>
                                                     <tr>
-                                                        <th><input type="checkbox" onclick="checkAll(this)"></th>
+                                                        <th><input type="checkbox" onclick="checkProductAll(this)"></th>
                                                         <th>Product Name</th>
                                                         <th>Price</th>
                                                         <th>Qty</th>
                                                         <th>Tax</th>
+                                                        <th>Branch</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -545,6 +572,7 @@
                                                             <td>{{ $productList->product_price }}</td>
                                                             <td>{{ $productList->product_qty }}</td>
                                                             <td>{{ $productList->product_tax }} %</td>
+                                                            <td>{{ optional($productList['branch'])->name ?? '' }}</td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
@@ -579,6 +607,15 @@
                                                                     method="post">
                                                                     @csrf
                                                                     <div class="modal-body">
+                                                                         @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                                            <label>Branch <span style="color: red">*</span></label>
+                                                                            <select name="branch_id" id="addCoupanBranchId"
+                                                                                class="form-select" required>
+                                                                                @foreach ($branches as $branch)
+                                                                                    <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                        @endif
                                                                         <label for="couponModalFormName">Coupon
                                                                             Name</label>
                                                                         <input type="text" class="form-control"
@@ -643,7 +680,7 @@
                                                         <div class="modal-content">
                                                             <div class="modal-header">
                                                                 <h5 class="modal-title" id="editCouponModalLabel">Edit
-                                                                    Product</h5>
+                                                                    Coupon</h5>
                                                                 <button type="button" class="close"
                                                                     onClick="modalClose();" aria-label="Close">
                                                                     <span aria-hidden="true">&times;</span>
@@ -653,6 +690,15 @@
                                                                 method="post">
                                                                 @csrf
                                                                 <div class="modal-body">
+                                                                     @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                                        <label>Branch <span style="color: red">*</span></label>
+                                                                        <select name="branch_id" id="editCoupanBranchId"
+                                                                            class="form-select" required>
+                                                                            @foreach ($branches as $branch)
+                                                                                <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    @endif
                                                                     <label for="couponName">Coupon Name</label>
                                                                     <input type="text" class="form-control"
                                                                         id="couponName" placeholder="Coupon Name"
@@ -695,13 +741,14 @@
                                             <table class="table table-striped text-center" style="width:100%">
                                                 <thead>
                                                     <tr>
-                                                        <th><input type="checkbox" onclick="checkAll(this)"></th>
+                                                        <th><input type="checkbox" onclick="checkCoupanAll(this)"></th>
                                                         <th>Coupon Name</th>
                                                         <th>Discount Type</th>
                                                         <th>Discount</th>
                                                         <th>Coupon Use</th>
                                                         <th>Start From</th>
                                                         <th>Valid Till</th>
+                                                        <th>Branch</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -717,6 +764,7 @@
                                                             <td>{{ $coupons->coupon_count }}</td>
                                                             <td>{{ $coupons->start_from }} </td>
                                                             <td>{{ $coupons->valid_till }}</td>
+                                                            <td>{{ optional($coupons['branch'])->name ?? '' }}</td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
@@ -929,6 +977,47 @@
         <!--Start Back To Top Button-->
         <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
         <!--End Back To Top Button-->
+        <script>
+                function checkCoupanAll(bx) {
+                    var cbs = document.getElementsByClassName('coupon_checkbox');
+                    for (var i = 0; i < cbs.length; i++) {
+                        if (cbs[i].type == 'checkbox') {
+                            cbs[i].checked = bx.checked;
+                        }
+                    }
+                }
+
+                function checkProductAll(bx) {
+                    var cbs = document.getElementsByClassName('product_checkbox');
+                    for (var i = 0; i < cbs.length; i++) {
+                        if (cbs[i].type == 'checkbox') {
+                            cbs[i].checked = bx.checked;
+                        }
+                    }
+                }
+
+                function checkMemberShipAll(bx) {
+                    var cbs = document.getElementsByClassName('membership_checkbox');
+                    for (var i = 0; i < cbs.length; i++) {
+                        if (cbs[i].type == 'checkbox') {
+                            cbs[i].checked = bx.checked;
+                        }
+                    }
+                }
+
+
+
+                function checkWeekendAll(bx) {
+                    // var cbs = document.getElementsByClassName('day_price_checkbox');
+                    // for (var i = 0; i < cbs.length; i++) {
+                    //     if (cbs[i].type == 'checkbox') {
+                    //         cbs[i].checked = bx.checked;
+                    //     }
+                    // }
+                }
+
+
+        </script>
 
     </div>
     <!--end wrapper-->

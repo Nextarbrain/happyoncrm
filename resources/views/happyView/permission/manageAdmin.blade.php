@@ -1,5 +1,4 @@
 @include('happyView.includes.head')
-
 <body>
     <!--wrapper-->
     <div class="wrapper">
@@ -33,7 +32,6 @@
         <!--end header -->
         <!--start page wrapper -->
         <div class="page-wrapper">
-
             <div class="page-content">
                 <div class="row">
                     <div class="col-md-12">
@@ -43,22 +41,14 @@
                                     {!! session()->get('msg') !!}
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
-                            @endif
-                            <nav aria-label="breadcrumb">
-                                <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page">Staff List</li>
-                                </ol>
-                            </nav>
+                            @endif                            
                             <button type="button" class="btn btn-primary btn-sm my-2" data-bs-toggle="modal"
                                 data-bs-target="#addNew">
                                 Add New
                             </button>
-
                             <div class="container">
                                 <div class="row table-responsive">
                                     <div class="data_table">
-
                                         <table id="example1" class="table table-striped" style="width:100%">
                                             <thead>
                                                 <tr>
@@ -67,6 +57,7 @@
                                                     <th>Email</th>
                                                     <th>Created</th>
                                                     <th>Last Updated</th>
+                                                    <th>Branch</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -81,6 +72,7 @@
                                                         <td>{{ $user->email }}</td>
                                                         <td>{{ $user->created_at }}</td>
                                                         <td>{{ $user->updated_at }}</td>
+                                                         <td>{{ optional($user['branch'])->name ?? '' }}</td>
                                                         <td>
                                                        <a href="{{ route('admin.admin.edit', ['id' => $user->id]) }}"
                                                                     class="btn-info text-dark rounded-btn"><i
@@ -99,19 +91,33 @@
                                         aria-hidden="true">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
-                                                {{ Form::open(['route' => 'admin.admin.permission', 'files' => false, 'method' => 'post']) }}
                                                 <div class="modal-header">
                                                     <h5 class="modal-title" id="exampleModalLabel">Create User</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                         aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
+                                                    @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                        <form method="GET" action="{{ route('admin.admin.role') }}">
+                                                            <label>Branch <span style="color: red">*</span></label>
+                                                            <select name="branch_id" id="manageBranchId"
+                                                                class="form-select" required>
+                                                                @foreach ($branches as $branch)
+                                                                    <option value="{{ $branch['id'] }}" {{ $branch['id'] == $branchId  ? 'selected' : ""}}>{{ $branch['name'] }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </form>
+                                                    @endif
+                                                    {{ Form::open(['route' => 'admin.admin.permission', 'files' => false, 'method' => 'post']) }}
                                                     {{ Form::label('name', ucwords('name')) }}
                                                     {!! Form::text('name', null, ['class' => 'form-control' . ($errors->has('name') ? ' form-error' : null)]) !!}
                                                     @error('name')
                                                         <span
                                                             class="text-danger font-weight-bold text-capitalize d-block">{{ $message }}</span>
                                                     @enderror
+                                                    @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                        <input type="hidden" name="branch_id" id="hiddenBranchId">
+                                                    @endif
                                                     {{ Form::label('email', ucwords('email')) }}
                                                     {!! Form::email('email', null, ['class' => 'form-control' . ($errors->has('email') ? ' form-error' : null)]) !!}
                                                     @error('email')
@@ -132,6 +138,15 @@
                                                         <span
                                                             class="text-danger font-weight-bold text-capitalize d-block">{{ $message }}</span>
                                                     @enderror
+                                                    {{-- @if(!auth('admin')->user()->branch_id != null)
+                                                        {{ Form::label('branch_id', 'Branch') }}
+                                                        {!! Form::select('branch_id', $branches, null, ['class' => 'form-control']) !!}
+                                                        @error('branch_id')
+                                                            <span class="text-danger font-weight-bold text-capitalize">{{ $message }}</span>
+                                                        @enderror
+                                                    @else
+                                                        {!! Form::hidden('branch_id', auth('admin')->user()->branch_id ?? null) !!}
+                                                    @endif --}}
                                                     {{ Form::label('roles', ucwords('Assign Role')) }}
                                                     {!! Form::select('roles', $roles, null, [
                                                         'class' => 'form-control' . ($errors->has('roles') ? ' form-error' : null),
@@ -156,14 +171,12 @@
                     </div>
                 </div>
             </div>
-
             <!--start overlay-->
             <div class="overlay toggle-icon"></div>
             <!--end overlay-->
             <!--Start Back To Top Button-->
             <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
         </div>
-
         <!--end page wrapper -->
         <!--start overlay-->
         <div class="overlay toggle-icon"></div>
@@ -180,8 +193,7 @@
     <script src="{{ asset('assets/plugins/simplebar/js/simplebar.min.js') }}"></script>
     <script src="{{ asset('assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js') }}"></script>
     <!--app JS-->
-
-    <script src="{{ asset('assets/js/app.js') }}"></script>
+    {{-- <script src="{{ asset('assets/js/app.js') }}"></script> --}}
     @error('name')
         <script>
             var permission = new bootstrap.Modal(document.getElementById('addNew'), {
@@ -189,4 +201,30 @@
             });
             permission.show();
         </script>
+
     @enderror
+    <script>
+        $(document).ready(function () {
+            $('#manageBranchId').on('change', function () {
+                let branchId = $(this).val();
+                if (!branchId) return;
+                $('#hiddenBranchId').val(branchId);
+                $.ajax({
+                    url: '{{ route("getBranchRole") }}',
+                    type: 'GET',
+                    data: { branch_id: branchId },
+                    success: function (res) {
+                        let rolesSelect = $('select[name="roles"]');
+                        rolesSelect.empty();
+                        rolesSelect.append('<option value="">Select Role</option>');
+                        $.each(res.data, function (key, value) {
+                            rolesSelect.append(`<option value="${value.name}">${value.name}</option>`);
+                        });
+                    },
+                    error: function (err) {
+                        console.error("AJAX error:", err);
+                    }
+                });
+            });
+        });
+    </script>

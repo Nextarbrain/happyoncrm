@@ -85,8 +85,8 @@
 													<th>Use Credit</th>
 													<th>Left Credit</th>
 													<th>Total Credit</th>
-
-												</tr>
+                                                    <th>Branch</th>
+                                                </tr>
 											</thead>
 											<tbody>
 												@foreach($membershipUser as $users)
@@ -133,6 +133,7 @@
 														{{$users['membershipBuy']->total_credit}}
 													@endif
 													</td>
+                                                    <td> {{ optional($users['branch'])->name ?? '' }}</td>
 												</tr>
 												@endforeach
 											</tbody>

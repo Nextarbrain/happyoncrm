@@ -22,6 +22,7 @@ use App\Models\MembershipBuy;
 use App\Models\PaymentMethod;
 use App\Models\DeleteActivity;
 use App\Models\MembershipPlan;
+use App\Models\Branch;
 
 //import model admin
 use App\Models\MembershipHistory;
@@ -35,57 +36,77 @@ class EventController extends Controller
 {
     public function eventBookingReport(Request $request)
     {
+        $branchId = !empty($request->branch_id) && count($request->branch_id) > 0 ? $request->branch_id : (auth('admin')->user()->branch_id ? [strval(auth('admin')->user()->branch_id)]: null);
         if (isset($request->daterange) && $request->daterange != "") {
             $daterange = explode("-", $request->daterange);
             $daterange[0] = date('Y-m-d', strtotime($daterange[0]));
             $daterange[1] = date('Y-m-d', strtotime($daterange[1]));
             if ($daterange[0] == $daterange[1]) {
-                $event_bookings = EventBooking::whereDate('booking_date', $daterange[0])->where('payment_status', 'Paid')->get();
-            } else {
-                $event_bookings = EventBooking::whereBetween('booking_date', [$daterange[0], $daterange[1]])->where('payment_status', 'Paid')->get();
-            }
+                $event_bookings = EventBooking::with('branch')->whereDate('booking_date', $daterange[0])->where('payment_status', 'Paid');
+                if ($branchId) {
+                    $event_bookings->whereIn('branch_id', $branchId);
+                }
+                $event_bookings = $event_bookings->get();
 
+            } else {
+                $event_bookings = EventBooking::with('branch')->whereBetween('booking_date', [$daterange[0], $daterange[1]])->where('payment_status', 'Paid');
+                if ($branchId) {
+                    $event_bookings->whereIn('branch_id', $branchId);
+                }
+                $event_bookings = $event_bookings->get();
+            }
             return view('happyView.events-booking-report', compact('event_bookings'));
         }
     }
 
     public function eventsView(Request $req)
     {
+        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         if($req->fromDate && $req->toDate){
-            $event_bookings = EventBooking::whereBetween('booking_date', [$req->fromDate, $req->toDate])->get();
+            $event_bookings = EventBooking::with('branch')->whereBetween('booking_date', [$req->fromDate, $req->toDate]);
+            if ($branchId) {
+                $event_bookings->where('branch_id', $branchId);
+            }
+            $event_bookings = $event_bookings->get();
         }else{
-            $event_bookings = EventBooking::latest()->get();
-
+            $event_bookings = EventBooking::with('branch');
+            if($branchId) {
+                $event_bookings->where('branch_id', $branchId);
+            }
+            $event_bookings = $event_bookings->latest()->get();
         }
 
         return view('happyView.events', ['event_bookings' => $event_bookings]);
     }
     public function eventsbookingmonthView()
     {
-        $event_booking_month = EventBooking::whereMonth('booking_date', '=', Carbon\Carbon::now())->get();
+        $event_booking_month = EventBooking::with('branch')->whereMonth('booking_date', '=', Carbon\Carbon::now())->get();
         return view('happyView.events', ['event_bookings' => $event_booking_month]);
     }
     public function upcomingeventsbookingView()
     {
+        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $today = Carbon\Carbon::today();
-        $event_bookings = EventBooking::whereDate('booking_date', '>=', $today)->latest()->get();
+        $event_bookings = EventBooking::with('branch')->whereDate('booking_date', '>=', $today);
+        if($branchId) {
+            $event_bookings->where('branch_id', $branchId);
+        }
+        $event_bookings = $event_bookings->latest()->get();
         return view('happyView.events', ['event_bookings' => $event_bookings]);
     }
 
     public function addEventView(Request $request)
     {
-
-        return view('happyView.events-add');
+        $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
+        return view('happyView.events-add', compact('branches'));
     }
 
     public function editEventView(Request $request)
     {
-
+        $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
         $eventbooking = EventBooking::where('id', $request->id)->first();
         $eventitems = EventItem::where('event_booking_id', $request->id)->get();
-
-
-        return view('happyView.events-edit', compact('eventbooking', 'eventitems'));
+        return view('happyView.events-edit', compact('eventbooking', 'eventitems', 'branches'));
     }
 
     public function invoiceEvent(Request $request)
@@ -100,11 +121,15 @@ class EventController extends Controller
 
     public function editEventPost(Request $request)
     {
-        // dd(count($request->event_item_ids));
+        $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
+        if(!$branchId) {
+           return redirect()->back()->with('error', 'Please select a branch first.');
+        }
         $id = $request->id;
         $eventbooking = EventBooking::where('id', $id)->first();
         $eventbooking->booking_date = $request->booking_date;
         $eventbooking->booking_time_from = $request->booking_time_from;
+        $eventbooking->branch_id = $branchId;
         $eventbooking->booking_time_to = $request->booking_time_to;
         $eventbooking->phone = $request->phone;
         $eventbooking->bill_name = $request->billing_name;
@@ -157,6 +182,7 @@ class EventController extends Controller
 
                 if (isset($item_name[$i])) {
                     $event_item->event_booking_id = $id;
+                    $event_item->branch_id = $branchId;
                     $event_item->item_name = $item_name[$i];
                     $event_item->item_price = $item_price[$i];
                     $event_item->item_qty = $item_qty[$i];
@@ -170,11 +196,16 @@ class EventController extends Controller
 
     public function addEventPost(Request $request)
     {
-        
+        // $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
+        if(!$branchId) {
+           return redirect()->back()->with('error', 'Please select a branch first.');
+        }
         $eventbooking = new EventBooking();
         $eventbooking->booking_date = $request->booking_date;
         $eventbooking->booking_time_from = $request->booking_time_from;
         $eventbooking->booking_time_to = $request->booking_time_to;
+        $eventbooking->branch_id = $branchId;
         $eventbooking->phone = $request->phone;
         $eventbooking->bill_name = $request->billing_name;
         $eventbooking->contact_person = $request->contact;
@@ -184,7 +215,7 @@ class EventController extends Controller
         $eventbooking->payment_status = $request->payment_status;
 
         $eventbooking->couponcode = $request->couponcode;
-        
+
         $eventbooking->couponvalue = $request->couponvalue;
 
         $eventbooking->totalamount = $request->totalAmount;
@@ -219,6 +250,7 @@ class EventController extends Controller
                 if (isset($item_name[$i])) {
                     $event_item->event_booking_id = $eventbooking->id;
                     $event_item->item_name = $item_name[$i];
+                    $event_item->branch_id = $branchId;
                     $event_item->item_price = $item_price[$i];
                     $event_item->item_qty = $item_qty[$i];
                     $event_item->item_tax = $item_tax[$i];
@@ -234,8 +266,10 @@ class EventController extends Controller
         if ($request->input('item_name') == null) {
             return back()->with('error', 'Please Provide item Name');
         }
+        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $item = new EventItem();
         $item->item_name = $request->input('item_name');
+        $item->branch_id = $branchId;
         $item->item_price = $request->input('price');
         $item->item_qty = $request->input('qty');
         $item->item_tax = $request->input('tax');
@@ -248,7 +282,9 @@ class EventController extends Controller
 
     public function editEventItemPost(Request $request)
     {
+        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $item = EventItem::where('id', $request->eventItemId)->first();
+        $item->branch_id = $branchId;
         $item->item_price = $request->editprice;
         $item->item_qty = $request->editqty;
         $item->item_tax = $request->tax;

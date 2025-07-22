@@ -16,4 +16,9 @@ class Coupon extends Model
 
         return $this->start_from <= $now && $this->valid_till >= $now;
     }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class,'branch_id');
+    }
 }

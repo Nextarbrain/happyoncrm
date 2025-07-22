@@ -81,6 +81,9 @@ class CustomerDataTable extends DataTable
             ->editColumn('updated_at', function ($user) {
                 return $user->updated_at ? $user->updated_at->format('d-m-Y H:i a') : '';
             })
+            ->addColumn('branch', function ($user) {
+                return isset($user->branch->name) ? $user->branch->name : '';
+            })
             ->addColumn('action', function ($user) {
                 $actions = '';
                 if (can('tickets-edit')) {
@@ -101,7 +104,13 @@ class CustomerDataTable extends DataTable
      */
     public function query(User $model)
     {
-        return $model->with('paymentInfo', 'kid', 'userDetails')->latest();
+        $branchId = auth('admin')->user()->branch_id ?? null;
+        $model = $model->with('paymentInfo', 'kid', 'userDetails','branch');
+        if ($branchId) {
+            $model->where('branch_id', $branchId);
+        }
+        $model = $model->latest();
+        return $model;
     }
 
     /**
@@ -115,16 +124,23 @@ class CustomerDataTable extends DataTable
         ->setTableId('customer-table')
         ->columns($this->getColumns())
         ->minifiedAjax()
-        ->dom('lBfrtip')
+        ->dom(
+                "<'row mb-2 align-items-center'" .
+                    "<'col-md-auto d-flex align-items-center gap-2'B>" .
+                    "<'col-md d-flex justify-content-end align-items-center gap-2'f<'#custom-toolbar'>>" .
+                    ">" .
+                    "<'row'<'col-sm-12'tr>>" .
+                    "<'row mt-2'<'col-sm-4'i><'col-sm-4 text-center'l><'col-sm-4 text-end'p>>"
+            )
         ->orderBy(1)
         ->buttons([
-            'extend' => 'reload',
+            // 'extend' => 'reload',
             ['extend' => 'csv', 'className' => 'btn btn-sm btn-primary'],
             ['extend' => 'copy', 'className' => 'btn btn-sm btn-primary'],
             ['extend' => 'excel', 'className' => 'btn btn-sm btn-primary'],
             ['extend' => 'print', 'className' => 'btn btn-sm btn-primary'],
             ['extend' => 'pdf', 'className' => 'btn btn-sm btn-primary'],
-            'colvis'
+            ['extend' => 'colvis', 'className' => 'btn btn-sm btn-primary'],
         ])
         ->columnDefs([
             ['checkboxes' => true, 'render' => '<input  type="checkbox">', 'target' => 0, 'selectRow' => true]
@@ -135,10 +151,10 @@ class CustomerDataTable extends DataTable
         ->lengthMenu([
             [10, 25, 50, 100, 500, -1], // Show these options in the length menu, -1 will show all
             ['10', '25', '50', '100', '500', 'All'] // Label for each option
-        ])
-        ->languageSearchPlaceholder('Search...')
+        ])        
         ->language([
-            'searchPlaceholder' => "Search All Columns..."
+            'searchPlaceholder' => "Search All Columns...",
+            'search' => '',
         ]);
     }
 
@@ -162,6 +178,7 @@ class CustomerDataTable extends DataTable
             Column::make('amount_spent')->title('Amount Spent'),
             Column::make('phone')->title('Phone'),
             Column::make('updated_at')->title('Updated At'),
+            Column::make('branch')->title('Branch'),
             Column::computed('action')
                 ->exportable(false)
                 ->printable(false)

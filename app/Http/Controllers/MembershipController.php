@@ -4,26 +4,18 @@ namespace App\Http\Controllers;
 
 use Carbon;
 use Exception;
-use Dompdf\Dompdf;
 use App\Models\Kid;
 use App\Models\User;
-use App\Models\Admin;
 use App\Models\Coupon;
 use App\Models\Event;
 use App\Models\UserDetail;
+use App\Models\Branch;
 use Illuminate\Http\Request;
 use App\Models\MembershipBuy;
 use App\Models\PaymentMethod;
-use App\Models\DeleteActivity;
+use App\Models\MembershipBuyRenewable;
 use App\Models\MembershipPlan;
 use App\Models\MembershipHistory;
-
-// //import model admin
-// use Illuminate\Support\Facades\Http;
-// use SimpleSoftwareIO\QrCode\Facades\QrCode;
-
-// //import class hash password
-// use Illuminate\Support\Facades\Hash;
 
 class MembershipController extends Controller
 {
@@ -31,17 +23,25 @@ class MembershipController extends Controller
     {
 
         hasPermission('reports-membership');
+        $branchId = !empty($request->branch_id) && count($request->branch_id) > 0 ? $request->branch_id : (auth('admin')->user()->branch_id ? [strval(auth('admin')->user()->branch_id)] : null);
         if (isset($request->daterange) && $request->daterange != "") {
             $daterange = explode("-", $request->daterange);
             $daterange[0] = date('y-m-d', strtotime($daterange[0]));
             $daterange[1] = date('y-m-d', strtotime($daterange[1]));
 
             if ($daterange[0] == $daterange[1]) {
-                $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo')->whereDate('created_at', $daterange[0])->get();
+                $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo', 'branch')->whereDate('created_at', $daterange[0]);
+                if ($branchId) {
+                    $membershipUsers->whereIn('branch_id', $branchId);
+                }
+                $membershipUsers = $membershipUsers->get();
             } else {
-                $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo')->whereBetween('created_at', [$daterange[0], $daterange[1]])->get();
+                $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo', 'branch')->whereBetween('created_at', [$daterange[0], $daterange[1]]);
+                if ($branchId) {
+                    $membershipUsers->whereIn('branch_id', $branchId);
+                }
+                $membershipUsers = $membershipUsers->get();
             }
-
             return view('happyView.membership-booking-reports', compact('membershipUsers'));
         }
     }
@@ -50,8 +50,7 @@ class MembershipController extends Controller
     {
         $search = $request->post('query');
 
-
-        $user = UserDetail::where('phone_no', 'LIKE', "%{$search}%")->where('membership_plan', '1')->latest()->limit(5)->get();
+        $user = UserDetail::where('phone_no', 'LIKE', "%{$search}%")->where('membership_plan', '1')->latest()->limit(5)->get();;
 
         $result = '';
         foreach ($user as $u) {
@@ -68,6 +67,10 @@ class MembershipController extends Controller
 
         $paymentMethod = PaymentMethod::where('user_id', $id)->latest()->first();
 
+        // $paymentMethod->subTotal
+        $subTotalWithoutDiscount = $paymentMethod->subTotal + ($paymentMethod->couponvalue ?? 0);
+
+        $subTotal = ($subTotalWithoutDiscount - $paymentMethod->gst18);
         $data = [
             'guardian_name' => $user->name,
             "payment_method" => $paymentMethod->payment_method,
@@ -92,66 +95,125 @@ class MembershipController extends Controller
     public function membershipHistoryView(Request $request)
     {
         hasPermission('membership-history');
-        $membershipUser = MembershipHistory::with('user', 'kid', 'userDetails', 'membershipBuy')->where('user_id', $request->id)->latest()->get();
+        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        $membershipUser = MembershipHistory::with('user', 'kid', 'userDetails', 'membershipBuy', 'branch')->where('user_id', $request->id);
+        if ($branchId) {
+            $membershipUser->where('branch_id', $branchId);
+        }
+        $membershipUser = $membershipUser->latest()->get();
         return view('happyView.membership-history-view', compact('membershipUser'));
     }
 
     public function membershipView()
     {
         hasPermission('membership');
-        $membership = MembershipPlan::get();
-        $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo')->latest()->get();
-        return view('happyView.memberships', compact('membership', 'membershipUsers'));
+        $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
+        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        // $membership = MembershipPlan::get();
+        $membership = MembershipPlan::whereNull('branch_id')->get();
+        if (session('branch_id') > 0) {
+            $branchPlans = MembershipPlan::where('branch_id', session('branch_id'))->get();
+            if ($branchPlans->count() === 3) {
+                $membership = $branchPlans->values();
+            } else {
+                // Fill missing plan from default                
+                $requiredPlans = $membership->pluck('plan_name')->toArray();
+                foreach ($requiredPlans as $plan) {
+                    $reqPlan = MembershipPlan::where('branch_id', session('branch_id'))->where('plan_name', $plan)->get();
+                    if ($reqPlan->isEmpty()) {
+                        $reqPlan = MembershipPlan::whereNull('branch_id')->where('plan_name', $plan)->get();
+                    }
+                    $branchPlans = $branchPlans->merge($reqPlan);
+                }
+                $membership = $branchPlans->values();
+            }
+        }
+        $membershipUsers = MembershipBuy::with('user', 'kid', 'userDetails', 'paymentInfo', 'branch');
+        if ($branchId) {
+            $membershipUsers->where('branch_id', $branchId);
+        }
+        $membershipUsers = $membershipUsers->latest()->get();
+        return view('happyView.memberships', compact('membership', 'membershipUsers', 'branches'));
     }
 
     public function membershipHistory()
     {
         hasPermission('membership-history');
-        $membershipUsers = MembershipHistory::with('user', 'kid', 'userDetails', 'membershipBuy')->latest()->get();
+        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        $membershipUsers = MembershipHistory::with('user', 'kid', 'userDetails', 'membershipBuy', 'branch');
+        if ($branchId) {
+            $membershipUsers->where('branch_id', $branchId);
+        }
+        $membershipUsers = $membershipUsers->latest()->get();
 
         return view('happyView.membership-history', compact('membershipUsers'));
     }
 
 
-
-
     public function getMembershipPlan(Request $request)
     {
         hasPermission('membership');
+        $branchId = $request->get('branch_id') ? (int) $request->get('branch_id') : auth('admin')->user()->branch_id;
         $id = $request->input('id');
         $data = MembershipPlan::where('id', $id)->first();
+        if (!$data) {
+            return response()->json(["status" => false, "message" => "Please Choose Membership Plan "]);
+        }
         $price = $data->price;
+        $data->subtotal = $data->price;
         if ($request->coupon) {
-            $coupon = Coupon::where('coupon_name', $request->coupon)->first();
+            $coupon = Coupon::where('coupon_name', $request->coupon);
+            if ($branchId) {
+                $coupon->where('branch_id', $branchId);
+            }
+            $coupon = $coupon->first();
+            if ($coupon == null) {
+                return response()->json(["status" => false, "message" => "Please enter a valid coupon code"]);
+            }
         }
+
+        $gstAmount = ($data->price / 1.18);
+        $planAfterGST = $data->price - $gstAmount;
+
         if (isset($coupon) && !is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
-            $data->price = $price - $coupon->discount;
+            $finalCoupanPrice = $planAfterGST - $coupon->discount;
+            $data->price = number_format($finalCoupanPrice, 2, '.', '');
+            $data->discounted_amt = number_format($coupon->discount, 2, '.', '');
         } elseif (isset($coupon) && !is_null($coupon) && $coupon->discount_type === 'percent') {
-            $data->price = ($coupon->discount / 100) * $price;
+            $finalCoupanPrice = ($coupon->discount / 100) * $gstAmount;
+            $data->price = $data->discounted_amt = number_format($finalCoupanPrice, 2, '.', '');
         }
+        $data->coupan_name = $coupon->coupon_name ?? '';
+        $data->coupan_price = $coupon->discount ?? '';
         return response()->json($data);
     }
 
     public function addMembershipPlan(Request $request)
     {
         hasPermission('membership-add');
-        $userdetail = UserDetail::where('phone_no', $request->input('phone'))->where('membership_plan', 1)->first();
+        $userdetail = UserDetail::with('user')->where('phone_no', $request->input('phone'))->where('membership_plan', 1)->first();
         $getPlan = MembershipPlan::where('id', $request->input('membershipPlan'))->first();
+        $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
+        if (!$branchId) {
+            return redirect()->back()->with('error', 'Please select a branch first.');
+        }
 
         if (isset($userdetail)) {
-
             $member = MembershipBuy::where('user_id', $userdetail->user_id)->latest()->first();
             if (isset($member)) {
                 if ($member->credit_left > 0) {
-
+                    if ($userdetail->user) {
+                        $userdetail->user->name =  $request->input('name');
+                        $userdetail->user->save();
+                    }
                     $kidsDetails = new Kid();
                     $kidsDetails->user_id = $userdetail->user_id;
                     $kidsDetails->name = $request->input('name');
+                    $kidsDetails->branch_id = $branchId;
                     $kidsDetails->save();
 
 
                     $member->plan = $getPlan->plan_name;
-
                     $user_total_creadit = $member->credit_left + $getPlan->credits;
 
                     $member->credit_left = $user_total_creadit;
@@ -174,25 +236,45 @@ class MembershipController extends Controller
                     $member->time = now()->format('H:i');
                     $member->save();
 
+                    $paymentMethod = '';
+                    if ($request->input('payment_mode') == 1) {
+                        $paymentMethod = "UPI";
+                    } elseif ($request->input('payment_mode') == 2) {
+                        $paymentMethod = "Cash";
+                    } else {
+                        $paymentMethod = "Debit/Credit";
+                    }
+
+                    $membershipRenewabel = new MembershipBuyRenewable();
+                    $membershipRenewabel->amount = $request->input('totalamount');
+                    $membershipRenewabel->branch_id = $branchId;
+                    $membershipRenewabel->user_id = $userdetail->user_id;
+                    $membershipRenewabel->payment_method = $paymentMethod;
+                    $membershipRenewabel->created_at = now();
+                    $membershipRenewabel->save();
+
                     $amount = new PaymentMethod();
                     $amount->user_id = $userdetail->user_id;
                     $amount->subTotal = $request->input('subtotal');
+                    $amount->branch_id = $branchId;
                     $amount->gst18 = $request->input('gst18');
                     $amount->amounts = $request->input('totalamount');
                     $amount->payment_method = "Card";
 
                     $coupon = null;
                     if ($request->coupon_code) {
-                        $coupon = Coupon::where('coupon_name', $request->coupon_code)->first();
+                        $coupon = Coupon::where('coupon_name', $request->coupon_code);
+                        if ($branchId) {
+                            $coupon->where('branch_id', $branchId);
+                        }
+                        $coupon = $coupon->first();
                     }
                     if (!is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
                         $amount->couponvalue = $coupon->discount;
                         $amount->couponcode = $request->coupon_code;
-                        $amount->subTotal = $request->input('subtotal') - $coupon->discount;
                     } elseif (!is_null($coupon) && $coupon->discount_type === 'percent') {
-                        $amount->couponvalue = ($coupon->discount / 100) * $amount->subTotal;
+                        $amount->couponvalue = $request->input('couponDis');
                         $amount->couponcode = $request->coupon_code;
-                        $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
                     }
                     couponCountUpdate($request->coupon_code);
                     $amount->save();
@@ -216,6 +298,7 @@ class MembershipController extends Controller
                 } else {
                     $userSave = new User();
                     $userSave->name = $request->input('name');
+                    $userSave->branch_id = $branchId;
                     $userSave->email = $request->input('name') . rand(10, 100) . '@gmail.com';
                     $userSave->role = 2;
                     $userSave->save();
@@ -223,17 +306,21 @@ class MembershipController extends Controller
                         $userDetails = new UserDetail();
                         $userDetails->user_id = $userSave->id;
                         $userDetails->phone_no = $request->input('phone');
+                        $userDetails->branch_id = $branchId;
                         $userDetails->number_of_kids = 1;
                         $userDetails->membership_plan = 1;
                         $userDetails->save();
 
+
                         $kidsDetails = new Kid();
                         $kidsDetails->user_id = $userSave->id;
+                        $kidsDetails->branch_id = $branchId;
                         $kidsDetails->name = $request->input('name');
                         $kidsDetails->save();
 
                         $member = new MembershipBuy();
                         $member->user_id = $userSave->id;
+                        $member->branch_id = $branchId;
                         $member->plan = $getPlan->plan_name;
                         $member->credit_left = $getPlan->credits;
                         $member->total_credit = $getPlan->credits;
@@ -254,24 +341,55 @@ class MembershipController extends Controller
                         $member->time = now()->format('H:i');
                         $member->save();
 
+                        $paymentMethod = '';
+                        if ($request->input('payment_mode') == 1) {
+                            $paymentMethod = "UPI";
+                        } elseif ($request->input('payment_mode') == 2) {
+                            $paymentMethod = "Cash";
+                        } else {
+                            $paymentMethod = "Debit/Credit";
+                        }
+
+                        $membershipRenewabel = new MembershipBuyRenewable();
+                        $membershipRenewabel->amount = $request->input('totalamount');
+                        $membershipRenewabel->branch_id = $branchId;
+                        $membershipRenewabel->user_id = $userSave->id;
+                        $membershipRenewabel->payment_method = $paymentMethod;
+                        $membershipRenewabel->created_at = now();
+                        $membershipRenewabel->save();
+
                         $amount = new PaymentMethod();
                         $amount->user_id = $userSave->id;
+                        $amount->branch_id = $branchId;
                         $amount->subTotal = $request->input('subtotal');
                         $amount->gst18 = $request->input('gst18');
                         $amount->amounts = $request->input('totalamount');
                         $amount->payment_method = "Card";
                         $coupon = null;
                         if ($request->coupon_code) {
-                            $coupon = Coupon::where('coupon_name', $request->coupon_code)->first();
+                            $coupon = Coupon::where('coupon_name', $request->coupon_code);
+                            if ($branchId) {
+                                $coupon->where('branch_id', $branchId);
+                            }
+                            $coupon = $coupon->first();
                         }
+                        // if (!is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
+                        //     $amount->couponvalue = $coupon->discount;
+                        //     $amount->couponcode = $request->coupon_code;
+                        //     $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
+                        // } elseif (!is_null($coupon) && $coupon->discount_type === 'percent') {
+                        //     $totalAfterGST = $amount->subTotal - $request->input('gst18');
+                        //     $amount->couponvalue = ($coupon->discount / 100) * $totalAfterGST;
+                        //     $amount->couponcode = $request->coupon_code;
+                        //     $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
+                        // }
+
                         if (!is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
                             $amount->couponvalue = $coupon->discount;
                             $amount->couponcode = $request->coupon_code;
-                            $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
                         } elseif (!is_null($coupon) && $coupon->discount_type === 'percent') {
-                            $amount->couponvalue = ($coupon->discount / 100) * $amount->subTotal;
+                            $amount->couponvalue = $request->input('couponDis');
                             $amount->couponcode = $request->coupon_code;
-                            $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
                         }
                         couponCountUpdate($request->coupon_code);
                         $amount->save();
@@ -295,12 +413,14 @@ class MembershipController extends Controller
             } else {
                 $userSave = new User();
                 $userSave->name = $request->input('name');
+                $userSave->branch_id = $branchId;
                 $userSave->email = $request->input('name') . rand(10, 100) . '@gmail.com';
                 $userSave->role = 2;
                 $userSave->save();
                 if ($userSave->id) {
                     $userDetails = new UserDetail();
                     $userDetails->user_id = $userSave->id;
+                    $userDetails->branch_id = $branchId;
                     $userDetails->phone_no = $request->input('phone');
                     $userDetails->number_of_kids = 1;
                     $userDetails->membership_plan = 1;
@@ -308,12 +428,14 @@ class MembershipController extends Controller
 
                     $kidsDetails = new Kid();
                     $kidsDetails->user_id = $userSave->id;
+                    $kidsDetails->branch_id = $branchId;
                     $kidsDetails->name = $request->input('name');
                     $kidsDetails->save();
 
                     $member = new MembershipBuy();
                     $member->user_id = $userSave->id;
                     $member->plan = $getPlan->plan_name;
+                    $member->branch_id = $branchId;
                     $member->credit_left = $getPlan->credits;
                     $member->total_credit = $getPlan->credits;
                     $member->amount = $request->input('totalamount');
@@ -333,24 +455,44 @@ class MembershipController extends Controller
                     $member->time = now()->format('H:i');
                     $member->save();
 
+                    $paymentMethod = '';
+                    if ($request->input('payment_mode') == 1) {
+                        $paymentMethod = "UPI";
+                    } elseif ($request->input('payment_mode') == 2) {
+                        $paymentMethod = "Cash";
+                    } else {
+                        $paymentMethod = "Debit/Credit";
+                    }
+
+                    $membershipRenewabel = new MembershipBuyRenewable();
+                    $membershipRenewabel->amount = $request->input('totalamount');
+                    $membershipRenewabel->branch_id = $branchId;
+                    $membershipRenewabel->user_id = $userSave->id;
+                    $membershipRenewabel->payment_method = $paymentMethod;
+                    $membershipRenewabel->created_at = now();
+                    $membershipRenewabel->save();
+
                     $amount = new PaymentMethod();
                     $amount->user_id = $userSave->id;
+                    $amount->branch_id = $branchId;
                     $amount->subTotal = $request->input('subtotal');
                     $amount->gst18 = $request->input('gst18');
                     $amount->amounts = $request->input('totalamount');
                     $amount->payment_method = "Card";
                     $coupon = null;
                     if ($request->coupon_code) {
-                        $coupon = Coupon::where('coupon_name', $request->coupon_code)->first();
+                        $coupon = Coupon::where('coupon_name', $request->coupon_code);
+                        if ($branchId) {
+                            $coupon->where('branch_id', $branchId);
+                        }
+                        $coupon = $coupon->first();
                     }
                     if (!is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
                         $amount->couponvalue = $coupon->discount;
-                        $amount->couponcode = $request->coupon_code;
-                        $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
+                        $amount->couponcode = $request->coupon_code;                        
                     } elseif (!is_null($coupon) && $coupon->discount_type === 'percent') {
-                        $amount->couponvalue = ($coupon->discount / 100) * $amount->subTotal;
-                        $amount->couponcode = $request->coupon_code;
-                        $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
+                        $amount->couponvalue = $request->input('couponDis');
+                        $amount->couponcode = $request->coupon_code;                        
                     }
                     couponCountUpdate($request->coupon_code);
                     $amount->save();
@@ -372,93 +514,121 @@ class MembershipController extends Controller
                 }
             }
         } else {
-                $userSave = new User();
-                $userSave->name = $request->input('name');
-                $userSave->email = $request->input('name') . rand(10, 100) . '@gmail.com';
-                $userSave->role = 2;
-                $userSave->save();
-                if ($userSave->id) {
-                    $userDetails = new UserDetail();
-                    $userDetails->user_id = $userSave->id;
-                    $userDetails->phone_no = $request->input('phone');
-                    $userDetails->number_of_kids = 1;
-                    $userDetails->membership_plan = 1;
-                    $userDetails->save();
+            $userSave = new User();
+            $userSave->name = $request->input('name');
+            $userSave->branch_id = $branchId;
+            $userSave->email = $request->input('name') . rand(10, 100) . '@gmail.com';
+            $userSave->role = 2;
+            $userSave->save();
+            if ($userSave->id) {
+                $userDetails = new UserDetail();
+                $userDetails->user_id = $userSave->id;
+                $userDetails->branch_id = $branchId;
+                $userDetails->phone_no = $request->input('phone');
+                $userDetails->number_of_kids = 1;
+                $userDetails->membership_plan = 1;
+                $userDetails->save();
 
-                    $kidsDetails = new Kid();
-                    $kidsDetails->user_id = $userSave->id;
-                    $kidsDetails->name = $request->input('name');
-                    $kidsDetails->save();
+                $kidsDetails = new Kid();
+                $kidsDetails->user_id = $userSave->id;
+                $kidsDetails->branch_id = $branchId;
+                $kidsDetails->name = $request->input('name');
+                $kidsDetails->save();
 
-                    $member = new MembershipBuy();
-                    $member->user_id = $userSave->id;
-                    $member->plan = $getPlan->plan_name;
-                    $member->credit_left = $getPlan->credits;
-                    $member->total_credit = $getPlan->credits;
-                    $member->amount = $request->input('totalamount');
-                    if ($request->input('payment_mode') == 1) {
-                        $member->payment_method = "UPI";
-                    } elseif ($request->input('payment_mode') == 2) {
-                        $member->payment_method = "Cash";
-                    } else {
-                        $member->payment_method = "Debit/Credit";
-                    }
-                    $member->date = $request->input('date');
-                    $date = Carbon\Carbon::parse($request->input('date'));
-                    $dateAfter1Year = $date->addYear();
-                    $member->renewal_date = $dateAfter1Year->format('Y-m-d');
-
-                    // $member->time = $request->input('time');
-                    $member->time = now()->format('H:i');
-                    $member->save();
-
-                    $amount = new PaymentMethod();
-                    $amount->user_id = $userSave->id;
-                    $amount->subTotal = $request->input('subtotal');
-                    $amount->gst18 = $request->input('gst18');
-                    $amount->amounts = $request->input('totalamount');
-                    $amount->payment_method = "Card";
-                    $coupon = null;
-                    if ($request->coupon_code) {
-                        $coupon = Coupon::where('coupon_name', $request->coupon_code)->first();
-                    }
-                    if (!is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
-                        $amount->couponvalue = $coupon->discount;
-                        $amount->couponcode = $request->coupon_code;
-                        $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
-                    } elseif (!is_null($coupon) && $coupon->discount_type === 'percent') {
-                        $amount->couponvalue = ($coupon->discount / 100) * $amount->subTotal;
-                        $amount->couponcode = $request->coupon_code;
-                        $amount->subTotal = $request->input('subtotal') -  $amount->couponvalue;
-                    }
-                    couponCountUpdate($request->coupon_code);
-                    $amount->save();
-
-
-                    $mobile = "91" . $request->input('phone');
-                    $package = $getPlan->plan_name;
-                    $entries = $getPlan->credits;
-                    $date = $request->input('date');
-                    $renewal_date = $dateAfter1Year->format('Y-m-d');
-
-                    $msg = "Congratulation! You are now the Privilege Member of HappyOn Family. Membership details : Package: $package, Date: $date, Entries: $entries, Valid Upto: $renewal_date";
-                    $template_id = "1707167990929869469";
-                    sendsms($mobile, $msg, $template_id);
-                    session()->flash('success', 'Membership Plan has been saved successfully!');
-
-                    // Redirect back to the previous page
-                    return redirect()->back();
+                $member = new MembershipBuy();
+                $member->user_id = $userSave->id;
+                $member->branch_id = $branchId;
+                $member->plan = $getPlan->plan_name;
+                $member->credit_left = $getPlan->credits;
+                $member->total_credit = $getPlan->credits;
+                $member->amount = $request->input('totalamount');
+                if ($request->input('payment_mode') == 1) {
+                    $member->payment_method = "UPI";
+                } elseif ($request->input('payment_mode') == 2) {
+                    $member->payment_method = "Cash";
+                } else {
+                    $member->payment_method = "Debit/Credit";
                 }
+                $member->date = $request->input('date');
+                $date = Carbon\Carbon::parse($request->input('date'));
+                $dateAfter1Year = $date->addYear();
+                $member->renewal_date = $dateAfter1Year->format('Y-m-d');
+
+                // $member->time = $request->input('time');
+                $member->time = now()->format('H:i');
+                $member->save();
+
+                $paymentMethod = '';
+                if ($request->input('payment_mode') == 1) {
+                    $paymentMethod = "UPI";
+                } elseif ($request->input('payment_mode') == 2) {
+                    $paymentMethod = "Cash";
+                } else {
+                    $paymentMethod = "Debit/Credit";
+                }
+
+                $membershipRenewabel = new MembershipBuyRenewable();
+                $membershipRenewabel->amount = $request->input('totalamount');
+                $membershipRenewabel->branch_id = $branchId;
+                $membershipRenewabel->user_id = $userSave->id;
+                $membershipRenewabel->payment_method = $paymentMethod;
+                $membershipRenewabel->created_at = now();
+                $membershipRenewabel->save();
+
+                $amount = new PaymentMethod();
+                $amount->user_id = $userSave->id;
+                $amount->branch_id = $branchId;
+                $amount->subTotal = $request->input('subtotal');
+                $amount->gst18 = $request->input('gst18');
+                $amount->amounts = $request->input('totalamount');
+                $amount->payment_method = "Card";
+                $coupon = null;
+                if ($request->coupon_code) {
+                    $coupon = Coupon::where('coupon_name', $request->coupon_code);
+                    if ($branchId) {
+                        $coupon->where('branch_id', $branchId);
+                    }
+                    $coupon = $coupon->first();
+                }
+                if (!is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
+                        $amount->couponvalue = $coupon->discount;
+                        $amount->couponcode = $request->coupon_code;                        
+                    } elseif (!is_null($coupon) && $coupon->discount_type === 'percent') {
+                        $amount->couponvalue = $request->input('couponDis');
+                        $amount->couponcode = $request->coupon_code;                        
+                    }
+                couponCountUpdate($request->coupon_code);
+                $amount->save();
+
+
+                $mobile = "91" . $request->input('phone');
+                $package = $getPlan->plan_name;
+                $entries = $getPlan->credits;
+                $date = $request->input('date');
+                $renewal_date = $dateAfter1Year->format('Y-m-d');
+
+                $msg = "Congratulation! You are now the Privilege Member of HappyOn Family. Membership details : Package: $package, Date: $date, Entries: $entries, Valid Upto: $renewal_date";
+                $template_id = "1707167990929869469";
+                sendsms($mobile, $msg, $template_id);
+                session()->flash('success', 'Membership Plan has been saved successfully!');
+
+                // Redirect back to the previous page
+                return redirect()->back();
+            }
         }
     }
 
     public function getPlan(Request $request)
     {
         $mobile = $request->input('mobile');
-
+        $branchId = auth('admin')->user()->branch_id ?? null;
         $findId = UserDetail::select('user_id')->where(['phone_no' => $mobile, 'membership_plan' => 1])->latest()->first();
 
-        $user = MembershipBuy::with('user', 'kid', 'userDetails')->where('user_id', $findId->user_id)->first();
+        $user = MembershipBuy::with('user', 'kid', 'userDetails')->where('user_id', $findId->user_id);
+        // if ($branchId) {
+        //     $user->where('branch_id', $branchId);
+        // }
+        $user = $user->first();
 
         return response()->json($user);
     }
@@ -485,6 +655,11 @@ class MembershipController extends Controller
     public function updateMembership(Request $request)
     {
         hasPermission('membership-edit');
+        // $branchId = auth('admin')->user()->branch_id ?? null;
+        $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
+        if (!$branchId) {
+            return redirect()->back()->with('error', 'Please select a branch first.');
+        }
         if ($request->input('response_otp') > 0) {
             $user = User::where('id', $request->input('user_id'))->where('otp', $request->input('response_otp'))->first();
 
@@ -498,6 +673,7 @@ class MembershipController extends Controller
 
                 $event = new Event();
                 $event->user_id = $request->input('user_id');
+                $event->branch_id = $branchId;
                 $event->booking_date = now()->format('y-m-d');
                 $event->Hours =  now()->format('H:i');
                 $event->save();
@@ -507,10 +683,12 @@ class MembershipController extends Controller
                 $end_time = Carbon\Carbon::parse(now()->format('H:i'))->addHour($request->input('hrs'));
                 $time_str = $end_time->toTimeString();
                 $kidsDetails->end_time = $time_str;
+                $kidsDetails->branch_id = $branchId;
                 $kidsDetails->save();
 
                 $membershiphistory = new MembershipHistory;
                 $membershiphistory->user_id = $request->input('user_id');
+                $membershiphistory->branch_id = $branchId;
                 $membershiphistory->membership_buyer_id = $update->id;
                 $membershiphistory->use_credit = $request->input('hrs');
                 $membershiphistory->current_left = $update->credit_left;
@@ -540,7 +718,7 @@ class MembershipController extends Controller
                 return redirect('/tickets')->with('error', 'OTP Wrong!');
             }
         } else {
-            return redirect('/tickets')->with('error', 'Please endter OTP!');
+            return redirect('/tickets')->with('error', 'Please enter OTP!');
         }
     }
 
@@ -550,24 +728,40 @@ class MembershipController extends Controller
         if ($request->input('plan') == null) {
             return back()->with('error', 'Please Provide Plan');
         }
+        $branchId = auth('admin')->user()->branch_id ?? null;
         $membership = new MembershipPlan();
         $membership->plan_name = $request->input('plan');
         $membership->price = $request->input('price');
         $membership->credits = $request->input('credit');
         // if ($membership->id) {
-            $membership->save();
+        $membership->save();
 
-            return back()->with('success', 'Success! MembershipPlan created');
+        return back()->with('success', 'Success! MembershipPlan created');
         // }
     }
 
     public function editMemberPost(Request $request)
     {
-        $member = MembershipPlan::where('id', $request->memberId)->first();
-        $member->price = $request->editPlanPrice;
-        $member->credits = $request->editPlanEntry;
-        $member->save();
-
+        hasPermission('admin-membership-edit');
+        $branch_id = session('branch_id');
+        if ($branch_id > 0) {
+            $memPlan = MembershipPlan::where([
+                ['id', '=', $request->memberId],
+                ['branch_id', '=', $branch_id],
+            ])->first();
+            if (!$memPlan) {
+                $adminPlan = MembershipPlan::where('id', $request->memberId)->first();
+                $memPlan = new MembershipPlan();
+                $memPlan->branch_id = $branch_id;
+                $memPlan->plan_name = $adminPlan->plan_name;
+                $memPlan->credits = $adminPlan->credits;
+            }
+        } else {
+            $memPlan = MembershipPlan::where('id', $request->memberId)->first();
+            $memPlan->credits = $request->editPlanEntry;
+        }
+        $memPlan->price = $request->editPlanPrice;
+        $memPlan->save();
         session()->flash('success', 'Membership Plan Updated Successfully!');
         return redirect()->back();
     }
@@ -625,5 +819,44 @@ class MembershipController extends Controller
         } catch (Exception $e) {
             return response()->json(['success' => $e->getMessage()], 500);
         }
+    }
+
+    public function membershipBookingUser(Request $request)
+    {
+        hasPermission('report-membership-user');
+        $branchId = !empty($request->branch_id) && count($request->branch_id) > 0 ? $request->branch_id : (auth('admin')->user()->branch_id ? [strval(auth('admin')->user()->branch_id)] : null);
+        $membershipUsers = MembershipHistory::with('user', 'kid', 'userDetails', 'membershipBuy', 'branch');
+        if ($request->membership_user) {
+            $membershipUsers->where('user_id', $request->membership_user);
+        }
+        if ($branchId) {
+            $membershipUsers->whereIn('branch_id', $branchId);
+        }
+        $membershipUsers = $membershipUsers->latest()->get();
+        return view('happyView.membership-booking-user', compact('membershipUsers'));
+    }
+    public function getBranchPlan(Request $request)
+    {
+        $branchId = $request->get('branch_id');
+        $membership = MembershipPlan::whereNull('branch_id')->get();
+
+        if ($branchId) {
+            $branchPlans = MembershipPlan::where('branch_id', $branchId)->get();
+            if ($branchPlans->count() === 3) {
+                $membership = $branchPlans->values();
+            } else {
+                // Fill missing plan from default
+                $requiredPlans = ['Happy Star', 'Bright Star', 'Shooting Star'];
+                foreach ($requiredPlans as $plan) {
+                    $reqPlan = MembershipPlan::where('branch_id', $branchId)->where('plan_name', $plan)->get();
+                    if ($reqPlan->isEmpty()) {
+                        $reqPlan = MembershipPlan::whereNull('branch_id')->where('plan_name', $plan)->get();
+                    }
+                    $branchPlans = $branchPlans->merge($reqPlan);
+                }
+                $membership = $branchPlans->values();
+            }
+        }
+        return response()->json($membership);
     }
 }

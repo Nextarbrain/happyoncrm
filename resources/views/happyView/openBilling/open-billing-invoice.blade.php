@@ -172,7 +172,7 @@ body {
 <td style="
     width: 20%;
     font-size: 15px;text-align:right;
-">{{ $subtotal+$tax }}</td>
+">{{ $subtotal }}</td>
 
 						
 				

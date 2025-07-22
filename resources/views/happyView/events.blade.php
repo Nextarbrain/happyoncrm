@@ -1,5 +1,4 @@
 @include('happyView.includes.head')
-
 <body>
     <!--wrapper-->
     <div class="wrapper">
@@ -11,7 +10,6 @@
                     <div class="mobile-toggle-menu">
                         <i class="fa fa-bars" aria-hidden="true"></i>
                     </div>
-
                     <div class="top-menu ms-auto">
                         <ul class="navbar-nav align-items-center">
                             <li class="nav-item dropdown dropdown-large">
@@ -28,12 +26,9 @@
                             </li>
                         </ul>
                     </div>
-
                 </nav>
             </div>
         </header>
-
-
         <!--end header -->
         <!--start page wrapper -->
         <div class="page-wrapper">
@@ -41,51 +36,58 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="dashboard_left">
-                            <div class="user_list">
-                                <div class="row align-items-center text-center">
-                                    <div class="col-md-4">
-                                        <p>Event List ({{ count($event_bookings) }})</p>
-
+                            <div class="container-fluid">                                
+                                <div class="row mb-2">
+                                    <div class="col">
+                                        <h5 class="mb-0">Event List ({{ count($event_bookings) }})</h5>
                                     </div>
+                                </div>                                
+                                <div class="row mb-3">
+                                    <div class="col">
+                                        <form action="{{ url()->current() }}" method="get">
+                                            @csrf
+                                            <div class="d-flex flex-wrap align-items-center">
+                                                <label class="font-weight-bold">Select Date:</label>
+                                                <div class="mr-2 mb-2 mx-2">
+                                                    <input type="date" name="fromDate"
+                                                        value="{{ request()->get('fromDate') }}" class="form-control-sm border border-primary"
+                                                        placeholder="From Date">
+                                                </div>
 
-                                    <div class="col-md-4 d-flex my-3 align-items-center justify-content-center">
+                                                <div class="mr-2 mb-2">
+                                                    <input type="date" name="toDate"
+                                                        value="{{ request()->get('toDate') }}" class="form-control-sm border border-primary"
+                                                        placeholder="To Date">
+                                                </div>
 
-                                        <div class="add_btn">
-                                            <a href="{{ url('/add-event') }}">ADD NEW +</a>
-                                        </div>
-
-                                        <div class="count mx-3" id="user_delete">
-                                            <i class="fa fa-trash-o m-0" aria-hidden="true"></i>
-                                        </div>
+                                                <div class="mb-2 mx-2">
+                                                    <button type="submit" class="btn btn-sm btn-primary">Apply</button>
+                                                </div>
+                                            </div>
+                                        </form>
                                     </div>
-
                                 </div>
-
-                                <form action="{{ url()->current() }}" method="get">
-                                    @csrf
-                                    <label>Analysis date wise:</label>
-                                    <div class="row">
-                                        <div class="col-md-2 my-2">
-                                            <input type="date" name="fromDate"
-                                                value="{{ request()->get('fromDate') }}"
-                                                class="form-control float-right" id="reservation">
+                                <div class="row mb-3 align-items-center">                                    
+                                    <div class="col-md-6">
+                                        <div id="datatable-buttons"></div>
+                                    </div>
+                                    <div class="col-md-6 text-md-right d-flex justify-content-md-end justify-content-start align-items-center flex-wrap">
+                                        <div id="user_delete" class="mr-3 mb-2">
+                                            <i class="fa fa-trash-o fa-lg text-danger" aria-hidden="true"></i>
                                         </div>
-                                        <div class="col-md-2 my-2">
-                                            <input type="date" name="toDate" value="{{ request()->get('toDate') }}"
-                                                class="form-control float-right" id="reservation">
+                                        <div class="mr-2 mb-2 mx-3">
+                                            <input type="search" id="datatable-search" class="form-control form-control-sm" placeholder="Search...">
                                         </div>
-                                        <div class="col-md-4">
-                                            <input type="submit" value="Apply" name="submit"
-                                                class="btn btn-primary m-1">
+                                        <div class="mb-2">
+                                            <a href="{{ url('/add-event') }}" class="btn btn-sm btn-primary">Add New +</a>
                                         </div>
                                     </div>
-                                </form>
+                                </div>
                             </div>
                             <!-- data table  -->
                             <div class="container">
                                 <div class="row table-responsive">
                                     <div class="data_table">
-
                                         <table id="example1" class="table table-striped text-center"
                                             style="width:100%">
                                             <thead>
@@ -102,6 +104,7 @@
                                                     <th>Pay Method</th>
                                                     <th>Due Amount</th>
                                                     <th>Pay Status</th>
+                                                    <th>Branch</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -135,12 +138,14 @@
 
 
                                                         <!--	<td class="gree_c">
-              <span>{{ count(\App\Models\EventItem::where('event_booking_id', $item['id'])->get()) }}</span>
-             </td> -->
+                                                                <span>{{ count(\App\Models\EventItem::where('event_booking_id', $item['id'])->get()) }}</span>
+                                                                </td> -->
 
                                                         <td>{{ $item['payment_method'] }}</td>
                                                         <td>{{ round($item['due_amount']) }}</td>
                                                         <td>{{ $item['payment_status'] }}</td>
+                                                        <td class="text-capitalize">
+                                                            {{ optional($item['branch'])->name ?? '' }} </td>
                                                         <td><a href="{{ url('/edit-event', $item['id']) }}""><i
                                                                     class="fa fa-pencil" aria-hidden="true"></i></a>
                                                             <i class="fa fa-eye" aria-hidden="true"></i>
@@ -183,9 +188,9 @@
     <script src="{{ asset('assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js') }}"></script>
     <script src="{{ asset('assets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js') }}"></script>
     <script src="{{ asset('assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js') }}"></script>
-    <script src="{{ asset('assets/plugins/chartjs/js/Chart.min.js') }}"></script>
+    {{-- <script src="{{ asset('assets/plugins/chartjs/js/Chart.min.js') }}"></script>
     <script src="{{ asset('assets/plugins/chartjs/js/Chart.extension.js') }}"></script>
-    <script src="{{ asset('assets/js/index.js') }}"></script>
+    <script src="{{ asset('assets/js/index.js') }}"></script> --}}
     <!--app JS-->
     <script src="{{ asset('assets/js/circle-progress.min.js') }}"></script>
     <script src="{{ asset('assets/js/app.js') }}"></script>
@@ -214,14 +219,24 @@
     </script>
 
     <script>
-        $(function() {
-            $("#example1").DataTable({
-                "responsive": true,
-                "lengthChange": true,
-                "autoWidth": true,
-                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        $(function() {            
+            var table = $('#example1').DataTable({
+                dom: '<"row mb-3 align-items-center">rt' +
+                    '<"row mt-3 align-items-center"' +
+                    '<"col-md-4 d-flex align-items-center"i>' +
+                    '<"col-md-4 d-flex justify-content-center"l>' +
+                    '<"col-md-4 d-flex justify-content-end"p>>',
+                buttons: ['copy', 'csv', 'print', 'colvis'],
+                responsive: true,
+                info: true
+            });
+            table.buttons().container().appendTo('#datatable-buttons');            
 
+            // Bind custom search input
+            $('#datatable-search').on('keyup', function() {
+                table.search(this.value).draw();
+            });
+            $('.dt-buttons button').addClass('btn-sm');
         });
     </script>
 
@@ -244,7 +259,7 @@
             });
             console.log(selectedItems);
             var baseUrl = "{{ URL::to('/') }}";
-            if (selectedItems.length > 0 && confirm('Are you Sure to Delete Data?')) {
+            if (selectedItems.length > 0 && confirm('Are you sure you want to delete this data?')) {
                 $.ajax({
                     type: 'Delete',
                     url: baseUrl + '/delete-event',
