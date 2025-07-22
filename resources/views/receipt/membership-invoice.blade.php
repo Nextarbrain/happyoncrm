@@ -61,7 +61,7 @@
                                                     <td style="font-size: 15px;width: 20%;text-align: right;">Amount</td>
                                                 </tr>
                                                 <tr style="border-top: 1px solid #000;">
-                                                    <td style="font-size: 15px;">{{ $package_name }} - {{ $user->membership->total_credit ?? null }} Entry</td>
+                                                    <td style="font-size: 15px;">{{ $package_name }} - {{ $total_credit ?? null }} Entry</td>
                                                     <td style="font-size: 15px;text-align: right;">{{ $user->membership->amount ?? null }}</td>
                                                 </tr>
                                             </tbody>
@@ -84,12 +84,12 @@
                                                                 @endif
                                                                 @if (isset($gst18) && $gst18 != null && $gst18 != '0.00')
                                                                     <tr style="border-top: 1px solid #000;">
-                                                                        <td style="font-size: 15px;">Includes Gst @ 18% :</td>
+                                                                        <td style="font-size: 15px;">Includes GST @ 18% :</td>
                                                                         <td style="font-size: 15px;text-align: right;">{{ $gst18 }}</td>
                                                                     </tr>
                                                                 @endif
                                                                 <tr style="border-top: 1px solid #000;">
-                                                                    <td style="font-size: 15px;font-weight: 400;">Grant Total :</td>
+                                                                    <td style="font-size: 15px;font-weight: 400;">Grand Total :</td>
                                                                     <td style="font-size: 15px;text-align: right;">{{ $totalAmount }}</td>
                                                                 </tr>
                                                             </tbody>
