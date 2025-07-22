@@ -336,7 +336,8 @@
                     const taxRatesList = {
                         '18': 1.18,
                         '12': 1.12,
-                        '5': 1.05
+                        '5': 1.05,
+                        '0': 1
                     };
                     if (taxRatesList.hasOwnProperty(taxRate)) {
                         basicAmt = rowtotal / taxRatesList[taxRate];
