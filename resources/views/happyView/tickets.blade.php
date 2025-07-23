@@ -729,8 +729,8 @@
                             subTotalLessGST -= gst;
                         });                        
 
-                        $('#subtotal').text("₹ " + subTotalLessGST.toFixed(2));
-                        $('#subtotlSave').val(subTotalLessGST.toFixed(2));
+                        // $('#subtotal').text("₹ " + subTotalLessGST.toFixed(2));
+                        // $('#subtotlSave').val(subTotalLessGST.toFixed(2));
 
                         let gst18Ded = parseFloat($('#gst18').val()) || 0;
                         let gst18OnVal = parseFloat($('#gst18On').val()) || 0;
@@ -748,6 +748,9 @@
                         $('#couponCodeShow').html("Coupon Code (" + data.coupon_name + ")");
                         $('#couponValueShow').html(discountAmt.toFixed(2));
                         sum = subTotalLessGST - discountAmt.toFixed(2);
+
+                        $('#subtotal').text("₹ " + sum.toFixed(2));
+                        $('#subtotlSave').val(sum.toFixed(2));
 
                         //update GST                        
                         let newGst = (sum * 18) / 100;
