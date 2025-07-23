@@ -702,8 +702,7 @@
 
                     $('#subtotal').text("₹ " + sum.toFixed(2));
                     $('#subtotlSave').val(sum.toFixed(2));
-                    document.getElementById('gstOn').innerHTML = "Includes Gst @18% on " + sum.toFixed(
-                        2);
+                    document.getElementById('gstOn').innerHTML = "Includes Gst @18% ";
                     var gstKid = (sum * 18) / 100;
                     document.getElementById('gstValue').innerHTML = '' + gstKid.toFixed(2);
                     var finalAmount = sum + gstKid;
@@ -824,9 +823,7 @@
                         $('#subtotal').text("₹ " + sumamount.toFixed(
                             2));
                         $('#subtotlSave').val(sumamount.toFixed(2));
-                        document.getElementById('gstOn').innerHTML =
-                            "Includes Gst @18% on " + sumamount.toFixed(
-                                2);
+                        document.getElementById('gstOn').innerHTML = "Includes Gst @18% ";
                         var gstKid = (sumamount * 18) / 100;
                         document.getElementById('gstValue').innerHTML =
                             '' + gstKid.toFixed(2);
@@ -877,8 +874,7 @@
 
 
                         $('#subtotlSave').val(sum.toFixed(2));
-                        document.getElementById('gstOn').innerHTML =
-                            "Includes Gst @18% on " + sum.toFixed(2);
+                        document.getElementById('gstOn').innerHTML = "Includes Gst @18% ";
                         var gstKid = (sum * 18) / 100;
                         document.getElementById('gstValue').innerHTML =
                             '' + gstKid.toFixed(2);
@@ -1143,7 +1139,7 @@
             document.getElementById('totalAmount').innerHTML = '₹ ' + totalExtra.toFixed(2);
             $("#chargeAmount").val(totalExtra);
             $('#gst18').val(gstKid);
-            document.getElementById('gstOn').innerHTML = "Includes Gst @18% on " + gstKid.toFixed(2);
+            document.getElementById('gstOn').innerHTML = "Includes Gst @18% ";
         }
     </script>
 
