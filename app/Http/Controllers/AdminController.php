@@ -999,7 +999,13 @@ class AdminController extends Controller
 
                 $data = [];
                 if ($key == "Cash") {
-                    $cash = PaymentMethod::where('payment_method', 'Cash')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
+                    // $cash = PaymentMethod::where('payment_method', 'Cash')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
+                    $cash = PaymentMethod::where('payment_method', 'Cash')
+                        ->whereHas('user.userDetails', function ($q) {
+                            $q->where('membership_plan', 0);
+                        })
+                        ->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
+
                     if ($branchId) {
                         $cash->where('branch_id', $branchId);
                     }
@@ -1057,7 +1063,13 @@ class AdminController extends Controller
                     $data['cash_open'] = $cash_open;
                     $data['cash_event_partial'] = $partial_cash;
                 } else if ($key == "UPI") {
-                    $upi = PaymentMethod::where('payment_method', 'UPI')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
+                    // $upi = PaymentMethod::where('payment_method', 'UPI')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
+                    $upi = PaymentMethod::where('payment_method', 'UPI')
+                        ->whereHas('user.userDetails', function ($q) {
+                            $q->where('membership_plan', 0);
+                        })
+                        ->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
+
                     if ($branchId) {
                         $upi->where('branch_id', $branchId);
                     }
@@ -1114,7 +1126,13 @@ class AdminController extends Controller
                     $data['upi_open'] = $upi_open;
                     $data['upi_event_partial'] = $partial_upi;
                 } else {
-                    $card = PaymentMethod::where('payment_method', 'Debit/Credit')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
+                    // $card = PaymentMethod::where('payment_method', 'Debit/Credit')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
+                    $card = PaymentMethod::where('payment_method', 'Debit/Credit')
+                        ->whereHas('user.userDetails', function ($q) {
+                            $q->where('membership_plan', 0);
+                        })
+                        ->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
+
                     if ($branchId) {
                         $card->where('branch_id', $branchId);
                     }
@@ -1174,11 +1192,15 @@ class AdminController extends Controller
                 $applydate = $request->daterange;
             }
         } else {
-
             $today = Carbon\Carbon::today();
             $data = [];
             if ($key == "Cash") {
-                $cash = PaymentMethod::where('payment_method', 'Cash')->whereDate('created_at', $today);
+                // $cash = PaymentMethod::where('payment_method', 'Cash')->whereDate('created_at', $today);
+                $cash = PaymentMethod::where('payment_method', 'Cash')
+                    ->whereHas('user.userDetails', function ($q) {
+                        $q->where('membership_plan', 0);
+                    })->whereDate('created_at', $today);
+
                 if ($branchId) {
                     $cash->where('branch_id', $branchId);
                 }
@@ -1235,7 +1257,12 @@ class AdminController extends Controller
                 $data['cash_open'] = $cash_open;
                 $data['cash_event_partial'] = $partial_cash;
             } else if ($key == "UPI") {
-                $upi = PaymentMethod::where('payment_method', 'UPI')->whereDate('created_at', $today);
+                // $upi = PaymentMethod::where('payment_method', 'UPI')->whereDate('created_at', $today);
+                $upi = PaymentMethod::where('payment_method', 'UPI')
+                    ->whereHas('user.userDetails', function ($q) {
+                        $q->where('membership_plan', 0);
+                    })->whereDate('created_at', $today);
+
                 if ($branchId) {
                     $upi->where('branch_id', $branchId);
                 }
@@ -1293,7 +1320,12 @@ class AdminController extends Controller
                 $data['upi_open'] = $upi_open;
                 $data['upi_event_partial'] = $partial_upi;
             } else {
-                $card = PaymentMethod::where('payment_method', 'Debit/Credit')->whereDate('created_at', $today);
+                // $card = PaymentMethod::where('payment_method', 'Debit/Credit')->whereDate('created_at', $today);
+                $card = PaymentMethod::where('payment_method', 'Debit/Credit')
+                    ->whereHas('user.userDetails', function ($q) {
+                        $q->where('membership_plan', 0);
+                    })->whereDate('created_at', $today);
+
                 if ($branchId) {
                     $card->where('branch_id', $branchId);
                 }
@@ -1354,7 +1386,6 @@ class AdminController extends Controller
 
             $applydate = "Today";
         }
-
         return view('happyView.payment_method_filter', compact('data', 'applydate'));
     }
 
