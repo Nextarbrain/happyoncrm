@@ -27,11 +27,11 @@ class AdminPermission extends Controller
     private function createUser($req)
     {
         $branchId = $req->branch_id ? $req->branch_id : auth('admin')->user()->branch_id;
-        if(!$branchId) {
+        if (!$branchId) {
             return redirect()->back()->with('error', 'Please select a branch first.');
         }
         $roles = Role::query();
-        if($branchId) {
+        if ($branchId) {
             $roles->where('branch_id', $branchId);
         }
         $roles = $roles->pluck('name', 'name')->all();
@@ -61,13 +61,13 @@ class AdminPermission extends Controller
         $users = $users->get();
 
         $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
-        if($branchId === null) {
+        if ($branchId === null) {
             $branchId = $branches[0]['id'] ?? null;
         }
 
         $role = [];
         $role = Role::query();
-       if ($branchId) {
+        if ($branchId) {
             $role->where('branch_id', $branchId);
         }
         $role = $role->get()->toArray();
@@ -85,7 +85,7 @@ class AdminPermission extends Controller
                 }
             }
         }
-        return view('happyView.permission.manageAdmin', compact('roles', 'users','branches', 'branchId'));
+        return view('happyView.permission.manageAdmin', compact('roles', 'users', 'branches', 'branchId'));
     }
 
     public function role(Request $req)
@@ -98,7 +98,7 @@ class AdminPermission extends Controller
             $permissions = [];
             $permission = Permission::get();
             $roles = Role::query();
-            if($branchId) {
+            if ($branchId) {
                 $roles->where('branch_id', $branchId);
             }
             $roles = $roles->get();
@@ -112,7 +112,7 @@ class AdminPermission extends Controller
     public function getBranchRole(Request $request)
     {
         $branchId = $request->input('branch_id');
-        if($branchId) {
+        if ($branchId) {
             $role = Role::where('branch_id', $branchId)->get();
         } else {
             $role = Role::all();
@@ -132,7 +132,7 @@ class AdminPermission extends Controller
             }
             return view('happyView.permission.editRole', compact('user', 'permissions', 'branches'));
         } elseif ($req->isMethod('PUT')) {
-            $user->update(['guard_name' => 'admin', 'name' => $req->name, 'branch_id' => $req->branch_id ]);
+            $user->update(['guard_name' => 'admin', 'name' => $req->name, 'branch_id' => $req->branch_id]);
             $user->syncPermissions($req->permission);
             return redirect()->back()->with(bindMsg("Permission Updated Successfully! ", 'success'));
         }
@@ -141,21 +141,30 @@ class AdminPermission extends Controller
     public function store(object $req)
     {
         $req->merge([
-         'name' => $req->name . ' ' . ($req->name ? $req->branch_id : ''),
+            'name' => $req->name . ' ' . ($req->name ? $req->branch_id : ''),
         ]);
         $req->validate([
             'name' => 'required|unique:roles,name',
             'permission' => 'required',
         ]);
-        $role = Role::create(['guard_name' => 'admin', 'name' => $req->name, 'branch_id' => $req->branch_id ]);
+        $role = Role::create(['guard_name' => 'admin', 'name' => $req->name, 'branch_id' => $req->branch_id]);
         $role->syncPermissions($req->permission);
         return redirect()->back()->with(bindMsg("Role Has Been Created!", 'success'));
     }
     public function editAdmin(Request $req, $id)
     {
-        $branchId = $req->branch_id ? $req->branch_id : auth('admin')->user()->branch_id;
-        if(!$branchId) {
-            return redirect()->back()->with('error', 'Please select a branch first.');
+        $admin = auth('admin')->user();
+        $user = null;
+        $branchId = null;
+
+        if (is_null($admin->branch_id) && $admin->isSuperAdmin) {
+            $user = Admin::find((int) $id);
+            $branchId = $user?->branch_id;
+        } else {
+            $branchId = $req->branch_id ?? $admin->branch_id;
+            if (is_null($branchId)) {
+                return redirect()->back()->with('error', 'Please select a branch first.');
+            }
         }
         $branches = Branch::pluck('name', 'id')->all();
         if ($req->isMethod('GET')) {
@@ -181,7 +190,7 @@ class AdminPermission extends Controller
             }
 
             $userRole =  $user->getRoleNames()->first();
-            return view('happyView.permission.editAdmin', compact('user', 'roles', 'userRole','branches'));
+            return view('happyView.permission.editAdmin', compact('user', 'roles', 'userRole', 'branches'));
         } elseif ($req->isMethod('PUT')) {
             $req->validate([
                 'name' => 'required|regex:/(^[A-Za-z ]+$)+/|max:200',
