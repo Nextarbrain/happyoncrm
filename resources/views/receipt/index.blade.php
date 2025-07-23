@@ -149,22 +149,22 @@
                                                                                         @endif
                                                                                         @if (isset($gst18) && $gst18 != null && $gst18 != '0.00')
                                                                                             <tr style="border-top: 1px solid #000;">
-                                                                                                <td style="font-size: 15px;">Exclude Gst@ 18% :</td>
+                                                                                                <td style="font-size: 15px;">Exclude GST@ 18% :</td>
                                                                                                 <td style="font-size: 15px;text-align: right;">{{ $gst18 }}</td>
                                                                                             </tr>
                                                                                             <tr style="border-top: 1px solid #000;">
-                                                                                                <td style="font-size: 15px;">Exclude Gst@ 5% :</td>
+                                                                                                <td style="font-size: 15px;">Exclude GST@ 5% :</td>
                                                                                                 <td style="font-size: 15px;text-align: right;">{{ $gst5 }}</td>
                                                                                             </tr>
                                                                                         @endif
                                                                                         @if (isset($gst12) && $gst12 != null && $gst12 != '0.00')
                                                                                             <tr style="border-top: 1px solid #000;">
-                                                                                                <td style="font-size: 15px;">Exclude Gst@ 12% :</td>
+                                                                                                <td style="font-size: 15px;">Exclude GST@ 12% :</td>
                                                                                                 <td style="font-size: 15px;text-align: right;">{{ $gst12 }}</td>
                                                                                             </tr>
                                                                                         @endif
                                                                                         <tr style="border-top: 1px solid #000;">
-                                                                                            <td style="font-size: 15px;font-weight: 400;">Grant Total :</td>
+                                                                                            <td style="font-size: 15px;font-weight: 400;">Grand Total :</td>
                                                                                             <td style="font-size: 15px;text-align: right;">{{ $totalAmount }}</td>
                                                                                         </tr>
                                                                                     </tbody>
