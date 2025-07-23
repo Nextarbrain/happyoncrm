@@ -377,8 +377,6 @@
     <script src="assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.0/js/toastr.js"></script>
-
-
     <script>
         let removeCouponDiscountAmt = '';
         let removeCouponType = '';
@@ -390,7 +388,6 @@
                 if (search.length > 0) {
                     $('#result').css("display", "block");
                     $.ajax({
-
                         type: 'Post',
                         url: baseUrl + '/get-ticket-phone-list',
                         headers: {
@@ -399,7 +396,6 @@
                         data: {
                             query: search
                         },
-
                         success: function(data) {
                             $('#nameOfKid').val('');
                             $('#kidsQty').val('');
@@ -410,7 +406,6 @@
                 } else {
                     $('#result').css("display", "none");
                 }
-
             });
         });
 
@@ -425,7 +420,6 @@
                     data: {
                         query: user
                     },
-
                     success: function(data) {
                         var arr = JSON.parse(data);
                         $("#nameOfKid").val(arr.name);
@@ -452,7 +446,6 @@
             }
         }
     </script>
-
     <script>
         //Number of Kids Options
         $("#kidsQty").on("change", function() {
@@ -483,7 +476,6 @@
                 $('#socks').css("display", "block");
                 $('#adult').css("display", "block");
             }
-
             for (var i = 1; i <= numDivs; i++) {
                 var childDiv =
                     '<div class="row child-div"><div class="col-md-4"><div class="mb-4 input_wrap dark"><label>Kid Name <span>*</span></label><input type="text" class="form-control" placeholder="Kid Name " name="kidName[]" id ="kidName' +
@@ -712,7 +704,7 @@
                     branch: branchId
                 },
                 success: function(data) {
-                    let sum = $("#chargeAmount").val();
+                    let sum = $("#chargeAmount").val();                    
                     let sumamount = 0;
                     if (data.status === 400) {
                         $('#couponmsg').css('color', 'red').text(data.msg);
@@ -730,12 +722,13 @@
                         $('#couponmsg').css('color', '#0A5F59').text('Apply Coupon Successful!');
 
                         // GST deduction
-                        let subTotalLessGST = parseFloat(sum);
+                        let subTotalLessGST = parseFloat(sum);                        
 
                         ["#gst5", "#gst18", "#gst12"].forEach(id => {
-                            let gst = parseFloat($(id).val()) || 0;
+                            let gst = parseFloat($(id).val()) || 0;                           
                             subTotalLessGST -= gst;
-                        });
+                        });                        
+
                         $('#subtotal').text("₹ " + subTotalLessGST.toFixed(2));
                         $('#subtotlSave').val(subTotalLessGST.toFixed(2));
 
@@ -744,7 +737,7 @@
                         document.getElementById('gstOn').innerHTML = "Includes Gst @18% on " + gst18OnVal.toFixed(2);
                         document.getElementById('gstValue').innerHTML = gst18Ded.toFixed(2);
 
-                        // coupon discount deduction  AFTER GST deducated
+                        // coupon discount deduction AFTER GST deducated
                         let discountAmt = 0;
                         if (data.discount_type == 'flat') {
                             discountAmt = discount;
@@ -760,8 +753,11 @@
                         let newGst = (sum * 18) / 100;
                         $('#gst18').val(newGst.toFixed(2));
                         document.getElementById('gstValue').innerHTML = newGst.toFixed(2);
-                        sum += newGst;
 
+                        ["#gst5", "#gst18", "#gst12"].forEach(id => {
+                            let reGst = parseFloat($(id).val()) || 0;
+                            sum += reGst;
+                        });
                         document.getElementById('totalAmount').innerHTML = '₹ ' + sum.toFixed(2);
                         $("#chargeAmount").val(sum.toFixed(2));
                     } else {
