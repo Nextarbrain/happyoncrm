@@ -406,7 +406,6 @@ class TicketController extends Controller
 
     public function updateTickets(Request $request)
     {
-        dd($request);
         hasPermission('tickets-edit');
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
         if (!$branchId) {
