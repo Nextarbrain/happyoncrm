@@ -420,36 +420,18 @@ class AdminController extends Controller
                 $amountTicket[] = $data;
             }
             $totalTicketAmount = array_sum($amountTicket);
-            $totalTicket = $ticketSale->count();
-            // $upi_membership = MembershipBuy::select('amount')->where('payment_method', 'UPI')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
-            // if ($branchId) {
-            //     $upi_membership->where('branch_id', $branchId);
-            // }
-            // $upi_membership = $upi_membership->sum('amount');
-
+            $totalTicket = $ticketSale->count();            
             $upi_membership = MembershipBuyRenewable::select('amount')->where('payment_method', 'UPI')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
             if ($branchId) {
                 $upi_membership->where('branch_id', $branchId);
             }
             $upi_membership = $upi_membership->sum('amount');
 
-            // $cash_membership = MembershipBuy::select('amount')->where('payment_method', 'Cash')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
-            // if ($branchId) {
-            //     $cash_membership->where('branch_id', $branchId);
-            // }
-            // $cash_membership = $cash_membership->sum('amount');
-
             $cash_membership = MembershipBuyRenewable::select('amount')->where('payment_method', 'Cash')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
             if ($branchId) {
                 $cash_membership->where('branch_id', $branchId);
             }
-            $cash_membership = $cash_membership->sum('amount');
-
-            // $card_membership = MembershipBuy::select('amount')->where('payment_method', 'Debit/Credit')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
-            // if ($branchId) {
-            //     $card_membership->where('branch_id', $branchId);
-            // }
-            // $card_membership = $card_membership->sum('amount');
+            $cash_membership = $cash_membership->sum('amount');            
 
             $card_membership = MembershipBuyRenewable::select('amount')->where('payment_method', 'Debit/Credit')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
             if ($branchId) {
@@ -548,12 +530,6 @@ class AdminController extends Controller
             }
             $open_gst5 = $open_gst5->sum('gst5');
 
-
-            // $upi = PaymentMethod::select('amounts')->where('payment_method', 'UPI')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59'])->sum('amounts');
-            // $cash = PaymentMethod::select('amounts')->where('payment_method', 'Cash')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59'])->sum('amounts');
-            // $card = PaymentMethod::select('amounts')->where('payment_method', 'Debit/Credit')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59'])->sum('amounts');
-
-
             $upi = 0;
             $cash = 0;
             $card = 0;
@@ -575,7 +551,6 @@ class AdminController extends Controller
                     $card += isset($ticketSales['paymentInfo']) ? $ticketSales['paymentInfo']->amounts : 0;
                 }
             }
-
 
             $memberSale = User::has('membership')->with(['paymentInfo', 'membership'])
                 ->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59'])
@@ -800,36 +775,17 @@ class AdminController extends Controller
             $totalTicketAmount = array_sum($amountTicket);
             $totalTicket = $ticketSale->count();
 
-
-            // $upi_membership = MembershipBuy::select('amount')->where('payment_method', 'UPI')->whereDate('created_at', $today);
-            // if ($branchId) {
-            //     $upi_membership->where('branch_id', $branchId);
-            // }
-            // $upi_membership = $upi_membership->sum('amount');
-
             $upi_membership = MembershipBuyRenewable::select('amount')->where('payment_method', 'UPI')->whereDate('created_at', $today);
             if ($branchId) {
                 $upi_membership->where('branch_id', $branchId);
             }
             $upi_membership = $upi_membership->sum('amount');
 
-            // $cash_membership = MembershipBuy::select('amount')->where('payment_method', 'Cash')->whereDate('created_at', $today);
-            // if ($branchId) {
-            //     $cash_membership->where('branch_id', $branchId);
-            // }
-            // $cash_membership = $cash_membership->sum('amount');
-
             $cash_membership = MembershipBuyRenewable::select('amount')->where('payment_method', 'Cash')->whereDate('created_at', $today);
             if ($branchId) {
                 $cash_membership->where('branch_id', $branchId);
             }
             $cash_membership = $cash_membership->sum('amount');
-
-            // $card_membership = MembershipBuy::select('amount')->where('payment_method', 'Debit/Credit')->whereDate('created_at', $today);
-            // if ($branchId) {
-            //     $card_membership->where('branch_id', $branchId);
-            // }
-            // $card_membership = $card_membership->sum('amount');
 
             $card_membership = MembershipBuyRenewable::select('amount')->where('payment_method', 'Debit/Credit')->whereDate('created_at', $today);
             if ($branchId) {
@@ -923,24 +879,33 @@ class AdminController extends Controller
             }
             $open_gst5 = $open_gst5->sum('gst5');
 
-
-            $upi = PaymentMethod::select('amounts')->where('payment_method', 'UPI')->whereDate('created_at', $today);
+            $upi = PaymentMethod::select('amounts')->where('payment_method', 'UPI')
+                ->whereHas('user.userDetails', function ($q) {
+                    $q->where('membership_plan', 0);
+                })
+                ->whereDate('created_at', $today);
             if ($branchId) {
                 $upi->where('branch_id', $branchId);
             }
             $upi = $upi->sum('amounts');
-            $cash = PaymentMethod::select('amounts')->where('payment_method', 'Cash')->whereDate('created_at', $today);
+            $cash = PaymentMethod::select('amounts')->where('payment_method', 'Cash')
+                ->whereHas('user.userDetails', function ($q) {
+                    $q->where('membership_plan', 0);
+                })
+                ->whereDate('created_at', $today);
             if ($branchId) {
                 $cash->where('branch_id', $branchId);
             }
-            $cash = $cash->sum('amounts');
-            // dd($cash, $cash_membership, $cash_event, $cash_open);
-            $card = PaymentMethod::select('amounts')->where('payment_method', 'Debit/Credit')->whereDate('created_at', $today);
+            $cash = $cash->sum('amounts');            
+            $card = PaymentMethod::select('amounts')->where('payment_method', 'Debit/Credit')
+                ->whereHas('user.userDetails', function ($q) {
+                    $q->where('membership_plan', 0);
+                })
+                ->whereDate('created_at', $today);
             if ($branchId) {
                 $card->where('branch_id', $branchId);
             }
-            $card = $card->sum('amounts');
-            //  dd($upi, $upi_membership, $upi_event, $upi_open);
+            $card = $card->sum('amounts');            
             $upi = $upi + $upi_membership + $upi_event + $partial_upi + $upi_open;
             $cash = $cash + $cash_membership + $cash_event + $partial_cash + $cash_open;
             $card = $card + $card_membership + $card_event + $partial_card + $card_open;
