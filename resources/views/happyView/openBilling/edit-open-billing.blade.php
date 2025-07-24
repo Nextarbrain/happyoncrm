@@ -272,9 +272,7 @@
     {{-- {{NEW CALCULATION FLOW...START}} --}}
     <script>
         function calculate_amount() {
-            const items = getItemDetails();
-            const totals = calculateTotals(items);
-            if (totals === false) return;
+            const items = getItemDetails();            
 
             // check coupon code appied or not.
             const raw = $("#couponCode").val();
@@ -290,20 +288,29 @@
                     success: function(data) {
                         if (data.status == 400) {
                             $('#couponmsg').html(`<p class="text-danger">${data.msg}</p>`);
+                            const totals = calculateTotals(items);
+                            if (totals === false) return;
                             updateTotalsOnUI(totals);
                         } else {
                             $('#couponmsg').html("<p>Apply Coupon Successfull!</p>");
                             let discountTotal = 0;
                             if (data.discount_type === 'flat') {
                                 discountTotal = data.discount;
+                                const totals = calculateTotals(items, data);
+                                if (totals === false) return;
+                                updateTotalsOnUI(totals);
                             } else if (data.discount_type === 'percent') {
-                                discountTotal = (totals.subTotal * data.discount) / 100;
+                                const totals = calculateCouponTotals(items, data);
+                                if (totals === false) return;
+                                discountTotal = totals.totalDiscount;                                
+                                updateTotalsOnUI(totals, discountTotal, data);
                             }
-                            updateTotalsOnUI(totals, discountTotal, data);
                         }
                     }
                 });
             } else {
+                const totals = calculateTotals(items);
+                if (totals === false) return;
                 updateTotalsOnUI(totals);
             }
         }
@@ -325,15 +332,16 @@
             };
         }
 
-        function calculateTotals({
+         function calculateTotals({
             item_price,
             item_qty,
             item_tax
-        }) {
+        }, couponData = null) {
             let subTotal = 0,
                 gst18total = 0,
                 gst12total = 0,
-                gst5total = 0;
+                gst5total = 0,
+                totalDiscount = 0;
 
             for (let i = 0; i < item_price.length; i++) {
                 if (item_qty[i] == 0 || item_price[i] == 0) {
@@ -364,12 +372,66 @@
                     else if (taxRate === 5) gst5total += gstAmt;
                 }
             }
-
+            if(couponData !== null){
+                subTotal = subTotal - couponData.discount;
+            }
             return {
                 subTotal,
                 gst18total,
                 gst12total,
-                gst5total
+                gst5total,
+                totalDiscount
+            };
+        }
+        function calculateCouponTotals({
+            item_price,
+            item_qty,
+            item_tax
+        }, data) {
+            let subTotal = 0,
+                gst18total = 0,
+                gst12total = 0,
+                gst5total = 0,
+                totalDiscount = 0,
+                discountRate = data.discount;
+            for (let i = 0; i < item_price.length; i++) {
+                if (item_qty[i] == 0 || item_price[i] == 0) {
+                    $('#errorMsg').html('<span class="alert alert-danger">Minimum Qty/Price should be 1.</span>').fadeOut(8000);
+                } else {
+                    let qty = parseFloat(item_qty[i]) || 0;
+                    let price = parseFloat(item_price[i]) || 0;
+                    let taxRate = parseFloat(item_tax[i]) || 0;
+
+                    let rowtotal = price * qty;
+                    let gstAmt = 0;
+                    let basicAmt = 0;
+                    let discountAmt = 0;
+
+                    const taxRatesList = {
+                        '18': 1.18,
+                        '12': 1.12,
+                        '5': 1.05,
+                        '0': 1
+                    };
+                    if (taxRatesList.hasOwnProperty(taxRate)) {
+                        basicAmt = rowtotal / taxRatesList[taxRate];
+                        discountAmt = (basicAmt * discountRate) / 100;
+                        basicAmt = basicAmt - discountAmt;
+                        gstAmt = (basicAmt * taxRate) / 100;
+                    }
+                    subTotal += basicAmt;
+                    totalDiscount += discountAmt;
+                    if (taxRate === 18) gst18total += gstAmt;
+                    else if (taxRate === 12) gst12total += gstAmt;
+                    else if (taxRate === 5) gst5total += gstAmt;
+                }
+            }
+            return {
+                subTotal,
+                gst18total,
+                gst12total,
+                gst5total,
+                totalDiscount
             };
         }
 
@@ -377,9 +439,10 @@
             subTotal,
             gst18total,
             gst12total,
-            gst5total
+            gst5total,
+            totalDiscount
         }, discountTotal = 0, couponData = null) {
-            const totalAmount = (subTotal + gst18total + gst12total + gst5total) - discountTotal;
+            const totalAmount = subTotal + gst18total + gst12total + gst5total;
 
             $('#subtotal').text(subTotal.toFixed(2));
             $('#valueGst18').text(gst18total.toFixed(2));
