@@ -451,7 +451,7 @@
         $("#kidsQty").on("change", function() {
             var numDivs = $(this).val(); // Get the selected value
             $('#parent-div').empty();
-            document.getElementById('gstOn').innerHTML = "Includes Gst @18%";
+            document.getElementById('gstOn').innerHTML = "Includes Gst @18% ";
             document.getElementById('gstValue').innerHTML = '';
             document.getElementById('totalAmount').innerHTML = '';
             document.getElementById('couponCodeShow').innerHTML = 'Coupon';
@@ -466,7 +466,7 @@
                 $('#subtotal').text("");
                 $('#subtotlSave').val('0');
                 $("#chargeAmount").val('0');
-                document.getElementById('gstOn').innerHTML = "Includes Gst @18% on 0";
+                document.getElementById('gstOn').innerHTML = "Includes Gst @18%";
                 document.getElementById('gstValue').innerHTML = '0';
                 document.getElementById('totalAmount').innerHTML = '₹ 0';
                 $('#valueGst').text("₹ 0");
@@ -516,7 +516,7 @@
                     var totalDeductGst = sum - gstDeductedFromKidPrice; //137.28                    
                     $('#subtotal').text("₹ " + gstDeductedFromKidPrice.toFixed(2));
                     $('#subtotlSave').val(gstDeductedFromKidPrice.toFixed(2));
-                    document.getElementById('gstOn').innerHTML = "Includes Gst @18% on " + sum.toFixed(2);
+                    document.getElementById('gstOn').innerHTML = "Includes Gst @18% ";
                     $('#gst18On').val(sum.toFixed(2));
                     document.getElementById('gstValue').innerHTML = '' + totalDeductGst.toFixed(2);
                     let finalAmount = sum;
@@ -670,7 +670,7 @@
                 }
             });
             let gstOnPrice = sum + priceWith18Gst;
-            document.getElementById('gstOn').innerHTML = "Includes Gst @18% on " + gstOnPrice.toFixed(2);
+            document.getElementById('gstOn').innerHTML = "Includes Gst @18% ";
 
             $('#gst18On').val(gstOnPrice.toFixed(2));
             $('#gstValue').text("₹ " + taxAmount18.toFixed(2));
@@ -729,12 +729,12 @@
                             subTotalLessGST -= gst;
                         });                        
 
-                        $('#subtotal').text("₹ " + subTotalLessGST.toFixed(2));
-                        $('#subtotlSave').val(subTotalLessGST.toFixed(2));
+                        // $('#subtotal').text("₹ " + subTotalLessGST.toFixed(2));
+                        // $('#subtotlSave').val(subTotalLessGST.toFixed(2));
 
                         let gst18Ded = parseFloat($('#gst18').val()) || 0;
                         let gst18OnVal = parseFloat($('#gst18On').val()) || 0;
-                        document.getElementById('gstOn').innerHTML = "Includes Gst @18% on " + gst18OnVal.toFixed(2);
+                        document.getElementById('gstOn').innerHTML = "Includes Gst @18% ";
                         document.getElementById('gstValue').innerHTML = gst18Ded.toFixed(2);
 
                         // coupon discount deduction AFTER GST deducated
@@ -748,6 +748,9 @@
                         $('#couponCodeShow').html("Coupon Code (" + data.coupon_name + ")");
                         $('#couponValueShow').html(discountAmt.toFixed(2));
                         sum = subTotalLessGST - discountAmt.toFixed(2);
+
+                        $('#subtotal').text("₹ " + sum.toFixed(2));
+                        $('#subtotlSave').val(sum.toFixed(2));
 
                         //update GST                        
                         let newGst = (sum * 18) / 100;
@@ -787,8 +790,7 @@
                         }
                         $('#subtotal').text("₹ " + sum.toFixed(2));
                         $('#subtotlSave').val(sum.toFixed(2));
-                        document.getElementById('gstOn').innerHTML = "Includes Gst @18% on " + sum
-                            .toFixed(2);
+                        document.getElementById('gstOn').innerHTML = "Includes Gst @18% ";
                         var gstKid = (sum * 18) / 100;
                         document.getElementById('gstValue').innerHTML = '' + gstKid.toFixed(2);
                         var finalAmount = sum + gstKid;
