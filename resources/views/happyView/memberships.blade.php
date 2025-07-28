@@ -137,7 +137,8 @@
                                                         @else
                                                             <td>{{ $membershipUser->plan }}</td>
                                                         @endif
-                                                        <td>{{ optional($membershipUser['userDetails'])->phone_no ?? '' }}</td>                                                        
+                                                        <td>{{ optional($membershipUser['userDetails'])->phone_no ?? '' }}
+                                                        </td>
                                                         <td>{{ $membershipUser->credit_left }} hrs</td>
                                                         <td>{{ $membershipUser->payment_method }}</td>
                                                         <td class="gree_c">
@@ -467,8 +468,9 @@
                         $('#plan_value').val(response.price);
                         var fullPrice = parseFloat(response.price);
                         var total = response.subtotal / 1.18;
-                        total = total.toFixed(2);                        
+                        total = total.toFixed(2);
                         $('#subtotal').val(parseFloat(response.subtotal));
+
                         /* plan price should be the same  gstTotal */
                         let stGSTC = response.subtotal - total;
                         // stGSTC = stGSTC.toFixed(2);
@@ -477,27 +479,30 @@
                         if (response && response.coupan_name) {
                             $('#remove-coupon').removeClass('disabled');
                             $('#apply-coupon').addClass('disabled');
-                            couponDiscountAmount = parseFloat(response.discounted_amt);                             
+                            couponDiscountAmount = parseFloat(response.discounted_amt);
                             $('#couponCodeShow').html("Coupon Code (" + response.coupan_name + ")");
                             $('#couponValueShow').html(couponDiscountAmount.toFixed(2));
                             $('#couponDis').val(couponDiscountAmount.toFixed(2));
                         } else {
                             couponDiscountAmount = 0;
                             $('#couponCodeShow').html("Coupon");
-                            $('#couponValueShow').html('');                            
-                        }                        
-                        total -= couponDiscountAmount.toFixed(2);                        
-                        $('#price').text('₹ ' + total.toFixed(2));
-                        $('#subtotal').val(total.toFixed(2));
+                            $('#couponValueShow').html('');
+                        }
                         // var total = parseFloat(response.subtotal / 1.18);
-                        stGSTC = (total * 18)/100;
-                        stGSTC = stGSTC.toFixed(2);                        
+                        // let totalAmount = parseFloat(response.subtotal) - couponDiscountAmount;
+                        console.log("couponDiscountAmount => ", couponDiscountAmount);
+
+                        let totalAmount = parseFloat(total) + parseFloat(stGSTC);
+                        totalAmount -= couponDiscountAmount.toFixed(2);
+                        stGSTC = (totalAmount * 18) / 100;
+                        stGSTC = stGSTC.toFixed(2);
                         $('#gstTotal').html(stGSTC);
                         $('#gst18').val(stGSTC);
-                        // let totalAmount = parseFloat(response.subtotal) - couponDiscountAmount;                        
-                        let totalAmount = parseFloat(total) + parseFloat(stGSTC);                        
-                        $('#totalAmount').html('₹ ' + totalAmount);
-                        $('#wholeAMount').val(totalAmount);
+                        $('#price').text('₹ ' + totalAmount.toFixed(2));
+                        $('#subtotal').val(totalAmount.toFixed(2));
+                        let finalTotalAmount = parseInt(totalAmount) + parseInt(stGSTC);
+                        $('#totalAmount').html('₹ ' + finalTotalAmount);
+                        $('#wholeAMount').val(finalTotalAmount);
                     } else {
                         $('#plan_value').val(0);
                         $('#subtotal').val(0);
