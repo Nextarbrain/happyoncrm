@@ -93,7 +93,7 @@ class MembershipController extends Controller
             "subTotal" => $paymentMethod->subTotal,
             "gst18" => $paymentMethod->gst18,
             "totalAmount" => $paymentMethod->amounts,
-        ];        
+        ];
         return view('receipt.membership-invoice', $data);
     }
 
@@ -121,7 +121,7 @@ class MembershipController extends Controller
             if ($branchPlans->count() === 3) {
                 $membership = $branchPlans->values();
             } else {
-                // Fill missing plan from default                
+                // Fill missing plan from default
                 $requiredPlans = $membership->pluck('plan_name')->toArray();
                 foreach ($requiredPlans as $plan) {
                     $reqPlan = MembershipPlan::where('branch_id', session('branch_id'))->where('plan_name', $plan)->get();
@@ -177,10 +177,9 @@ class MembershipController extends Controller
             }
         }
 
-        $gstAmount = ($data->price / 1.18);
-        $planAfterGST = $data->price - $gstAmount;
-
-        if (isset($coupon) && !is_null($coupon) && $coupon->discount_type === 'flat' && $coupon->isValid()) {
+        $gstAmount = $data->price;
+        $planAfterGST = $data->price;
+        if (isset($coupon) && !is_null($coupon) && $coupon->discount_type === 'flat') {
             $finalCoupanPrice = $planAfterGST - $coupon->discount;
             $data->price = number_format($finalCoupanPrice, 2, '.', '');
             $data->discounted_amt = number_format($coupon->discount, 2, '.', '');
