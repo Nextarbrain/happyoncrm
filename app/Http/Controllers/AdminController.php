@@ -1356,7 +1356,7 @@ class AdminController extends Controller
 
 
     public function DatawiseRecord(Request $request)
-    {
+    {       
         $applydate = base64_decode($request->date);
         $branchId = $request->branch_id ?? auth('admin')->user()->branch_id ?? null;
         $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
@@ -1395,11 +1395,7 @@ class AdminController extends Controller
                 $openbillings = $openbillings->get();
 
                 return view('happyView.openBilling.index', ['open_billings' => $openbillings, 'applydate' => $applydate]);
-            }
-
-            // $ticket_sales = PaymentMethod::sum('amounts');
-            // $member_sales = MembershipBuy::sum('amount');
-            // $event_sales = EventBooking::where('payment_status', 'Paid')->sum('totalamount');
+            }           
 
 
             $event_bookings = EventBooking::where('payment_status', 'Paid')->whereDate('booking_date', $today);
