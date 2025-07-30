@@ -1615,30 +1615,6 @@ class AdminController extends Controller
         }
     }
 
-    // public function getCoupon(Request $request)
-    // {
-
-    //     $todaydate = Carbon\Carbon::now('Asia/Kolkata')->format('Y-m-d');
-
-    //     $value = Coupon::where('coupon_name', $request->get('option'))->first();
-    //     dd($value);
-    //     if (!$value) {
-    //         return response()->json(['status' => 400, 'msg' => 'Please enter valid coupon code']);
-    //     }
-    //     if (isset($value->coupon_name) && $value->coupon_name != '') {
-    //         if ($value->start_from <= $todaydate && $value->valid_till >= $todaydate) {
-    //             $data = ['coupon_name' => $value->coupon_name, 'discount_type' => $value->discount_type, 'discount' => $value->discount];
-    //             return response()->json($data, 200);
-    //         } else {
-    //             return response()->json(['status' => 400, 'msg' => 'Coupon code expired']);
-    //         }
-    //     } else {
-    //         return response()->json(['status' => 400, 'msg' => 'Coupon code invalid']);
-    //     }
-
-    // }
-
-
     public function editProductPost(Request $request)
     {
         hasPermission('admin-products-edit');
