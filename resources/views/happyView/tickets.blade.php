@@ -455,12 +455,11 @@
                             '" required><input type="hidden" class="kidPrice' + i +
                             '" name="kidPrice[]"></div></div> <div class="col-md-4"><div class="mb-4 input_wrap dark"><label>Price</label><input type="number" class="form-control kid_price" placeholder="Price" name="kid_price[]" id="kid_price_' +
                             i +
-                            '" onkeyup="calculate()" readonly></div></div><div class="col-md-4 "><div class="mb-4 input_wrap"> <label>Hours <span>*</span></label><select onchange="calculateTotal()" name="hours[]" id="kid_hrs' +
+                            '" onkeyup="calculate()" readonly></div></div><div class="col-md-4 "><div class="mb-4 input_wrap"> <label>Hours <span>*</span></label><select name="hours[]" id="kid_hrs' +
                             i +
                             '" class="form-select hours" required><option value="">0</option><option value="1">1</option><option value="2">2</option><option value="Unlimited">Unlimited</option></select></div></div></div> ';
                         $("#parent-div").append(childDiv);
                         $('#result').css("display", "none");
-
                     }
                 });
             }
@@ -524,7 +523,7 @@
 
     <script>
         //Kids Hours Options
-        $(document).on('change', 'select[id^="kid_hrs"]', function() {
+        $(document).on('change', 'select[id^="kid_hrs"]', function() {            
             var selectBoxId = $(this);
             var inputTag = selectBoxId.closest('.child-div').find('.kid_price');
             // Make the AJAX call to fetch data from the server
@@ -622,7 +621,7 @@
             event.target.style.display = 'none';
         }
 
-        function calculateTotal() {
+        function calculateTotal() {            
             var sum = 0;
             var totalPrice = 0;
             var taxAmount18 = 0;
@@ -709,13 +708,11 @@
             updateGST(taxAmount12, ['cgs12tTotal', 'sgst12Total'], 'gst12', 'gst12Container');
         }
 
-        function updateGST(taxAmount, selectors, inputName, containerId = null) {
+        function updateGST(taxAmount, selectors, inputName, containerId = null) {            
             const halfTax = (taxAmount / 2).toFixed(2);
-
             selectors.forEach(id => {
                 $('#' + id).text("₹ " + halfTax);
             });
-
             $(`input[name="${inputName}"]`).val(taxAmount.toFixed(2));
 
             if (containerId) {
@@ -760,8 +757,8 @@
                             ["#kidsOnlyPrice", "#ba18", "#ba12", "#ba5"].forEach(id => {
                                 let ba = parseFloat($(id).val()) || 0;
                                 subTotalBA += ba;
-                            });
-                            payableTotalAmt -= discount;
+                            });                            
+                            subTotalBA -= discount;
                         } else if (data.discount_type == 'percent') {
 
                             ["#kidsOnlyPrice", "#ba18", "#ba12", "#ba5"].forEach(id => {
