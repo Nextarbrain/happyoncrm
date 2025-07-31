@@ -130,23 +130,39 @@
                                                             @endif
                                                             @if (isset($eventbooking->gst18) && $eventbooking->gst18 != '0.00')
                                                                 <tr style="border-top: 1px solid #000;">
-                                                                    <td style="font-size: 15px;">Includes Gst @ 18% :</td>
-                                                                    <td style="font-size: 15px;text-align: right;">{{ $eventbooking->gst18 }}</td>
+                                                                    <td style="font-size: 15px;">CGST @ 9% :</td>
+                                                                    <td style="font-size: 15px;text-align: right;">{{ round($eventbooking->gst18 / 2, 2) }}</td>
+                                                                </tr>
+                                                                <tr style="border-bottom: 1px solid #000;">
+                                                                    <td style="font-size: 15px;">SGST @ 9% :</td>
+                                                                    <td style="font-size: 15px;text-align: right;">{{ round($eventbooking->gst18 / 2, 2) }}</td>
                                                                 </tr>
                                                             @endif
                                                             @if (isset($eventbooking->gst12) && $eventbooking->gst12 != '0.00')
                                                                 <tr style="border-top: 1px solid #000;">
-                                                                    <td style="font-size: 15px;">Includes Gst @ 12% :</td>
+                                                                    <td style="font-size: 15px;">CGST @ 6% :</td>
                                                                     <td style="font-size: 15px; text-align: right;">
-                                                                        {{ $eventbooking->gst12 }}
+                                                                        {{ round($eventbooking->gst12 / 2, 2)}}
+                                                                    </td>
+                                                                </tr>
+                                                                <tr style="border-bottom: 1px solid #000;">
+                                                                    <td style="font-size: 15px;">SGST @ 6% :</td>
+                                                                    <td style="font-size: 15px; text-align: right;">
+                                                                        {{ round($eventbooking->gst12 / 2, 2) }}
                                                                     </td>
                                                                 </tr>
                                                             @endif
                                                             @if (isset($eventbooking->gst5) && $eventbooking->gst5 != '0.00')
                                                                 <tr style="border-top: 1px solid #000;">
-                                                                    <td style="font-size: 15px;">Includes Gst @ 5% :</td>
+                                                                    <td style="font-size: 15px;">CGST @ 2.5% :</td>
                                                                     <td style="font-size: 15px;text-align: right;">
-                                                                        {{ $eventbooking->gst5 }}
+                                                                        {{ round($eventbooking->gst5 / 2, 2) }}
+                                                                    </td>
+                                                                </tr>
+                                                                <tr style="border-bottom: 1px solid #000;">
+                                                                    <td style="font-size: 15px;">SGST @ 2.5% :</td>
+                                                                    <td style="font-size: 15px;text-align: right;">
+                                                                        {{ round($eventbooking->gst5 / 2, 2) }}
                                                                     </td>
                                                                 </tr>
                                                             @endif

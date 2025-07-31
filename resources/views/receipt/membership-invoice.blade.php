@@ -87,7 +87,7 @@
                                                                         <td style="font-size: 15px;">CGST @ 9% :</td>
                                                                         <td style="font-size: 15px;text-align: right;">{{ round($gst18 / 2, 2) }}</td>
                                                                     </tr>
-                                                                    <tr style="border-top: 1px solid #000;">
+                                                                    <tr style="border-bottom: 1px solid #000;">
                                                                         <td style="font-size: 15px;">SGST @ 9% :</td>
                                                                         <td style="font-size: 15px;text-align: right;">{{ round($gst18 / 2, 2) }}</td>
                                                                     </tr>
