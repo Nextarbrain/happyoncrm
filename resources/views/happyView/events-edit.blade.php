@@ -229,20 +229,38 @@
                                                                 <p id="couponValueShow">
                                                                     {{ $eventbooking->couponvalue }}</p>
                                                             </div>
-                                                            <hr>
-                                                            <div class="gst">
-                                                                <p id="gst18per">Includes Gst @ 18% on <span id="18peron"></span></p>
-                                                                <p id="valueGst18">{{ $eventbooking->gst18 }}</p>
+                                                            <hr>                                                            
+                                                            <div class="gst" style="display: flex; flex-direction: column;">
+                                                                <div style="display: flex; justify-content: space-between;">
+                                                                    <p id="cgst18Label">CGST @ 9%</p>
+                                                                    <p id="cgst18Total">{{ round($eventbooking->gst18 / 2, 2) }}</p>
+                                                                </div>
+                                                                <div style="display: flex; justify-content: space-between;">
+                                                                    <p id="sgst18Label">SGST @ 9%</p>
+                                                                    <p id="sgst18Total">{{ round($eventbooking->gst18 / 2, 2) }}</p>
+                                                                </div>
                                                             </div>
-                                                            <hr>
-                                                            <div class="gst1">
-                                                                <p id="gst12per">Includes Gst @12% on <span id="12peron"></span></p>
-                                                                <p id="valueGst12">{{ $eventbooking->gst12 }}</p>
+                                                            <hr>                                                            
+                                                            <div class="gst1" style="display: flex; flex-direction: column;">
+                                                                <div style="display: flex; justify-content: space-between;">
+                                                                    <p id="cgst12Label">CGST @ 6%</p>
+                                                                    <p id="cgst12Total">{{ round($eventbooking->gst12 / 2, 2) }}</p>
+                                                                </div>
+                                                                <div style="display: flex; justify-content: space-between;">
+                                                                    <p id="sgst12Label">SGST @ 6%</p>
+                                                                    <p id="sgst12Total">{{ round($eventbooking->gst12 / 2, 2) }}</p>
+                                                                </div>
                                                             </div>
-                                                            <hr>
-                                                            <div class="gst1">
-                                                                <p id="gst5per">Includes Gst @5% on <span id="5peron"></span></p>
-                                                                <p id="valueGst5">{{ $eventbooking->gst5 }}</p>
+                                                            <hr>                                                            
+                                                            <div class="gst1" style="display: flex; flex-direction: column;">
+                                                                <div style="display: flex; justify-content: space-between;">
+                                                                    <p id="cgst5Label">CGST @ 2.5%</p>
+                                                                    <p id="cgst5Total">{{ round($eventbooking->gst5 / 2, 2) }}</p>
+                                                                </div>
+                                                                <div style="display: flex; justify-content: space-between;">
+                                                                    <p id="sgst5Label">SGST @ 2.5%</p>
+                                                                    <p id="sgst5Total">{{ round($eventbooking->gst5 / 2, 2) }}</p>
+                                                                </div>
                                                             </div>
                                                             <hr>
                                                             <div class="amount">
@@ -735,6 +753,7 @@
                 totalDiscount
             };
         }
+
         function calculateCouponTotals({
             item_price,
             item_qty,
@@ -797,15 +816,13 @@
             const totalAmount = subTotal + gst18total + gst12total + gst5total;
 
             $('#subtotal').text(subTotal.toFixed(2));
-            $('#valueGst18').text(gst18total.toFixed(2));
-            $('#valueGst12').text(gst12total.toFixed(2));
-            $('#valueGst5').text(gst5total.toFixed(2));
-            $('#totalAmount').text(totalAmount.toFixed(2));
-
             $('#subtotalSave').val(subTotal.toFixed(2));
-            $('#gst18').val(gst18total.toFixed(2));
-            $('#gst12').val(gst12total.toFixed(2));
-            $('#gst5').val(gst5total.toFixed(2));
+
+            updateGST(gst18total, 18);
+            updateGST(gst12total, 12);
+            updateGST(gst5total, 5);
+
+            $('#totalAmount').text(totalAmount.toFixed(2));
             $('#chargeAmount').val(totalAmount.toFixed(2));
 
             if (couponName) {
@@ -813,6 +830,13 @@
                 $('#couponCodeShow').html(`Coupon Code (${couponName})`);
                 $('#couponValueShow').html(discountTotal.toFixed(2));
             }
+        }
+
+        function updateGST(gstTotal, gstRate) {
+            const halfGst = (gstTotal / 2).toFixed(2);
+            $(`#cgst${gstRate}Total`).text(halfGst);
+            $(`#sgst${gstRate}Total`).text(halfGst);
+            $(`#gst${gstRate}`).val(gstTotal.toFixed(2));
         }
     </script>
 
