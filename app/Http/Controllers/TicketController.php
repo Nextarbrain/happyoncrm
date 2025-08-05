@@ -97,13 +97,6 @@ class TicketController extends Controller
 
     public function addTickets(Request $request)
     {
-        // dump($request->product_quantity);
-        // dump($request->product_name);
-        // dump($request->price);
-        // dump($request->final_price);
-         dump($request);
-        dd('TEST');
-
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
         if (!$branchId) {
             return redirect()->back()->with('error', 'Please select a branch first.');
