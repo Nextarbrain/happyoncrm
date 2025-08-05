@@ -608,7 +608,7 @@
     <div class="col-md-3">
         <div class="input_wrap dark">
             <label>Total</label>
-            <input type="text" value="${price}" class="final_price form-control">
+            <input type="text" value="${price}" class="final_price form-control" name="final_price[]">
         </div>
     </div>
 </div>
