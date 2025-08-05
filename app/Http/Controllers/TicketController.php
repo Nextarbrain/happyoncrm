@@ -92,7 +92,6 @@ class TicketController extends Controller
             $user = $user->latest()->get();
         }
 
-
         return view('happyView.customerfilter', compact('user'));
     }
 
@@ -147,17 +146,18 @@ class TicketController extends Controller
                     $i++;
                 }
             }
-
             /* add on product in user_product table */
             if (isset($request->product_quantity)) {
                 foreach ($request->product_quantity as $key => $val) {
-                    $product_add = new UserProduct();
-                    $product_add->user_id = $userSave->id;
-                    $product_add->branch_id = $branchId;
-                    $product_add->product_name = $request->product_name[$key];                    
-                    $product_add->price = $request->price[$key] / $val;
-                    $product_add->qty = ($request->product_name[$key] == 'Socks') ? $val + count($kidsName) : $val;
-                    $product_add->save();
+                    if ($val !== "0") {
+                        $product_add = new UserProduct();
+                        $product_add->user_id = $userSave->id;
+                        $product_add->branch_id = $branchId;
+                        $product_add->product_name = $request->product_name[$key];
+                        $product_add->price = $request->price[$key] / $val;
+                        $product_add->qty = ($request->product_name[$key] == 'Socks') ? $val + count($kidsName) : $val;
+                        $product_add->save();
+                    }
                 }
             }
             if (!isset($request->product_name) || isset($request->product_name) && !in_array('Socks', $request->product_name)) {
@@ -377,9 +377,56 @@ class TicketController extends Controller
                 $branchId = $user['branch_id'] ?? null;
             }
             $kid = Kid::where('user_id', $id)->get();
-            $product = UserProduct::where('user_id', $id)->get();
+            $kidCount = count($kid);
 
-            $productData =  Product::select('product_name', 'product_price', 'product_tax', 'id');
+            // collect basic price
+            $totalKidPrice = $kid->sum('kidPrice');
+            $product = UserProduct::where('user_id', $id)->where('qty', '>', 0)->get();
+
+            $bAmt18 = 0;
+            $bAmt12 = 0;
+            $bAmt5 = 0;
+            $bAmt0 = 0;
+
+            if (count($product) > 0) {
+                foreach ($product as $item) {
+                    if ($item->product_name == 'Socks') {
+                        $qty = $item->qty - $kidCount;
+                    } else {
+                        $qty = $item->qty;
+                    }
+                    $ba = $item->price * $qty;
+                    $tax = Product::where('product_name', $item->product_name)
+                        ->where('branch_id', $branchId)
+                        ->value('product_tax');
+
+                    switch ($tax) {
+                        case 18:
+                            $bAmt18 += $ba;
+                            break;
+                        case 12:
+                            $bAmt12 += $ba;
+                            break;
+                        case 5:
+                            $bAmt5 += $ba;
+                            break;
+                        case 0:
+                            $bAmt0 += $ba;
+                            break;
+                        default:
+                            $bAmt18 += $ba;
+                    }
+                }
+            }
+            $kidPricebAmt = round($totalKidPrice / 1.18, 2);
+            $bAmt18 = round($bAmt18 / 1.18, 2);
+            $bAmt12 = round($bAmt12 / 1.12, 2);
+            $bAmt5 = round($bAmt5 / 1.05, 2);
+            $bAmt0 = round($bAmt0 / 1, 2);
+            $basicAmtArr = [$kidPricebAmt, $bAmt18, $bAmt12, $bAmt5, $bAmt0];
+
+            $productData = Product::select('product_name', 'product_price', 'product_tax', 'id')
+                ->where('product_name', '!=', 'Extra Time');
             if ($branchId) {
                 $productData->where('branch_id', $branchId);
             }
@@ -398,7 +445,8 @@ class TicketController extends Controller
             }
             $extraItems = $extraItems->first();
             $paymentMethod = PaymentMethod::where('user_id', $id)->first();
-            return view('happyView.tickets-edit', compact('user', 'kid', 'product', 'paymentMethod', 'extraItems', 'extraAdded', 'result', 'productData', 'branches', 'branchId'));
+            // dd($product);
+            return view('happyView.tickets-edit', compact('basicAmtArr', 'user', 'kid', 'product', 'paymentMethod', 'extraItems', 'extraAdded', 'result', 'productData', 'branches', 'branchId'));
         } else {
             abort(401);
         }

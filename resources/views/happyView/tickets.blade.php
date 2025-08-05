@@ -54,7 +54,6 @@
                                             </ul>
                                         </div>
                                         <div class="tab-content">
-
                                             <div id="paid" class="container tab-pane active" role="tabpanel"><br>
                                                 <style>
                                                     .phone-list {
@@ -523,7 +522,7 @@
 
     <script>
         //Kids Hours Options
-        $(document).on('change', 'select[id^="kid_hrs"]', function() {            
+        $(document).on('change', 'select[id^="kid_hrs"]', function() {
             var selectBoxId = $(this);
             var inputTag = selectBoxId.closest('.child-div').find('.kid_price');
             // Make the AJAX call to fetch data from the server
@@ -621,7 +620,7 @@
             event.target.style.display = 'none';
         }
 
-        function calculateTotal() {            
+        function calculateTotal() {
             var sum = 0;
             var totalPrice = 0;
             var taxAmount18 = 0;
@@ -642,9 +641,13 @@
                 var val = parseFloat($(this).val()) || 0;
                 adult_price.push(val);
             });
-            var itemPrice = [];
+            // $('input[name="price[]"]').each(function(index) {
+            //     var finalAdultPrice = parseFloat(select1Value[index]) * parseFloat(adult_price[index]);
+            //     finalPriceEach.push(finalAdultPrice);
+            //     $(this).val(finalAdultPrice);
+            // });
 
-            $('input[name="price[]"]').each(function(index) {
+            $('.final_price').each(function(index) {
                 var finalAdultPrice = parseFloat(select1Value[index]) * parseFloat(adult_price[index]);
                 finalPriceEach.push(finalAdultPrice);
                 $(this).val(finalAdultPrice);
@@ -670,7 +673,7 @@
             let ba18Val = 0;
             let ba12Val = 0;
             let ba5Val = 0;
-            $('.final_price').each(function(index) {
+            $('input[name="price[]"]').each(function(index){            
                 const rate = tax[index];
                 const finalPrice = finalPriceEach[index];
                 const divisor = taxRatesList[rate];
@@ -708,7 +711,7 @@
             updateGST(taxAmount12, ['cgs12tTotal', 'sgst12Total'], 'gst12', 'gst12Container');
         }
 
-        function updateGST(taxAmount, selectors, inputName, containerId = null) {            
+        function updateGST(taxAmount, selectors, inputName, containerId = null) {
             const halfTax = (taxAmount / 2).toFixed(2);
             selectors.forEach(id => {
                 $('#' + id).text("₹ " + halfTax);
@@ -757,7 +760,7 @@
                             ["#kidsOnlyPrice", "#ba18", "#ba12", "#ba5"].forEach(id => {
                                 let ba = parseFloat($(id).val()) || 0;
                                 subTotalBA += ba;
-                            });                            
+                            });
                             subTotalBA -= discount;
                         } else if (data.discount_type == 'percent') {
 

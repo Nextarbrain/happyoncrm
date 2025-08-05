@@ -128,20 +128,6 @@
                                                                 <input type="text" class="form-control" placeholder="Contact"value="{{ $eventbooking->contact_person }}" name="contact" required>
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-6 input_wrap">
-                                                            <div class="mb-4">
-                                                                <label>Kid name</label>
-                                                                <input type="text" class="form-control" placeholder="Kid Name" value="{{ $eventbooking->kid_name }}" name="kid_name" required>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="col-md-6">
-                                                            <div class="mb-4 input_wrap">
-                                                                <label>Kid DOB</label>
-                                                                <input type="date" class="form-control" placeholder="Kid DOB" value="{{ $eventbooking->kid_dob }}" name="kid_dob" required>
-                                                            </div>
-                                                        </div>
-
                                                         <div class="col-md-12" id="item_box">
                                                             <h4><b>List Items</b></h4>
                                                             <br>
