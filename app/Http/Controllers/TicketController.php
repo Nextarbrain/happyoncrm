@@ -744,6 +744,8 @@ class TicketController extends Controller
 
     public function custmerView(Request $req, UserDataTable  $datatable)
     {
+        // dd($req);
+
         return $datatable->with('data', $req)->render('happyView.customers');
     }
     // public function custmerView()
@@ -887,7 +889,7 @@ class TicketController extends Controller
     }
 
     public function update(Request $request)
-    {
+    {       
         hasPermission('tickets-edit');
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
         if (!$branchId) {
@@ -896,7 +898,7 @@ class TicketController extends Controller
         $id = $request->input('id');
         $user = User::where('id', $id)->first();
         $booking_date = isset($user['event']->booking_date) ? $user['event']->booking_date : null;
-        $now = now()->format('Y-m-d');    
+        $now = now()->format('Y-m-d');
         if ($booking_date < $now) {
             return redirect('/customers');
         }
@@ -959,9 +961,7 @@ class TicketController extends Controller
         $template_id = "1707168001515557376";
         sendsms($mobile, $msg, $template_id);
 
-        //for payment       
         $items = [];
-
         if (isset($request["product_name"]) && is_array($request["product_name"])) {
             for ($i = 0; $i < count($request["product_name"]); $i++) {
                 $items[] = [
