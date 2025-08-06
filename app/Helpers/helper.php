@@ -7,6 +7,7 @@ use App\Models\Coupon;
 use Illuminate\Support\Carbon;
 use App\Models\UserProduct;
 use App\Models\Branch;
+use Illuminate\Support\Facades\Log;
 
 function sendsms($phone, $msg, $template_id)
 {
@@ -60,6 +61,21 @@ function getTax($name)
     $product = $product->first();
     return is_null($product) ? 0 : $product->product_tax;
 }
+
+function getAddedItemTotal($productTax, $qty, $price)
+{
+    $taxRatesList = [
+        18 => 1.18,
+        12 => 1.12,
+        5  => 1.05,
+        0  => 1.00,
+    ];
+    //  dd($price);
+    $totalAmt = ($qty * $price);
+    // dd($totalAmt);
+    return round($totalAmt / $taxRatesList[$productTax], 2);
+}
+
 if (!function_exists('bindMsg')) {
     function bindMsg(string $msg, string $class)
     {
@@ -97,27 +113,20 @@ if (!function_exists('hasPermission')) {
 }
 function hasTwoProduct($userID, $name, $count)
 {
-    if (strtolower($name) == 'socks') {
-        $qty = UserProduct::where(['user_id' => intval($userID), 'product_name' => $name])->select('qty')->first();
-        if (is_null($qty)) {
-            return false;
-        }
-        if ($qty->qty > $count) {
-            return true;
-        } else {
-            return false;
-        }
-    } else {
-        if (UserProduct::where(['user_id' => intval($userID), 'product_name' => $name])->count() > $count) {
-            return true;
-        } else {
-            return false;
-        }
+    $name = strtolower($name);
+    $userID = intval($userID);
+    if ($name === 'socks') {
+        $record = UserProduct::where(['user_id' => $userID, 'product_name' => $name])
+            ->where('qty', '>', 0)
+            ->latest()
+            ->first();
+        $qty = $record ? $record->qty : 0;
+        return $qty > $count;
     }
+    return UserProduct::where(['user_id' => $userID, 'product_name' => $name])->where('qty', '>', 0)->exists();
 }
-function getProductPrice($name)
-{
-    $branchId = auth('admin')->user()->branch_id ?? null;
+function getProductPrice($name, $branchId = null)
+{    
     $product = Product::where('product_name', $name);
     if ($branchId) {
         $product->where('branch_id', $branchId);
@@ -178,8 +187,8 @@ if (! function_exists('remaining_time')) {
     {
         if (! $bookingDate || ! $startTime) {
             return '00 : 00 : 00';
-        }       
-        $start = Carbon::parse("{$bookingDate} {$startTime}:00", $timezone);        
+        }
+        $start = Carbon::parse("{$bookingDate} {$startTime}:00", $timezone);
         $hours   = ($kidHours === 'Unlimited') ? 1 : (float) ($kidHours ?? 0);
         $end     = (clone $start)->addSeconds($hours * 3600);
 
