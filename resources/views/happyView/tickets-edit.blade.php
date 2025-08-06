@@ -193,13 +193,8 @@
                                                                                     <input type="hidden" value="{{ $socks_products->product_name }}" name="product_name[]">
                                                                                     <div class="col-md-3">
                                                                                         <div class=" input_wrap">
-                                                                                            <label>{{ $socks_products->product_name }}
-                                                                                                Qty </label>
-                                                                                            <select name="product_quantity[]" class="form-select" disabled>
-                                                                                                @for ($i = 0; $i <= 10; $i++)
-                                                                                                    <option value="{{ $i }}" {{ $socks_products->qty == $i ? 'selected' : '' }}>{{ $i }}</option>
-                                                                                                @endfor
-                                                                                            </select>
+                                                                                            <label>{{ $socks_products->product_name }} Qty </label>                                                                                            
+                                                                                            <input type="text" class="form-control" name="product_quantity[]" value="{{ isset($socks_products->qty) ? $socks_products->qty : '' }}" readonly>
                                                                                         </div>
                                                                                     </div>
                                                                                     <div class="col-md-3">
