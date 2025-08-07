@@ -27,7 +27,7 @@ class UserDataTable extends DataTable
         if ($branchId) {
             $users->where('branch_id', $branchId);
         }
-        $userData = $users->with('paymentInfo', 'kid', 'event', 'userDetails')->latest();
+        $userData = $users->with('paymentInfo', 'event', 'userDetails', 'firstKid')->latest();
         return DataTables::of($userData)
             ->addColumn('checkbox', function ($user) {
                 return '<input type="checkbox" name="users[]" class="users_checkbox" value="' . $user->id . '" data-item-id="' . $user->id . '">';
@@ -40,10 +40,10 @@ class UserDataTable extends DataTable
                 }
             })
             ->editColumn('first_kid', function ($user) {
-                return isset($user->kid->name) ? '<span class="text-capitalize">' . $user->kid->name . '</span>' : '--';
+                return isset($user->firstKid->name) ? '<span class="text-capitalize">' . $user->firstKid->name . '</span>' : '--';
             })
             ->addColumn('first_kid', function ($user) {
-                return isset($user->kid->name) ? '<span class="text-capitalize">' . $user->kid->name . '</span>' : '--';
+                return isset($user->firstKid->name) ? '<span class="text-capitalize">' . $user->firstKid->name . '</span>' : '--';
             })
             ->editColumn('date', function ($user) {
                 if (isset($user->event->booking_date)) {
@@ -120,38 +120,72 @@ class UserDataTable extends DataTable
             ->editColumn('remaining_time', function ($user) {
                 date_default_timezone_set('Asia/Kolkata');
 
-                $endTime_kid_Obj = isset($user['kid']->end_time) ? $user['kid']->end_time : null;
+                $start_datetime = isset($user['event']->Hours) ? $user['event']->Hours : null;
+                $end_datetime = isset($user['kid']->end_time) ? $user['kid']->end_time : null;
                 $booking_date = isset($user['event']->booking_date) ? $user['event']->booking_date : null;
-                $endTimeWithDate = $booking_date . ' ' . $endTime_kid_Obj;
+                $start_date_time = $booking_date . ' ' . $start_datetime . ':00';
 
-                $current_time = Carbon::now();
-                $endTime = Carbon::createFromTimeString($endTimeWithDate);
+                $start_time_unix = strtotime($start_date_time);
 
-                if ($endTime->lt($current_time)) {
-                    $remainingTime = '00:00:00';
+                if (isset($user['kid']->hours) && $user['kid']->hours == 'Unlimited') {
+                    $hourQty = 1;
                 } else {
-                    $diffInSeconds = $endTime->diffInSeconds($current_time);
-                    $remainingTime = gmdate('H:i:s', $diffInSeconds);
+                    $hourQty = isset($user['kid']->hours) ? $user['kid']->hours : '';
                 }
-                return $remainingTime;
+
+                if ($hourQty == "1.5") {
+                    $totalSecond = $hourQty * 3600;
+                } else {
+                    $totalSecond = (int)$hourQty * 3600;
+                }
+
+                $end_time_unix_plus_one_hour = $start_time_unix + $totalSecond;
+                $remaining_seconds = $end_time_unix_plus_one_hour - time();
+
+                if ($remaining_seconds <= 0) {
+                    $remaining_seconds = 0;
+                }
+
+                $remaining_hours = floor($remaining_seconds / 3600);
+                $remaining_minutes = floor(($remaining_seconds % 3600) / 60);
+                $remaining_seconds = $remaining_seconds % 60;
+
+                return $remaining_hours . " : " . $remaining_minutes . " : " . $remaining_seconds;
             })
             ->addColumn('remaining_time', function ($user) {
                 date_default_timezone_set('Asia/Kolkata');
 
-                $endTime_kid_Obj = isset($user['kid']->end_time) ? $user['kid']->end_time : null;
+                $start_datetime = isset($user['event']->Hours) ? $user['event']->Hours : null;
+                $end_datetime = isset($user['kid']->end_time) ? $user['kid']->end_time : null;
                 $booking_date = isset($user['event']->booking_date) ? $user['event']->booking_date : null;
-                $endTimeWithDate = $booking_date . ' ' . $endTime_kid_Obj;
+                $start_date_time = $booking_date . ' ' . $start_datetime . ':00';
 
-                $current_time = Carbon::now();
-                $endTime = Carbon::createFromTimeString($endTimeWithDate);
+                $start_time_unix = strtotime($start_date_time);
 
-                if ($endTime->lt($current_time)) {
-                    $remainingTime = '00:00:00';
+                if (isset($user['kid']->hours) && $user['kid']->hours == 'Unlimited') {
+                    $hourQty = 1;
                 } else {
-                    $diffInSeconds = $endTime->diffInSeconds($current_time);
-                    $remainingTime = gmdate('H:i:s', $diffInSeconds);
+                    $hourQty = isset($user['kid']->hours) ? $user['kid']->hours : '';
                 }
-                return $remainingTime;
+
+                if ($hourQty == "1.5") {
+                    $totalSecond = $hourQty * 3600;
+                } else {
+                    $totalSecond = (int)$hourQty * 3600;
+                }
+
+                $end_time_unix_plus_one_hour = $start_time_unix + $totalSecond;
+                $remaining_seconds = $end_time_unix_plus_one_hour - time();
+
+                if ($remaining_seconds <= 0) {
+                    $remaining_seconds = 0;
+                }
+
+                $remaining_hours = floor($remaining_seconds / 3600);
+                $remaining_minutes = floor(($remaining_seconds % 3600) / 60);
+                $remaining_seconds = $remaining_seconds % 60;
+
+                return $remaining_hours . " : " . $remaining_minutes . " : " . $remaining_seconds;
             })
             ->editColumn('kids', function ($user) {
                 return isset($user->userDetails->number_of_kids) ? '<td class="gree_c">' . $user->userDetails->number_of_kids . '</td>' : '';
@@ -160,10 +194,10 @@ class UserDataTable extends DataTable
                 return isset($user->userDetails->number_of_kids) ? '<td class="gree_c">' . $user->userDetails->number_of_kids . '</td>' : '';
             })
             ->editColumn('hours', function ($user) {
-                return isset($user->kid->hours) ? $user->kid->hours : '';
+                return isset($user->firstKid->hours) ? $user->firstKid->hours : '';
             })
             ->addColumn('hours', function ($user) {
-                return isset($user->kid->hours) ? $user->kid->hours : '';
+                return isset($user->firstKid->hours) ? $user->firstKid->hours : '';
             })
             ->editColumn('payment_method', function ($user) {
                 return isset($user->paymentInfo->payment_method) ? $user->paymentInfo->payment_method : '';
