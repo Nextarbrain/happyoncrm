@@ -668,7 +668,8 @@ class TicketController extends Controller
             $kidTotal = $kidValue->count();
             $totalKidPrice = $kidValue->sum('kidPrice');
 
-            $userProducts = UserProduct::where(['user_id' => $id])->latest()->get();
+            // $userProducts = UserProduct::where(['user_id' => $id])->latest()->get();
+            $userProducts = UserProduct::where(['user_id' => $id])->where('qty', '>', 0)->where('product_name', '!=', 'Extra Time')->latest()->get();
             $in_time = strtotime($user['event']->Hours);
             $in_time = date("h:i A", $in_time);
 
