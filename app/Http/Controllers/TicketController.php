@@ -708,6 +708,10 @@ class TicketController extends Controller
             if ($kids->isEmpty()) {
                 $distinctHour = Kid::where('user_id', $id)->distinct()->pluck('hours');
                 foreach ($distinctHour as $dist) {
+                    $hourText = $dist . ' hr Play Time';
+                    if($dist == 'Unlimited'){
+                        $hourText = 'Unlimited Play Time';
+                    }
                     $kidTempData = Kid::where('user_id', $id);
                     $KidPrices = $kidTempData->where('hours', $dist)->select('kidPrice')->first();
                     $totalKidPrice = $kidTempData->where('hours', $dist)->sum('kidPrice');
@@ -930,7 +934,7 @@ class TicketController extends Controller
                 ->when($branchId, function ($q) use ($branchId) {
                     $q->whereIn('branch_id', (array) $branchId);
                 })->get();
-            // dd($user_bookings[0]->event->booking_date);
+            // dd($user_bookings);
             return view('happyView.sales-report', compact('user_bookings'));
         }
     }
@@ -976,8 +980,7 @@ class TicketController extends Controller
                     $end_time = Carbon\Carbon::parse($old_end_time)->addMinutes($request->input('extra_time_select')[$i]);
                     $time_str = $end_time->toTimeString();
                     $kidsDetails->end_time = $time_str;
-
-                    // $oldHour = $kidsDetails->extra_hour ? $kidsDetails->extra_hour : 0;
+                   
                     $newHours = $request->input('hours')[$i];
                     if (str_contains($newHours, 'hours')) {
                         $search = ' hours';
@@ -986,24 +989,6 @@ class TicketController extends Controller
                     $kidsDetails->extra_hour = $newHours - $kidsDetails->hours;
                 }
                 $kidsDetails->save();
-                // price
-                // $kidsDetails->kidPrice = $request->input('kid_price')[$i];
-                // hours
-                // $newHours = $request->input('hours')[$i];
-                // if (str_contains($newHours, 'hours')) {
-                //     $search = ' hours';
-                //     $newHours = str_replace($search, '', $newHours);
-                // }
-                // $kidsDetails->hours = $newHours;
-
-                // end_time
-                // if ($request->input('extra_time_select')[$i] != null) {
-                //     $old_end_time = $kidsDetails->end_time;
-                //     $end_time = Carbon\Carbon::parse($old_end_time)->addMinutes($request->input('extra_time_select')[$i]);
-                //     $time_str = $end_time->toTimeString();
-                //     $kidsDetails->end_time = $time_str;
-                // }
-
             }
         }
 
