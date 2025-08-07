@@ -132,8 +132,7 @@ class UserDataTable extends DataTable
                 } else {
                     $hourQty = isset($user['firstKid']->hours) ? $user['firstKid']->hours : '';
                 }
-
-                if ($hourQty == "1.5") {
+                if (strpos($hourQty, '.') !== false) {
                     $totalSecond = $hourQty * 3600;
                 } else {
                     $totalSecond = (int)$hourQty * 3600;
@@ -168,7 +167,7 @@ class UserDataTable extends DataTable
                     $hourQty = isset($user['firstKid']->hours) ? $user['firstKid']->hours : '';
                 }
 
-                if ($hourQty == "1.5") {
+                if (strpos($hourQty, '.') !== false) {
                     $totalSecond = $hourQty * 3600;
                 } else {
                     $totalSecond = (int)$hourQty * 3600;
