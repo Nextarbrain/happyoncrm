@@ -120,72 +120,38 @@ class UserDataTable extends DataTable
             ->editColumn('remaining_time', function ($user) {
                 date_default_timezone_set('Asia/Kolkata');
 
-                $start_datetime = isset($user['event']->Hours) ? $user['event']->Hours : null;
-                $end_datetime = isset($user['kid']->end_time) ? $user['kid']->end_time : null;
+                $endTime_kid_Obj = isset($user['kid']->end_time) ? $user['kid']->end_time : null;
                 $booking_date = isset($user['event']->booking_date) ? $user['event']->booking_date : null;
-                $start_date_time = $booking_date . ' ' . $start_datetime . ':00';
+                $endTimeWithDate = $booking_date . ' ' . $endTime_kid_Obj;
 
-                $start_time_unix = strtotime($start_date_time);
+                $current_time = Carbon::now();
+                $endTime = Carbon::createFromTimeString($endTimeWithDate);
 
-                if (isset($user['kid']->hours) && $user['kid']->hours == 'Unlimited') {
-                    $hourQty = 1;
+                if ($endTime->lt($current_time)) {
+                    $remainingTime = '00:00:00';
                 } else {
-                    $hourQty = isset($user['kid']->hours) ? $user['kid']->hours : '';
+                    $diffInSeconds = $endTime->diffInSeconds($current_time);
+                    $remainingTime = gmdate('H:i:s', $diffInSeconds);
                 }
-
-                if ($hourQty == "1.5") {
-                    $totalSecond = $hourQty * 3600;
-                } else {
-                    $totalSecond = (int)$hourQty * 3600;
-                }
-
-                $end_time_unix_plus_one_hour = $start_time_unix + $totalSecond;
-                $remaining_seconds = $end_time_unix_plus_one_hour - time();
-
-                if ($remaining_seconds <= 0) {
-                    $remaining_seconds = 0;
-                }
-
-                $remaining_hours = floor($remaining_seconds / 3600);
-                $remaining_minutes = floor(($remaining_seconds % 3600) / 60);
-                $remaining_seconds = $remaining_seconds % 60;
-
-                return $remaining_hours . " : " . $remaining_minutes . " : " . $remaining_seconds;
+                return $remainingTime;
             })
             ->addColumn('remaining_time', function ($user) {
                 date_default_timezone_set('Asia/Kolkata');
 
-                $start_datetime = isset($user['event']->Hours) ? $user['event']->Hours : null;
-                $end_datetime = isset($user['kid']->end_time) ? $user['kid']->end_time : null;
+                $endTime_kid_Obj = isset($user['kid']->end_time) ? $user['kid']->end_time : null;
                 $booking_date = isset($user['event']->booking_date) ? $user['event']->booking_date : null;
-                $start_date_time = $booking_date . ' ' . $start_datetime . ':00';
+                $endTimeWithDate = $booking_date . ' ' . $endTime_kid_Obj;
 
-                $start_time_unix = strtotime($start_date_time);
+                $current_time = Carbon::now();
+                $endTime = Carbon::createFromTimeString($endTimeWithDate);
 
-                if (isset($user['kid']->hours) && $user['kid']->hours == 'Unlimited') {
-                    $hourQty = 1;
+                if ($endTime->lt($current_time)) {
+                    $remainingTime = '00:00:00';
                 } else {
-                    $hourQty = isset($user['kid']->hours) ? $user['kid']->hours : '';
+                    $diffInSeconds = $endTime->diffInSeconds($current_time);
+                    $remainingTime = gmdate('H:i:s', $diffInSeconds);
                 }
-
-                if ($hourQty == "1.5") {
-                    $totalSecond = $hourQty * 3600;
-                } else {
-                    $totalSecond = (int)$hourQty * 3600;
-                }
-
-                $end_time_unix_plus_one_hour = $start_time_unix + $totalSecond;
-                $remaining_seconds = $end_time_unix_plus_one_hour - time();
-
-                if ($remaining_seconds <= 0) {
-                    $remaining_seconds = 0;
-                }
-
-                $remaining_hours = floor($remaining_seconds / 3600);
-                $remaining_minutes = floor(($remaining_seconds % 3600) / 60);
-                $remaining_seconds = $remaining_seconds % 60;
-
-                return $remaining_hours . " : " . $remaining_minutes . " : " . $remaining_seconds;
+                return $remainingTime;
             })
             ->editColumn('kids', function ($user) {
                 return isset($user->userDetails->number_of_kids) ? '<td class="gree_c">' . $user->userDetails->number_of_kids . '</td>' : '';

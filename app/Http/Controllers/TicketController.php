@@ -744,8 +744,6 @@ class TicketController extends Controller
 
     public function custmerView(Request $req, UserDataTable  $datatable)
     {
-        // dd($req);
-
         return $datatable->with('data', $req)->render('happyView.customers');
     }
     // public function custmerView()
