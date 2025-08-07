@@ -104,10 +104,7 @@
                                                                         </tr>
                                                                         @foreach ($kidsInvoice as $kidsInv)
                                                                             <tr style="border-top: 1px solid #000;">
-                                                                                <td style="font-size: 15px;">
-                                                                                    {{ $kidsInv['hours'] }}
-                                                                                    {{ $kidsInv['hours'] == 'Unlimited' ? '' : 'hr' }} Play Time
-                                                                                </td>
+                                                                                <td style="font-size: 15px;">{{ $kidsInv['hours'] }}</td>
                                                                                 <td style="font-size: 15px;text-align: center;">{{ $kidsInv['quantity'] }}</td>
                                                                                 <td style="font-size: 15px;">{{ $kidsInv['price'] }}</td>
                                                                                 <td style="font-size: 15px;text-align: right;">
@@ -147,7 +144,7 @@
                                                                                                 <td style="font-size: 15px;text-align: right;">{{ $couponvalue }}</td>
                                                                                             </tr>
                                                                                         @endif
-                                                                                        @if (isset($gst18) && $gst18 != null && $gst18 != '0.00')                                                                                          
+                                                                                        @if (isset($gst18) && $gst18 != null && $gst18 != '0.00')
                                                                                             <tr style="border-top: 1px solid #000;">
                                                                                                 <td style="font-size: 15px;">CGST @ 9% :</td>
                                                                                                 <td style="font-size: 15px;text-align: right;">{{ round($gst18 / 2, 2) }}</td>

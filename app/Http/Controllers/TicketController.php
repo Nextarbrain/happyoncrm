@@ -376,9 +376,18 @@ class TicketController extends Controller
             if ($branchId === null) {
                 $branchId = $user['branch_id'] ?? null;
             }
-            $kid = Kid::where('user_id', $id)->get();
-            $kidCount = count($kid);
+            $kids = Kid::where('user_id', $id)->get();
+            $kid = [];
+            foreach ($kids as $i => $k) {
+                $kid[$i]['id'] = $k->id;
+                $kid[$i]['name'] = $k->name;
 
+                $kPrice = (float) $k->kidPrice + ($k->extra_price ? (float)$k->extra_price : 0);
+                $kid[$i]['kidPrice'] = $kPrice;
+
+                $kPrice = (float) $k->hours + ($k->extra_hour ? (float)$k->extra_hour : 0);
+                $kid[$i]['hours'] = $kPrice;
+            }
             $product = UserProduct::where('user_id', $id)->where('qty', '>', 0)->where('product_name', '!=', 'Extra Time')->get();
 
             $productData = Product::select('product_name', 'product_price', 'product_tax', 'id')
@@ -668,8 +677,8 @@ class TicketController extends Controller
             $kidTotal = $kidValue->count();
             $totalKidPrice = $kidValue->sum('kidPrice');
 
-            // $userProducts = UserProduct::where(['user_id' => $id])->latest()->get();
             $userProducts = UserProduct::where(['user_id' => $id])->where('qty', '>', 0)->where('product_name', '!=', 'Extra Time')->latest()->get();
+
             $in_time = strtotime($user['event']->Hours);
             $in_time = date("h:i A", $in_time);
 
@@ -680,16 +689,55 @@ class TicketController extends Controller
                 $out_time = date("h:i A", $out_time);
             }
 
-            $distinctHour = Kid::where('user_id', $id)->distinct()->pluck('hours');
-            $kidsInvoice = [];
-            foreach ($distinctHour as $dist) {
-                $kidTempData = Kid::where('user_id', $id);
-                $KidPrices = $kidTempData->where('hours', $dist)->select('kidPrice')->first();
-                $totalKidPrice = $kidTempData->where('hours', $dist)->sum('kidPrice');
-                $kidTotal = $kidTempData->count();
-                $kidValue = Kid::where('user_id', $id)->count();
-                array_push($kidsInvoice, ['hours' => $dist, 'quantity' => $kidTotal, 'price' => $KidPrices->kidPrice, 'subtotal' => $totalKidPrice]);
+            $distinctHourToDisplay = Kid::where('user_id', $id)->get();
+            $distinctHourArr = [];
+            foreach ($distinctHourToDisplay as $singleKid) {
+                if ($singleKid->hours == 'Unlimited') {
+                    array_push($distinctHourArr, $singleKid->hours);
+                } else {
+                    $extra = $singleKid->extra_hour ? (float) $singleKid->extra_hour : 0;
+                    $hours = $extra + $singleKid->hours;
+                    array_push($distinctHourArr, $hours);
+                }
             }
+            $distinctHourArr = array_unique($distinctHourArr);
+
+            //kidsinvoice for add and edit
+            $kids = Kid::where('user_id', $id)->whereNotNull('qty')->get();
+            $kidsInvoice = [];
+            if ($kids->isEmpty()) {
+                $distinctHour = Kid::where('user_id', $id)->distinct()->pluck('hours');
+                foreach ($distinctHour as $dist) {
+                    $kidTempData = Kid::where('user_id', $id);
+                    $KidPrices = $kidTempData->where('hours', $dist)->select('kidPrice')->first();
+                    $totalKidPrice = $kidTempData->where('hours', $dist)->sum('kidPrice');
+                    $kidTotal = $kidTempData->count();                    
+                    array_push($kidsInvoice, ['hours' => $dist, 'quantity' => $kidTotal, 'price' => $KidPrices->kidPrice, 'subtotal' => $totalKidPrice]);
+                }
+            } else {
+                $kidsData = Kid::select('hours', 'kidPrice')->where('user_id', $id)->get();
+                $kidsExtraData = Kid::select('extra_hour', 'extra_price', 'qty')->where('user_id', $id)->get();
+                foreach ($kidsData as $i => $k) {
+                    $row = [];
+                    $hourText = $k->hours . ' hr Play Time';
+                    if($k->hours == 'Unlimited'){
+                        $hourText = 'Unlimited Play Time';
+                    }
+                    $row['hours'] = $hourText;
+                    $row['quantity'] = 1;
+                    $row['price'] = $k->kidPrice;
+                    $row['subtotal'] = $k->kidPrice;
+                    array_push($kidsInvoice, $row);
+                    $rowExtra = [];
+                    if ($kidsExtraData[$i]->qty !== null) {
+                        $rowExtra['hours'] = $kidsExtraData[$i]->extra_hour .' hr Play Time (Extra)';
+                        $rowExtra['quantity'] = $kidsExtraData[$i]->qty;
+                        $rowExtra['price'] = $kidsExtraData[$i]->extra_price;
+                        $rowExtra['subtotal'] = $kidsExtraData[$i]->extra_price;
+                        array_push($kidsInvoice, $rowExtra);
+                    }
+                }
+            }            
             $data = [
                 'guardian_name' => $user->name,
                 "payment_method" => $paymentMethod->payment_method,
@@ -700,8 +748,8 @@ class TicketController extends Controller
                 "couponcode" => $user['paymentInfo']->couponcode,
                 "couponvalue" => $user['paymentInfo']->couponvalue,
                 "invoiceNo" => $paymentMethod->id,
-                "distinctHours" => $distinctHour,
-                "kidTotal" => $kidValue,
+                "distinctHours" => $distinctHourArr,
+                "kidTotal" => $kidTotal,
                 "totalKidPrice" => $totalKidPrice,
                 "KidPrice" => $KidPrices['kidPrice'],
                 "playtime" => $totalHours,
@@ -712,7 +760,7 @@ class TicketController extends Controller
                 "totalAmount" => $paymentMethod->amounts,
                 'kidsInvoice' => $kidsInvoice,
                 'userProducts' => $userProducts
-            ];
+            ];           
             return view('receipt.index', $data);
         }
     }
@@ -888,7 +936,7 @@ class TicketController extends Controller
     }
 
     public function update(Request $request)
-    {       
+    {
         hasPermission('tickets-edit');
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
         if (!$branchId) {
@@ -908,6 +956,7 @@ class TicketController extends Controller
         $oldPayment = $paymentMethod->amounts;
 
         $paymentMethod->amounts = $request->input('newTotalAmount');
+        $paymentMethod->subTotal = $request->input('newSubAmt');
         $paymentMethod->save();
 
         // update kids
@@ -916,25 +965,45 @@ class TicketController extends Controller
             foreach ($kidids as $i => $row) {
                 $kidsDetails = Kid::where('id', $row)->first();
 
-                // price
-                $kidsDetails->kidPrice = $request->input('kid_price')[$i];
-
-                // hours
-                $newHours = $request->input('hours')[$i];
-                if (str_contains($newHours, 'hours')) {
-                    $search = ' hours';
-                    $newHours = str_replace($search, '', $newHours);
-                }
-                $kidsDetails->hours = $newHours;
-
-                // end_time
                 if ($request->input('extra_time_select')[$i] != null) {
+                    $qty = $kidsDetails->qty ? $kidsDetails->qty : 0;
+                    $kidsDetails->qty = $qty + 1;
+
+                    $oldPrice = $kidsDetails->kidPrice;
+                    $kidsDetails->extra_price = $request->input('kid_price')[$i] - $oldPrice;
+
                     $old_end_time = $kidsDetails->end_time;
                     $end_time = Carbon\Carbon::parse($old_end_time)->addMinutes($request->input('extra_time_select')[$i]);
                     $time_str = $end_time->toTimeString();
                     $kidsDetails->end_time = $time_str;
+
+                    // $oldHour = $kidsDetails->extra_hour ? $kidsDetails->extra_hour : 0;
+                    $newHours = $request->input('hours')[$i];
+                    if (str_contains($newHours, 'hours')) {
+                        $search = ' hours';
+                        $newHours = str_replace($search, '', $newHours);
+                    }
+                    $kidsDetails->extra_hour = $newHours - $kidsDetails->hours;
                 }
                 $kidsDetails->save();
+                // price
+                // $kidsDetails->kidPrice = $request->input('kid_price')[$i];
+                // hours
+                // $newHours = $request->input('hours')[$i];
+                // if (str_contains($newHours, 'hours')) {
+                //     $search = ' hours';
+                //     $newHours = str_replace($search, '', $newHours);
+                // }
+                // $kidsDetails->hours = $newHours;
+
+                // end_time
+                // if ($request->input('extra_time_select')[$i] != null) {
+                //     $old_end_time = $kidsDetails->end_time;
+                //     $end_time = Carbon\Carbon::parse($old_end_time)->addMinutes($request->input('extra_time_select')[$i]);
+                //     $time_str = $end_time->toTimeString();
+                //     $kidsDetails->end_time = $time_str;
+                // }
+
             }
         }
 

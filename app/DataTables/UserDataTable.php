@@ -130,7 +130,8 @@ class UserDataTable extends DataTable
                 if (isset($user['firstKid']->hours) && $user['firstKid']->hours == 'Unlimited') {
                     $hourQty = 1;
                 } else {
-                    $hourQty = isset($user['firstKid']->hours) ? $user['firstKid']->hours : '';
+                    $hourQty = isset($user['firstKid']->hours) ? $user['firstKid']->hours : 0;
+                    $hourQty += isset($user['firstKid']->extra_hour) ? $user['firstKid']->extra_hour : 0;
                 }
                 if (strpos($hourQty, '.') !== false) {
                     $totalSecond = $hourQty * 3600;
@@ -164,7 +165,8 @@ class UserDataTable extends DataTable
                 if (isset($user['firstKid']->hours) && $user['firstKid']->hours == 'Unlimited') {
                     $hourQty = 1;
                 } else {
-                    $hourQty = isset($user['firstKid']->hours) ? $user['firstKid']->hours : '';
+                    $hourQty = isset($user['firstKid']->hours) ? (float)$user['firstKid']->hours : 0;
+                    $hourQty += isset($user['firstKid']->extra_hour) ? (float)$user['firstKid']->extra_hour : 0;
                 }
 
                 if (strpos($hourQty, '.') !== false) {
@@ -193,10 +195,12 @@ class UserDataTable extends DataTable
                 return isset($user->userDetails->number_of_kids) ? '<td class="gree_c">' . $user->userDetails->number_of_kids . '</td>' : '';
             })
             ->editColumn('hours', function ($user) {
-                return isset($user->firstKid->hours) ? $user->firstKid->hours : '';
+                $hours = (isset($user->firstKid->hours) ? (float)$user->firstKid->hours : 0) + (isset($user->firstKid->extra_hour) ? (float)$user->firstKid->extra_hour : 0);
+                return $hours;
             })
             ->addColumn('hours', function ($user) {
-                return isset($user->firstKid->hours) ? $user->firstKid->hours : '';
+                $hours = (isset($user->firstKid->hours) ? (float)$user->firstKid->hours : 0) + (isset($user->firstKid->extra_hour) ? (float)$user->firstKid->extra_hour : 0);
+                return $hours;
             })
             ->editColumn('payment_method', function ($user) {
                 return isset($user->paymentInfo->payment_method) ? $user->paymentInfo->payment_method : '';
