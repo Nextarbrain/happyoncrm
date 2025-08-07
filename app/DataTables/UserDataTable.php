@@ -121,16 +121,16 @@ class UserDataTable extends DataTable
                 date_default_timezone_set('Asia/Kolkata');
 
                 $start_datetime = isset($user['event']->Hours) ? $user['event']->Hours : null;
-                $end_datetime = isset($user['kid']->end_time) ? $user['kid']->end_time : null;
+                $end_datetime = isset($user['firstKid']->end_time) ? $user['firstKid']->end_time : null;
                 $booking_date = isset($user['event']->booking_date) ? $user['event']->booking_date : null;
                 $start_date_time = $booking_date . ' ' . $start_datetime . ':00';
 
                 $start_time_unix = strtotime($start_date_time);
 
-                if (isset($user['kid']->hours) && $user['kid']->hours == 'Unlimited') {
+                if (isset($user['firstKid']->hours) && $user['firstKid']->hours == 'Unlimited') {
                     $hourQty = 1;
                 } else {
-                    $hourQty = isset($user['kid']->hours) ? $user['kid']->hours : '';
+                    $hourQty = isset($user['firstKid']->hours) ? $user['firstKid']->hours : '';
                 }
 
                 if ($hourQty == "1.5") {
@@ -156,16 +156,16 @@ class UserDataTable extends DataTable
                 date_default_timezone_set('Asia/Kolkata');
 
                 $start_datetime = isset($user['event']->Hours) ? $user['event']->Hours : null;
-                $end_datetime = isset($user['kid']->end_time) ? $user['kid']->end_time : null;
+                $end_datetime = isset($user['firstKid']->end_time) ? $user['firstKid']->end_time : null;
                 $booking_date = isset($user['event']->booking_date) ? $user['event']->booking_date : null;
                 $start_date_time = $booking_date . ' ' . $start_datetime . ':00';
 
                 $start_time_unix = strtotime($start_date_time);
 
-                if (isset($user['kid']->hours) && $user['kid']->hours == 'Unlimited') {
+                if (isset($user['firstKid']->hours) && $user['firstKid']->hours == 'Unlimited') {
                     $hourQty = 1;
                 } else {
-                    $hourQty = isset($user['kid']->hours) ? $user['kid']->hours : '';
+                    $hourQty = isset($user['firstKid']->hours) ? $user['firstKid']->hours : '';
                 }
 
                 if ($hourQty == "1.5") {
