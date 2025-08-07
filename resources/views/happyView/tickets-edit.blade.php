@@ -133,26 +133,26 @@
                                                         <div class="col-md-12" id="parent-div">
                                                             @if ($kid)
                                                                 @foreach ($kid as $i => $value)
-                                                                    <input type="hidden" name="kidids[]" value="{{ $value->id }}">
+                                                                    <input type="hidden" name="kidids[]" value="{{ $value['id'] }}">
                                                                     <div class="row child-div">
                                                                         <div class="col-md-3">
                                                                             <div class="mb-4 input_wrap dark">
                                                                                 <label>Kid Name <span>*</span></label>
-                                                                                <input type="text" class="form-control" name="kidName[]" value="{{ $value->name }}" readonly>
+                                                                                <input type="text" class="form-control" name="kidName[]" value="{{ $value['name'] }}" readonly>
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-md-3">
                                                                             <div class="mb-3 input_wrap dark">
                                                                                 <label>Price</label>
-                                                                                <input type="number" class="form-control" id="k_price_{{ $i }}" placeholder="Price" name="kid_price[]" value="{{ isset($value->kidPrice) ? $value->kidPrice : '' }}" readonly>
-                                                                                <input type="hidden" id="kh_price_{{ $i }}" name="old_price[]" value="{{ isset($value->kidPrice) ? $value->kidPrice : '' }}">
+                                                                                <input type="number" class="form-control" id="k_price_{{ $i }}" placeholder="Price" name="kid_price[]" value="{{ $value['kidPrice'] }}" readonly>
+                                                                                <input type="hidden" id="kh_price_{{ $i }}" name="old_price[]" value="{{ $value['kidPrice'] }}">
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-md-3 ">
                                                                             <div class="mb-4 input_wrap dark">
                                                                                 <label>Hours <span>*</span></label>
-                                                                                <input type="text" class="form-control hours" id="k_hour_{{ $i }}" name="hours[]" value="{{ isset($value->hours) ? $value->hours : '' }}" readonly>
-                                                                                <input type="hidden" name="old_hour[]" id="kh_hour_{{ $i }}" value="{{ isset($value->hours) ? $value->hours : '' }}">
+                                                                                <input type="text" class="form-control hours" id="k_hour_{{ $i }}" name="hours[]" value="{{ $value['hours'] }}" readonly>
+                                                                                <input type="hidden" name="old_hour[]" id="kh_hour_{{ $i }}" value="{{ $value['hours'] }}">
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-md-3">
@@ -193,7 +193,7 @@
                                                                                     <input type="hidden" value="{{ $socks_products->product_name }}" name="product_name[]">
                                                                                     <div class="col-md-3">
                                                                                         <div class=" input_wrap">
-                                                                                            <label>{{ $socks_products->product_name }} Qty </label>                                                                                            
+                                                                                            <label>{{ $socks_products->product_name }} Qty </label>
                                                                                             <input type="text" class="form-control" name="product_quantity[]" value="{{ isset($socks_products->qty) ? $socks_products->qty : '' }}" readonly>
                                                                                         </div>
                                                                                     </div>
@@ -327,6 +327,9 @@
                                                                 <p id="totalAmount">{{ $paymentMethod->amounts }}</p>
                                                                 <input type="hidden" id="newTotalAmount" name="newTotalAmount" value={{ $paymentMethod->amounts }}>
                                                                 <input type="hidden" id="oldTotalAmt" value={{ $paymentMethod->amounts }}>
+
+                                                                <input type="hidden" id="newSubAmt" name="newSubAmt" value={{ $paymentMethod->subTotal }}>
+                                                                <input type="hidden" id="oldSubAmt" value={{ $paymentMethod->subTotal }}>
                                                             </div>
                                                             <hr>
                                                             <div class="tearm_condition">
@@ -500,10 +503,15 @@
             const totalAmtElement = document.getElementById("totalAmount");
             const newTotalAmount = document.getElementById("newTotalAmount");
             const hiddenTotalAmtElement = document.getElementById("oldTotalAmt");
-            let hiddenPriceAmt = 0;
+
+            const subAmtElement = document.getElementById("subtotal");
+            const newSubAmount = document.getElementById("newSubAmt");
+            const hiddenSubAmtElement = document.getElementById("oldSubAmt");
+
+            let hiddenOldPriceAmt = 0;
             $('input[name="old_price[]"]').each(function() {
                 let val = parseFloat($(this).val()) || 0;
-                hiddenPriceAmt += val;
+                hiddenOldPriceAmt += val;
             });
             let priceAmt = 0;
             $('input[name="kid_price[]"]').each(function() {
@@ -511,12 +519,16 @@
                 priceAmt += valP;
             });
             let differenceAmt = 0;
-            if (hiddenPriceAmt !== priceAmt) {
-                differenceAmt = priceAmt - hiddenPriceAmt;
+            if (hiddenOldPriceAmt !== priceAmt) {
+                differenceAmt = priceAmt - hiddenOldPriceAmt;
             }
             let newTotal = parseFloat(hiddenTotalAmtElement.value) + differenceAmt;
             newTotalAmount.value = newTotal;
             totalAmtElement.innerHTML = newTotal;
+
+            let newSubA = parseFloat(hiddenSubAmtElement.value) + differenceAmt;
+            newSubAmount.value = newSubA;
+            subAmtElement.innerHTML = newSubA;
         }
     </script>
 
