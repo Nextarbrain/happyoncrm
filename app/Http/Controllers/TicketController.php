@@ -154,7 +154,8 @@ class TicketController extends Controller
                         $product_add->user_id = $userSave->id;
                         $product_add->branch_id = $branchId;
                         $product_add->product_name = $request->product_name[$key];
-                        $product_add->price = $request->final_price[$key] / $val;
+                        // $product_add->price = $request->final_price[$key] / $val;
+                        $product_add->price = $request->price[$key] / $val;
                         $product_add->qty = ($request->product_name[$key] == 'Socks') ? $val + count($kidsName) : $val;
                         $product_add->save();
                     }
@@ -293,15 +294,16 @@ class TicketController extends Controller
                     $items[] = [
                         "name" => $request["product_name"][$i],
                         "id" => uniqid(),
-                        "rate" => floatval($request["final_price"][$i]),
+                        // "rate" => floatval($request["final_price"][$i]),
+                         "rate" => floatval($request["price"][$i]),
                         "quantity" => intval($request["product_quantity"][$i]),
-                        "subtotal" => floatval($request["final_price"][$i]) * intval($request["product_quantity"][$i]),
+                        // "subtotal" => floatval($request["final_price"][$i]) * intval($request["product_quantity"][$i]),
+                        "subtotal" => floatval($request["price"][$i]) * intval($request["product_quantity"][$i]),
                         "category" => "",
                         "addon" => []
                     ];
                 }
             }
-
             $taxes = [];
             if (isset($request->product_name)) {
                 for ($i = 0; $i < count($request["product_name"]); $i++) {
@@ -309,7 +311,8 @@ class TicketController extends Controller
                     $taxes[] = [
                         "name" => "GST",
                         "percentage" => $request['tax'][$i],
-                        "amount" => $request["final_price"][$i] * $tax_api,
+                        // "amount" => $request["final_price"][$i] * $tax_api,
+                        "amount" => $request["price"][$i] * $tax_api,
                     ];
                 }
             }
@@ -570,7 +573,6 @@ class TicketController extends Controller
                     $product_add->qty = $adultQty;
                 }
             }
-
             $product_add->save();
         }
 
