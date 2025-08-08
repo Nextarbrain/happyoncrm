@@ -487,8 +487,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.0/js/toastr.js"></script>
     <script>
         $('#reservation').daterangepicker({
-            maxDate: new Date(),
-            //singleDatePicker: true,
+            maxDate: new Date(),          
         });
     </script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -563,24 +562,7 @@
                                 }
                             }
                         }
-                    });
-                    // google.charts.load('current', {
-                    //     'packages': ['corechart']
-                    // });
-                    // google.charts.setOnLoadCallback(drawChart);
-
-                    // function drawChart() {
-                    //     var data = google.visualization.arrayToDataTable(dataReturn);
-                    //     var options = {
-                    //         title: 'CRM Performance',
-                    //         curveType: 'function',
-                    //         legend: {
-                    //             position: 'bottom'
-                    //         }
-                    //     };
-                    //     var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-                    //     chart.draw(data, options);
-                    // }
+                    });                    
                 }
             }
         });
@@ -633,11 +615,7 @@
             formatNumber('total_sell',"{{ $totalSales }}");
             formatNumber('coupon_code_value',"{{ $couponvalue }}");
             formatNumber('total_member_amount',"{{ $totalMemberAmount }}");
-            formatNumber('total_open_billing_sale',"{{ $totalOpenBillingSales }}");
-            // let ticketSell = $('#ticketSell').text();
-            // let ticketSellValue = parseFloat(ticketSell);
-            // let ticketSellNumber = ticketSellValue.toLocaleString('en-IN');
-            // $('#ticketSell').text(ticketSellNumber);
+            formatNumber('total_open_billing_sale',"{{ $totalOpenBillingSales }}");            
         });
 
         function branchWiseData(selectElement) {

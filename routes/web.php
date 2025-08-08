@@ -92,7 +92,8 @@ Route::group(['middleware' => 'admin_auth'], function () {
 
     //Route::get('/edit-tickets-view/{id}', [TicketController::class, 'editTicketsView']);
     Route::get('/tickets-edit-view/{id}', [TicketController::class, 'ticketEdit']);
-    Route::post('/update-tickets', [TicketController::class, 'updateTickets']);
+    // Route::post('/update-tickets', [TicketController::class, 'updateTickets']);
+    Route::post('/update-tickets', [TicketController::class, 'update']);
     Route::get('/invoice-pdf/{id}', [TicketController::class, 'invoiceGenerate']);
     Route::post('/tickets-booking-report', [TicketController::class, 'ticketsBookingReport'])->name('ticketsBookingReport');
     Route::get('/tickets', [TicketController::class, 'ticketsView'])->name('tickets');

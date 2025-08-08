@@ -54,7 +54,6 @@
                                             </ul>
                                         </div>
                                         <div class="tab-content">
-
                                             <div id="paid" class="container tab-pane active" role="tabpanel"><br>
                                                 <style>
                                                     .phone-list {
@@ -182,19 +181,37 @@
                                                                 <p id="couponValueShow"></p>
                                                             </div>
                                                             <hr>
-                                                            <div class="gst">
-                                                                <p id="gstOn">Includes Gst @ 18%</p>
-                                                                <p id="gstValue"></p>
+                                                            <div class="gst" style="display: flex; flex-direction: column;">
+                                                                <div style="display: flex; justify-content: space-between;">
+                                                                    <p id="cgst18Label">CGST @ 9%</p>
+                                                                    <p id="cgst18Total"></p>
+                                                                </div>
+                                                                <div style="display: flex; justify-content: space-between;">
+                                                                    <p id="sgst18Label">SGST @ 9%</p>
+                                                                    <p id="sgst18Total"></p>
+                                                                </div>
                                                             </div>
                                                             <hr>
-                                                            <div class="gst d-none" id="gst12Container">
-                                                                <p id="gst12Percent">Includes Gst @12% </p>
-                                                                <p id="gst12PercentVal"></p>
+                                                            <div class="gst d-none" id="gst12Container" style="display: flex; flex-direction: column;">
+                                                                <div style="display: flex; justify-content: space-between;">
+                                                                    <p id="cgst12Label">CGST @ 6%</p>
+                                                                    <p id="cgs12tTotal"></p>
+                                                                </div>
+                                                                <div style="display: flex; justify-content: space-between;">
+                                                                    <p id="sgst12Label">SGST @ 6%</p>
+                                                                    <p id="sgst12Total"></p>
+                                                                </div>
                                                             </div>
                                                             <hr>
-                                                            <div class="gst1">
-                                                                <p id="gstSock">Includes Gst @5% </p>
-                                                                <p id="valueGst"></p>
+                                                            <div class="gst" style="display: flex; flex-direction: column;">
+                                                                <div style="display: flex; justify-content: space-between;">
+                                                                    <p id="cgst5Label">CGST @ 2.5%</p>
+                                                                    <p id="cgst5Total"></p>
+                                                                </div>
+                                                                <div style="display: flex; justify-content: space-between;">
+                                                                    <p id="sgst5Label">SGST @ 2.5%</p>
+                                                                    <p id="sgst5Total"></p>
+                                                                </div>
                                                             </div>
                                                             <hr>
                                                             <div class="amount">
@@ -203,11 +220,14 @@
                                                                 <input type="hidden" name="totalAmount" id="chargeAmount">
                                                                 <input type="hidden" name="subTotal" id="subtotlSave">
                                                                 <input type="hidden" name="gst18" id="gst18">
-                                                                <input type="hidden" name="gst18On" id="gst18On">
                                                                 <input type="hidden" name="gst5" id="gst5">
                                                                 <input type="hidden" name="gst12" id="gst12">
                                                                 <input type="hidden" id="adult_price_backend" value="{{ isset($result[0]['Adult']) ? $result[0]['Adult'] : 200 }}">
                                                                 <input type="hidden" id="socks_price_backend" value="{{ isset($result[0]['Socks']) ? $result[0]['Socks'] : '80' }}">
+                                                                <input type="hidden" name="kidsOnlyPrice" id="kidsOnlyPrice">
+                                                                <input type="hidden" name="ba18" id="ba18">
+                                                                <input type="hidden" name="ba12" id="ba12">
+                                                                <input type="hidden" name="ba5" id="ba5">
                                                             </div>
                                                             <hr>
                                                         </div>
@@ -223,7 +243,6 @@
                                                     </div>
                                                 </form>
                                             </div>
-
                                             <div id="free" class="container tab-pane fade" role="tabpanel"><br>
                                                 <form action="{{ url('/update-membership') }}" method="post" id="my-form">
                                                     @csrf
@@ -435,12 +454,11 @@
                             '" required><input type="hidden" class="kidPrice' + i +
                             '" name="kidPrice[]"></div></div> <div class="col-md-4"><div class="mb-4 input_wrap dark"><label>Price</label><input type="number" class="form-control kid_price" placeholder="Price" name="kid_price[]" id="kid_price_' +
                             i +
-                            '" onkeyup="calculate()" readonly></div></div><div class="col-md-4 "><div class="mb-4 input_wrap"> <label>Hours <span>*</span></label><select onchange="calculateTotal()" name="hours[]" id="kid_hrs' +
+                            '" onkeyup="calculate()" readonly></div></div><div class="col-md-4 "><div class="mb-4 input_wrap"> <label>Hours <span>*</span></label><select name="hours[]" id="kid_hrs' +
                             i +
                             '" class="form-select hours" required><option value="">0</option><option value="1">1</option><option value="2">2</option><option value="Unlimited">Unlimited</option></select></div></div></div> ';
                         $("#parent-div").append(childDiv);
                         $('#result').css("display", "none");
-
                     }
                 });
             }
@@ -449,28 +467,40 @@
     <script>
         //Number of Kids Options
         $("#kidsQty").on("change", function() {
-            var numDivs = $(this).val(); // Get the selected value
+            var numDivs = $(this).val();
             $('#parent-div').empty();
-            document.getElementById('gstOn').innerHTML = "Includes Gst @18% ";
-            document.getElementById('gstValue').innerHTML = '';
-            document.getElementById('totalAmount').innerHTML = '';
+
+            ['cgst18Total', 'sgst18Total', 'totalAmount', 'couponValueShow'].forEach(id => {
+                document.getElementById(id).innerHTML = '';
+            });
+            ['couponCode', 'couponValue'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
             document.getElementById('couponCodeShow').innerHTML = 'Coupon';
-            document.getElementById('couponValueShow').innerHTML = '';
-            document.getElementById("couponCode").value = '';
-            document.getElementById("couponValue").value = '';
             $('#couponmsg').removeAttr('style').text('');
             $('#couponCodebutton').prop('disabled', false);
             $('#subtotal').text("");
 
             if (!numDivs) {
+                const fieldsToReset = [
+                    '#subtotlSave',
+                    '#chargeAmount',
+                    '#kidsOnlyPrice',
+                    '#ba18',
+                    '#ba12',
+                    '#ba5',
+                    '#gst18'
+                ];
+
+                fieldsToReset.forEach(selector => {
+                    $(selector).val('0');
+                });
                 $('#subtotal').text("");
-                $('#subtotlSave').val('0');
-                $("#chargeAmount").val('0');
-                document.getElementById('gstOn').innerHTML = "Includes Gst @18%";
-                document.getElementById('gstValue').innerHTML = '0';
                 document.getElementById('totalAmount').innerHTML = '₹ 0';
-                $('#valueGst').text("₹ 0");
-                $('#gst18').val('0');
+
+                ['#cgst5Total', '#sgst5Total'].forEach(id => {
+                    $(id).text('0');
+                });
                 $('#dataRow').empty();
                 $('#extra-time').css("display", "block");
                 $('#socks').css("display", "block");
@@ -512,17 +542,18 @@
                         var val = parseFloat($(this).val()) || 0;
                         sum += val;
                     });
-                    var gstDeductedFromKidPrice = (sum / 1.18); // 762.71                    
-                    var totalDeductGst = sum - gstDeductedFromKidPrice; //137.28                    
-                    $('#subtotal').text("₹ " + gstDeductedFromKidPrice.toFixed(2));
-                    $('#subtotlSave').val(gstDeductedFromKidPrice.toFixed(2));
-                    document.getElementById('gstOn').innerHTML = "Includes Gst @18% ";
-                    $('#gst18On').val(sum.toFixed(2));
-                    document.getElementById('gstValue').innerHTML = '' + totalDeductGst.toFixed(2);
+                    var basicAmtKidPrice = (sum / 1.18);
+                    $("#kidsOnlyPrice").val(basicAmtKidPrice.toFixed(2));
+
+                    var totalDeductGst = sum - basicAmtKidPrice;
+                    $('#subtotal').text("₹ " + basicAmtKidPrice.toFixed(2));
+                    $('#subtotlSave').val(basicAmtKidPrice.toFixed(2));
+
+                    updateGST(totalDeductGst, ['cgst18Total', 'sgst18Total'], 'gst18');
+
                     let finalAmount = sum;
                     document.getElementById('totalAmount').innerHTML = '₹ ' + finalAmount.toFixed(2);
                     $("#chargeAmount").val(finalAmount.toFixed(2));
-                    $('#gst18').val(totalDeductGst.toFixed(2));
                 },
                 error: function(xhr, status, error) {
                     console.log(error);
@@ -577,7 +608,7 @@
     <div class="col-md-3">
         <div class="input_wrap dark">
             <label>Total</label>
-            <input type="text" value="${price}" class="final_price form-control">
+            <input type="text" value="${price}" class="final_price form-control" name="final_price[]">
         </div>
     </div>
 </div>
@@ -610,13 +641,17 @@
                 var val = parseFloat($(this).val()) || 0;
                 adult_price.push(val);
             });
-            var itemPrice = [];
-
             $('input[name="price[]"]').each(function(index) {
                 var finalAdultPrice = parseFloat(select1Value[index]) * parseFloat(adult_price[index]);
                 finalPriceEach.push(finalAdultPrice);
                 $(this).val(finalAdultPrice);
             });
+
+            // $('.final_price').each(function(index) {
+            //     var finalAdultPrice = parseFloat(select1Value[index]) * parseFloat(adult_price[index]);
+            //     finalPriceEach.push(finalAdultPrice);
+            //     $(this).val(finalAdultPrice);
+            // });
             let tax = [];
             $('select[name="tax[]"]').each(function(index) {
                 var val = parseFloat($(this).val()) || 0;
@@ -635,6 +670,11 @@
                 '5': 1.05,
                 '0': 1.00
             };
+            let ba18Val = 0;
+            let ba12Val = 0;
+            let ba5Val = 0;
+            // $('input[name="price[]"]').each(function(index){
+
             $('.final_price').each(function(index) {
                 const rate = tax[index];
                 const finalPrice = finalPriceEach[index];
@@ -642,19 +682,24 @@
                 const basicAmount = finalPrice / divisor;
                 totalPrice += basicAmount;
                 const taxAmount = finalPrice - basicAmount;
-
                 switch (rate) {
                     case 18:
                         taxAmount18 += taxAmount;
+                        ba18Val += basicAmount;
+                        $("#ba18").val(ba18Val.toFixed(2));
                         break;
                     case 12:
                         taxAmount12 += taxAmount;
+                        ba12Val += basicAmount;
+                        $("#ba12").val(ba12Val.toFixed(2));
                         break;
                     case 5:
                         taxAmount5 += taxAmount;
+                        ba5Val += basicAmount;
+                        $("#ba5").val(ba5Val.toFixed(2));
                         break;
                 }
-                $(this).val((finalPrice + taxAmount).toFixed(2));
+                $(this).val(basicAmount.toFixed(2));
             });
             let subTotalPrice = 0;
             subTotalPrice = totalPrice + taxAmount18 + taxAmount12 + taxAmount5;
@@ -663,33 +708,22 @@
             $('input[name="totalAmount"]').val(subTotalPrice.toFixed(2));
             $('#totalAmount').text("₹ " + subTotalPrice.toFixed(2));
 
-            let priceWith18Gst = 0;
-            tax.forEach((value, index) => {
-                if (value === 18) {
-                    priceWith18Gst += adult_price[index] * select1Value[index];
-                }
+            updateGST(taxAmount18, ['cgst18Total', 'sgst18Total'], 'gst18');
+            updateGST(taxAmount5, ['cgst5Total', 'sgst5Total'], 'gst5');
+            updateGST(taxAmount12, ['cgs12tTotal', 'sgst12Total'], 'gst12', 'gst12Container');
+        }
+
+        function updateGST(taxAmount, selectors, inputName, containerId = null) {
+            const halfTax = (taxAmount / 2).toFixed(2);
+            selectors.forEach(id => {
+                $('#' + id).text("₹ " + halfTax);
             });
-            let gstOnPrice = sum + priceWith18Gst;
-            document.getElementById('gstOn').innerHTML = "Includes Gst @18% ";
+            $(`input[name="${inputName}"]`).val(taxAmount.toFixed(2));
 
-            $('#gst18On').val(gstOnPrice.toFixed(2));
-            $('#gstValue').text("₹ " + taxAmount18.toFixed(2));
-            $('input[name="gst18"]').val(taxAmount18.toFixed(2));
-            $('#valueGst').text("₹ " + taxAmount5.toFixed(2));
-            $('input[name="gst5"]').val(taxAmount5.toFixed(2));
-
-            if (taxAmount12 > 0) {
-                document.querySelector('#gst12Container').classList.remove('d-none');
-            } else {
-                document.querySelector('#gst12Container').classList.add('d-none');
+            if (containerId) {
+                const container = $('#' + containerId);
+                taxAmount > 0 ? container.removeClass('d-none') : container.addClass('d-none');
             }
-            $('#gst12PercentVal').text("₹ " + taxAmount12.toFixed(2));
-            $('input[name="gst12"]').val(taxAmount12.toFixed(2));
-            var totalwithTax = (totalPrice + taxAmount18 + taxAmount5 + taxAmount12).toFixed(2);
-            var totalwithOutTax = totalPrice.toFixed(2);
-            // $('#totalAmount').text("₹ EXF" + subTotalPrice);
-            // $('input[name="totalAmount"]').val(subTotalPrice);
-            // $('input[name="subTotal"]').text(totalPrice.toFixed(2));
         }
     </script>
 
@@ -704,8 +738,7 @@
                     branch: branchId
                 },
                 success: function(data) {
-                    let sum = $("#chargeAmount").val();                    
-                    let sumamount = 0;
+                    let sum = $("#chargeAmount").val();
                     if (data.status === 400) {
                         $('#couponmsg').css('color', 'red').text(data.msg);
                         return false;
@@ -716,77 +749,86 @@
                     }
                     if (data != '') {
                         let discount = removeCouponDiscountAmt = data.discount;
+                        let subTotalBA = 0;
+                        let payableTotalAmt = 0;
+                        let perTotalDiscountAmt = 0;
+                        let totalNewBa18 = 0;
                         removeCouponType = data.discount_type;
                         $('#remove-coupon').removeClass('disabled');
                         $('#couponCodebutton').addClass('disabled');
                         $('#couponmsg').css('color', '#0A5F59').text('Apply Coupon Successful!');
 
-                        // GST deduction
-                        let subTotalLessGST = parseFloat(sum);                        
-
-                        ["#gst5", "#gst18", "#gst12"].forEach(id => {
-                            let gst = parseFloat($(id).val()) || 0;                           
-                            subTotalLessGST -= gst;
-                        });                        
-
-                        // $('#subtotal').text("₹ " + subTotalLessGST.toFixed(2));
-                        // $('#subtotlSave').val(subTotalLessGST.toFixed(2));
-
-                        let gst18Ded = parseFloat($('#gst18').val()) || 0;
-                        let gst18OnVal = parseFloat($('#gst18On').val()) || 0;
-                        document.getElementById('gstOn').innerHTML = "Includes Gst @18% ";
-                        document.getElementById('gstValue').innerHTML = gst18Ded.toFixed(2);
-
-                        // coupon discount deduction AFTER GST deducated
-                        let discountAmt = 0;
                         if (data.discount_type == 'flat') {
-                            discountAmt = discount;
+                            ["#kidsOnlyPrice", "#ba18", "#ba12", "#ba5"].forEach(id => {
+                                let ba = parseFloat($(id).val()) || 0;
+                                subTotalBA += ba;
+                            });
+                            subTotalBA -= discount;
                         } else if (data.discount_type == 'percent') {
-                            discountAmt = (subTotalLessGST.toFixed(2) * discount) / 100;
+
+                            ["#kidsOnlyPrice", "#ba18", "#ba12", "#ba5"].forEach(id => {
+                                let ba = parseFloat($(id).val()) || 0;
+                                if (id !== "#ba5") {
+                                    let indDiscountAmt = (ba * discount) / 100;
+                                    let newBa = (ba - indDiscountAmt);
+                                    if (id == '#kidsOnlyPrice' || id == '#ba18') {
+                                        totalNewBa18 += newBa;
+                                    }
+                                    $(id).val(newBa.toFixed(2));
+                                    perTotalDiscountAmt += indDiscountAmt;
+                                    subTotalBA += newBa;
+                                } else {
+                                    subTotalBA += ba;
+                                }
+                            });
+                            //updated GST for 18 and 12
+                            let new18Gst = (totalNewBa18 * 18) / 100;
+                            updateGST(new18Gst, ['cgst18Total', 'sgst18Total'], 'gst18');
+                            let ba12 = parseFloat($('#ba12').val()) || 0;
+                            let new12Gst = 0;
+                            if (ba12 > 0) {
+                                new12Gst = (ba12 * 12) / 100;
+                                updateGST(new12Gst, ['cgs12tTotal', 'sgst12Total'], 'gst12');
+                            } else {
+                                document.querySelector('#gst12Container').classList.add('d-none');
+                            }
+                            discount = perTotalDiscountAmt;
                         }
-                        $('#couponValue').val(discountAmt.toFixed(2));
-                        $('#couponCodeShow').html("Coupon Code (" + data.coupon_name + ")");
-                        $('#couponValueShow').html(discountAmt.toFixed(2));
-                        sum = subTotalLessGST - discountAmt.toFixed(2);
 
-                        $('#subtotal').text("₹ " + sum.toFixed(2));
-                        $('#subtotlSave').val(sum.toFixed(2));
-
-                        //update GST                        
-                        let newGst = (sum * 18) / 100;
-                        $('#gst18').val(newGst.toFixed(2));
-                        document.getElementById('gstValue').innerHTML = newGst.toFixed(2);
+                        $('#subtotal').text("₹ " + subTotalBA.toFixed(2));
+                        $('#subtotlSave').val(subTotalBA.toFixed(2));
 
                         ["#gst5", "#gst18", "#gst12"].forEach(id => {
-                            let reGst = parseFloat($(id).val()) || 0;
-                            sum += reGst;
+                            let gst = parseFloat($(id).val()) || 0;
+                            payableTotalAmt += gst;
                         });
-                        document.getElementById('totalAmount').innerHTML = '₹ ' + sum.toFixed(2);
-                        $("#chargeAmount").val(sum.toFixed(2));
+
+                        $('#couponValue').val(discount.toFixed(2));
+                        $('#couponCodeShow').html("Coupon Code (" + data.coupon_name + ")");
+                        $('#couponValueShow').html(discount.toFixed(2));
+
+                        payableTotalAmt += subTotalBA;
+
+                        document.getElementById('totalAmount').innerHTML = '₹ ' + payableTotalAmt.toFixed(2);
+                        $("#chargeAmount").val(payableTotalAmt.toFixed(2));
                     } else {
+                        let sumamount = 0;
+                        alert('Coupon Data is void. Else case.');
                         // Get the value of the first select box
-                        var select1Value = parseInt($('#adult_qty')
-                            .val());
-                        var adult_price = document.getElementById(
-                            'adult_price_backend').value;
-                        var finalAdultPrice = parseFloat(adult_price) *
-                            parseFloat(select1Value);
+                        var select1Value = parseInt($('#adult_qty').val());
+                        var adult_price = document.getElementById('adult_price_backend').value;
+                        var finalAdultPrice = parseFloat(adult_price) * parseFloat(select1Value);
                         // Get the value of the second select box
-                        var select2Value = parseInt($('#socks_qty')
-                            .val());
-                        var socks_price = document.getElementById(
-                            'socks_price_backend').value;
-                        var finalSocksPrice = parseFloat(socks_price) *
-                            parseFloat(select2Value);
-                        $("#socks_price").val(finalSocksPrice.toFixed(
-                            2));
+                        var select2Value = parseInt($('#socks_qty').val());
+                        var socks_price = document.getElementById('socks_price_backend').value;
+                        var finalSocksPrice = parseFloat(socks_price) * parseFloat(select2Value);
+                        $("#socks_price").val(finalSocksPrice.toFixed(2));
                         // Add the values of the select boxes to the sum
                         if (isNaN(finalAdultPrice)) {
                             var taxSum = sumamount + finalAdultPrice;
                             var gstKid = (taxSum * 18) / 100;
                             sumamount += finalAdultPrice;
-                            $("#adult_price").val(finalAdultPrice
-                                .toFixed(2));
+                            $("#adult_price").val(finalAdultPrice.toFixed(2));
                         }
                         $('#subtotal').text("₹ " + sum.toFixed(2));
                         $('#subtotlSave').val(sum.toFixed(2));
@@ -798,8 +840,7 @@
                             var gstSocks = (socks_price * 5) / 100;
                             finalAmount += gstSocks;
                         }
-                        document.getElementById('totalAmount')
-                            .innerHTML = '₹ ' + finalAmount.toFixed(2);
+                        document.getElementById('totalAmount').innerHTML = '₹ ' + finalAmount.toFixed(2);
                         $("#chargeAmount").val(finalAmount.toFixed(2));
                         $('#gst18').val(gstKid.toFixed(2));
                     }
