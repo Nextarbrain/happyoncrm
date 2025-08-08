@@ -27,7 +27,7 @@ class UserDataTable extends DataTable
         if ($branchId) {
             $users->where('branch_id', $branchId);
         }
-        $userData = $users->with('paymentInfo', 'kid', 'event', 'userDetails')->latest();
+        $userData = $users->with('paymentInfo', 'event', 'userDetails', 'firstKid')->latest();
         return DataTables::of($userData)
             ->addColumn('checkbox', function ($user) {
                 return '<input type="checkbox" name="users[]" class="users_checkbox" value="' . $user->id . '" data-item-id="' . $user->id . '">';
@@ -40,10 +40,10 @@ class UserDataTable extends DataTable
                 }
             })
             ->editColumn('first_kid', function ($user) {
-                return isset($user->kid->name) ? '<span class="text-capitalize">' . $user->kid->name . '</span>' : '--';
+                return isset($user->firstKid->name) ? '<span class="text-capitalize">' . $user->firstKid->name . '</span>' : '--';
             })
             ->addColumn('first_kid', function ($user) {
-                return isset($user->kid->name) ? '<span class="text-capitalize">' . $user->kid->name . '</span>' : '--';
+                return isset($user->firstKid->name) ? '<span class="text-capitalize">' . $user->firstKid->name . '</span>' : '--';
             })
             ->editColumn('date', function ($user) {
                 if (isset($user->event->booking_date)) {
@@ -121,19 +121,19 @@ class UserDataTable extends DataTable
                 date_default_timezone_set('Asia/Kolkata');
 
                 $start_datetime = isset($user['event']->Hours) ? $user['event']->Hours : null;
-                $end_datetime = isset($user['kid']->end_time) ? $user['kid']->end_time : null;
+                $end_datetime = isset($user['firstKid']->end_time) ? $user['firstKid']->end_time : null;
                 $booking_date = isset($user['event']->booking_date) ? $user['event']->booking_date : null;
                 $start_date_time = $booking_date . ' ' . $start_datetime . ':00';
 
                 $start_time_unix = strtotime($start_date_time);
 
-                if (isset($user['kid']->hours) && $user['kid']->hours == 'Unlimited') {
+                if (isset($user['firstKid']->hours) && $user['firstKid']->hours == 'Unlimited') {
                     $hourQty = 1;
                 } else {
-                    $hourQty = isset($user['kid']->hours) ? $user['kid']->hours : '';
+                    $hourQty = isset($user['firstKid']->hours) ? $user['firstKid']->hours : 0;
+                    $hourQty += isset($user['firstKid']->extra_hour) ? $user['firstKid']->extra_hour : 0;
                 }
-
-                if ($hourQty == "1.5") {
+                if (strpos($hourQty, '.') !== false) {
                     $totalSecond = $hourQty * 3600;
                 } else {
                     $totalSecond = (int)$hourQty * 3600;
@@ -156,19 +156,20 @@ class UserDataTable extends DataTable
                 date_default_timezone_set('Asia/Kolkata');
 
                 $start_datetime = isset($user['event']->Hours) ? $user['event']->Hours : null;
-                $end_datetime = isset($user['kid']->end_time) ? $user['kid']->end_time : null;
+                $end_datetime = isset($user['firstKid']->end_time) ? $user['firstKid']->end_time : null;
                 $booking_date = isset($user['event']->booking_date) ? $user['event']->booking_date : null;
                 $start_date_time = $booking_date . ' ' . $start_datetime . ':00';
 
                 $start_time_unix = strtotime($start_date_time);
 
-                if (isset($user['kid']->hours) && $user['kid']->hours == 'Unlimited') {
+                if (isset($user['firstKid']->hours) && $user['firstKid']->hours == 'Unlimited') {
                     $hourQty = 1;
                 } else {
-                    $hourQty = isset($user['kid']->hours) ? $user['kid']->hours : '';
+                    $hourQty = isset($user['firstKid']->hours) ? (float)$user['firstKid']->hours : 0;
+                    $hourQty += isset($user['firstKid']->extra_hour) ? (float)$user['firstKid']->extra_hour : 0;
                 }
 
-                if ($hourQty == "1.5") {
+                if (strpos($hourQty, '.') !== false) {
                     $totalSecond = $hourQty * 3600;
                 } else {
                     $totalSecond = (int)$hourQty * 3600;
@@ -194,10 +195,12 @@ class UserDataTable extends DataTable
                 return isset($user->userDetails->number_of_kids) ? '<td class="gree_c">' . $user->userDetails->number_of_kids . '</td>' : '';
             })
             ->editColumn('hours', function ($user) {
-                return isset($user->kid->hours) ? $user->kid->hours : '';
+                $hours = (isset($user->firstKid->hours) ? (float)$user->firstKid->hours : 0) + (isset($user->firstKid->extra_hour) ? (float)$user->firstKid->extra_hour : 0);
+                return $hours;
             })
             ->addColumn('hours', function ($user) {
-                return isset($user->kid->hours) ? $user->kid->hours : '';
+                $hours = (isset($user->firstKid->hours) ? (float)$user->firstKid->hours : 0) + (isset($user->firstKid->extra_hour) ? (float)$user->firstKid->extra_hour : 0);
+                return $hours;
             })
             ->editColumn('payment_method', function ($user) {
                 return isset($user->paymentInfo->payment_method) ? $user->paymentInfo->payment_method : '';

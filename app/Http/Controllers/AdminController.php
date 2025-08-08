@@ -1356,7 +1356,7 @@ class AdminController extends Controller
 
 
     public function DatawiseRecord(Request $request)
-    {
+    {       
         $applydate = base64_decode($request->date);
         $branchId = $request->branch_id ?? auth('admin')->user()->branch_id ?? null;
         $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
@@ -1395,11 +1395,7 @@ class AdminController extends Controller
                 $openbillings = $openbillings->get();
 
                 return view('happyView.openBilling.index', ['open_billings' => $openbillings, 'applydate' => $applydate]);
-            }
-
-            // $ticket_sales = PaymentMethod::sum('amounts');
-            // $member_sales = MembershipBuy::sum('amount');
-            // $event_sales = EventBooking::where('payment_status', 'Paid')->sum('totalamount');
+            }           
 
 
             $event_bookings = EventBooking::where('payment_status', 'Paid')->whereDate('booking_date', $today);
@@ -1618,30 +1614,6 @@ class AdminController extends Controller
             return response()->json(['status' => 400, 'msg' => 'Coupon code has expired']);
         }
     }
-
-    // public function getCoupon(Request $request)
-    // {
-
-    //     $todaydate = Carbon\Carbon::now('Asia/Kolkata')->format('Y-m-d');
-
-    //     $value = Coupon::where('coupon_name', $request->get('option'))->first();
-    //     dd($value);
-    //     if (!$value) {
-    //         return response()->json(['status' => 400, 'msg' => 'Please enter valid coupon code']);
-    //     }
-    //     if (isset($value->coupon_name) && $value->coupon_name != '') {
-    //         if ($value->start_from <= $todaydate && $value->valid_till >= $todaydate) {
-    //             $data = ['coupon_name' => $value->coupon_name, 'discount_type' => $value->discount_type, 'discount' => $value->discount];
-    //             return response()->json($data, 200);
-    //         } else {
-    //             return response()->json(['status' => 400, 'msg' => 'Coupon code expired']);
-    //         }
-    //     } else {
-    //         return response()->json(['status' => 400, 'msg' => 'Coupon code invalid']);
-    //     }
-
-    // }
-
 
     public function editProductPost(Request $request)
     {

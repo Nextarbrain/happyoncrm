@@ -11,7 +11,6 @@
                     <div class="mobile-toggle-menu">
                         <i class="fa fa-bars" aria-hidden="true"></i>
                     </div>
-
                     <div class="top-menu ms-auto">
                         <ul class="navbar-nav align-items-center">
                             <li class="nav-item dropdown dropdown-large">
@@ -28,16 +27,12 @@
                             </li>
                         </ul>
                     </div>
-
                 </nav>
             </div>
         </header>
-
-
         <!--end header -->
         <!--start page wrapper -->
         <div class="page-wrapper">
-
             <div class="page-content">
                 <div class="row">
                     <div class="col-md-12">
@@ -47,17 +42,6 @@
                                     <div class="col-md-3">
                                         <p>User List ({{ count($user) }}) </p>
                                     </div>
-                                    {{--	<div class="col-md-3">
-										<label>Download Report</label>
-										<form action="{{url('/tickets-booking-report')}}" method="post">
-											@csrf
-
-											<div class="d-flex">
-											<input type="text" name="daterange" class="form-control float-right" id="reservation1">
-											<input type="submit" value="Apply" name="submit" class="btn btn-primary m-1">
-											</div>
-										</form>
-									</div> --}}
                                     <div class="col-md-3">
                                         @if (can('tickets-add'))
                                             <div class="add_btn">
@@ -72,44 +56,28 @@
                                             </div>
                                         @endif
                                     </div>
-
                                     <div class="col-md-3">
-
                                         <div class="dropdown">
-                                            <button class="btn btn-secondary dropdown-toggle" type="button"
-                                                id="dropdownMenuButton1" data-bs-toggle="dropdown"
-                                                aria-expanded="false">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                                 Payment Method
                                             </button>
                                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                <li><a class="dropdown-item"
-                                                        href="{{ url('customer-filter?key=Cash') }}">Cash</a></li>
-                                                <li><a class="dropdown-item"
-                                                        href="{{ url('customer-filter?key=UPI') }}">UPI</a></li>
-                                                <li><a class="dropdown-item"
-                                                        href="{{ url('customer-filter?key=Debit/Credit') }}">Debit/Credit</a>
+                                                <li><a class="dropdown-item" href="{{ url('customer-filter?key=Cash') }}">Cash</a></li>
+                                                <li><a class="dropdown-item" href="{{ url('customer-filter?key=UPI') }}">UPI</a></li>
+                                                <li><a class="dropdown-item" href="{{ url('customer-filter?key=Debit/Credit') }}">Debit/Credit</a>
                                                 </li>
                                             </ul>
                                         </div>
-
                                     </div>
-
-
-
                                 </div>
-
-
                             </div>
                             <!-- data table  -->
                             <div class="container">
                                 <div class="row table-responsive">
                                     <div class="data_table">
                                         <div class="table_header">
-
-
                                         </div>
-                                        <table id="example1" class="table table-striped overflow-auto text-center"
-                                            style="width:100%">
+                                        <table id="example1" class="table table-striped overflow-auto text-center" style="width:100%">
                                             <thead>
                                                 <tr>
                                                     <th><input type="checkbox" onclick="checkAll(this)"></th>
@@ -127,7 +95,6 @@
                                                     <th>Hours</th>
                                                     <th>Pay Method</th>
                                                     <th>Type</th>
-
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -136,21 +103,16 @@
                                                     $totalAmount = 0;
                                                 @endphp
                                                 @foreach ($user as $users)
-
                                                     @if ($users->role == 1 || ($users->role == 2 && isset($users->membership)))
                                                         <tr>
-                                                            <td><input type="checkbox" name="users[]"
-                                                                    class="users_checkbox" value="{{ $users->id }}"
-                                                                    data-item-id="{{ $users->id }}"></td>
+                                                            <td><input type="checkbox" name="users[]" class="users_checkbox" value="{{ $users->id }}" data-item-id="{{ $users->id }}"></td>
                                                             @if (isset($users['paymentInfo']) && $users['paymentInfo']->payment_method == 'Card')
-                                                                <td><img src="/assets/images/Vector.png" alt="logo">
-                                                                    &nbsp;{{ $users->name }} </td>
+                                                                <td><img src="/assets/images/Vector.png" alt="logo">&nbsp;{{ $users->name }} </td>
                                                             @else
                                                                 <td class="text-capitalize">{{ $users->name }}</td>
                                                             @endif
                                                             @if (isset($users['kid']->name) && $users['kid']->name != '')
-                                                                <td class="text-capitalize">{{ $users['kid']->name }}
-                                                                </td>
+                                                                <td class="text-capitalize">{{ $users['kid']->name }}</td>
                                                             @else
                                                                 <td>--</td>
                                                             @endif
@@ -164,29 +126,19 @@
                                                                     </td>
                                                                 @endif
                                                             @else
-                                                                <td>{{ isset($users['membership']->date) ? \Carbon\Carbon::parse($users['membership']->date)->format('d M, Y') : '' }}
-                                                                </td>
+                                                                <td>{{ isset($users['membership']->date) ? \Carbon\Carbon::parse($users['membership']->date)->format('d M, Y') : '' }}</td>
                                                             @endif
-                                                            <td>{{ isset($users['userDetails']->phone_no) ? $users['userDetails']->phone_no : '' }}
-                                                            </td>
-                                                            <td>{{ isset($users['paymentInfo']) && $users['paymentInfo']->gst18 ?? number_format($users['paymentInfo']->gst18 / 2, 2) }}
-                                                            </td>
-                                                            <td>{{ isset($users['paymentInfo']) && $users['paymentInfo']->gst18 ?? number_format($users['paymentInfo']->gst18 / 2, 2) }}
-                                                            </td>
-                                                            <td>{{ isset($users['paymentInfo']) && $users['paymentInfo']->gst5 ??  number_format($users['paymentInfo']->gst5 / 2, 2) }}
-                                                            </td>
-                                                            <td>{{ isset($users['paymentInfo']) && $users['paymentInfo']->gst5 ??  number_format($users['paymentInfo']->gst5 / 2, 2) }}
-                                                            </td>
-
+                                                            <td>{{ isset($users['userDetails']->phone_no) ? $users['userDetails']->phone_no : '' }}</td>
+                                                            <td>{{ optional($users['paymentInfo'])->gst18 ? round(optional($users['paymentInfo'])->gst18 / 2, 2) : '' }}</td>
+                                                            <td>{{ optional($users['paymentInfo'])->gst18 ? round(optional($users['paymentInfo'])->gst18 / 2, 2) : '' }}</td>
+                                                            <td>{{ optional($users['paymentInfo'])->gst5 ? round(optional($users['paymentInfo'])->gst5 / 2, 2) : '' }}</td>
+                                                            <td>{{ optional($users['paymentInfo'])->gst5 ? round(optional($users['paymentInfo'])->gst5 / 2, 2) : '' }}</td>                                                            
                                                             @if (isset($users['paymentInfo']) && $users['paymentInfo']->payment_method == 'Card')
-                                                                <td> {{ $users['membership']->amount ?? $users['paymentInfo']->amounts }}
-                                                                </td>
+                                                                <td> {{ $users['membership']->amount ?? $users['paymentInfo']->amounts }}</td>
                                                             @else
-                                                                <td>{{ isset($users['paymentInfo']->amounts) ? $users['paymentInfo']->amounts : '' }}
-                                                                </td>
+                                                                <td>{{ isset($users['paymentInfo']->amounts) ? $users['paymentInfo']->amounts : '' }}</td>
                                                             @endif
                                                             @php
-
                                                                 date_default_timezone_set('Asia/Kolkata');
                                                                 $start_datetime = isset($users['event']->Hours) ? $users['event']->Hours : null;
                                                                 $end_datetime = isset($users['kid']->end_time) ? $users['kid']->end_time : null;
@@ -218,12 +170,8 @@
                                                                 $remaining_hours = floor($remaining_seconds / 3600);
                                                                 $remaining_minutes = floor(($remaining_seconds % 3600) / 60);
                                                                 $remaining_seconds = $remaining_seconds % 60;
-
                                                                 $remaining_time = $remaining_hours . ' : ' . $remaining_minutes . ' : ' . $remaining_seconds;
-
                                                             @endphp
-
-
 
                                                             @if (isset($users['kid']) && $users['kid']->hours == 'Unlimited')
                                                                 <td>{{ $users['kid']->hours }}</td>
@@ -234,27 +182,19 @@
                                                                 <span>{{ isset($users['userDetails']->number_of_kids) ? $users['userDetails']->number_of_kids : '' }}</span>
                                                             </td>
                                                             <td>
-                                                                <span
-                                                                    id="time_hrs">{{ isset($users['kid']->hours) ? $users['kid']->hours : '' }}</span>
+                                                                <span id="time_hrs">{{ isset($users['kid']->hours) ? $users['kid']->hours : '' }}</span>
                                                             </td>
-                                                            <td>{{ isset($users['paymentInfo']->payment_method) ? $users['paymentInfo']->payment_method : '' }}
-                                                            </td>
+                                                            <td>{{ isset($users['paymentInfo']->payment_method) ? $users['paymentInfo']->payment_method : '' }}</td>
 
                                                             <td>{{ $users->role == 1 ? 'Ticket' : '' }}
                                                                 {{ $users->role == 2 ? 'Membership' : '' }}
                                                             </td>
                                                             <td>
                                                                 @if (can('tickets-edit'))
-                                                                    <a
-                                                                        href="{{ url('/tickets-edit-view/' . $users->id) }}""><i
-                                                                            class="fa fa-pencil"
-                                                                            aria-hidden="true"></i></a>
+                                                                    <a href="{{ url('/tickets-edit-view/' . $users->id) }}""><i class="fa fa-pencil" aria-hidden="true"></i></a>
                                                                 @endif
                                                                 <i class="fa fa-eye" aria-hidden="true"></i>
-                                                                <a href="{{ url('/invoice-pdf/' . $users->id) }}"
-                                                                    target="_blank"><i class="fa fa-file"
-                                                                        aria-hidden="true"></i></a>
-
+                                                                <a href="{{ url('/invoice-pdf/' . $users->id) }}" target="_blank"><i class="fa fa-file" aria-hidden="true"></i></a>
                                                             </td>
                                                         </tr>
 
@@ -270,7 +210,6 @@
                                                     @endif
                                                 @endforeach
                                                 @isset($event_bookings)
-
                                                     @foreach ($event_bookings as $event)
                                                         <tr>
                                                             <td>-</td>
@@ -285,26 +224,20 @@
                                                             <td>{{ number_format($event->gst5 / 2, 2) }}</td>
                                                             <td>{{ $event->totalamount }}</td>
                                                             <td>-</td>
-                                                            <td class="gree_c">
-                                                                <span>1</span>
-                                                            </td>
+                                                            <td class="gree_c"><span>1</span></td>
                                                             <td>NA</td>
                                                             <td>{{ $event->advance_payment_method }}</td>
                                                             <td>Event</td>
                                                             <td>
-                                                                <a href="{{ url('/edit-event', $event->id) }}""><i
-                                                                        class="fa fa-pencil" aria-hidden="true"></i></a>
+                                                                <a href="{{ url('/edit-event', $event->id) }}""><i class="fa fa-pencil" aria-hidden="true"></i></a>
                                                                 <i class="fa fa-eye" aria-hidden="true"></i>
-                                                                <a href="{{ url('/invoice-event-pdf', $event->id) }}"
-                                                                    target="_blank"><i class="fa fa-file"
-                                                                        aria-hidden="true"></i></a>
+                                                                <a href="{{ url('/invoice-event-pdf', $event->id) }}" target="_blank"><i class="fa fa-file" aria-hidden="true"></i></a>
                                                             </td>
                                                         </tr>
                                                         @php
                                                             $totalAmount += $event->totalamount;
                                                         @endphp
                                                     @endforeach
-
                                                 @endisset
                                                 @isset($openbillings)
                                                     @foreach ($openbillings as $openbilling)
@@ -328,22 +261,16 @@
                                                             <td>{{ $openbilling->payment_method }}</td>
                                                             <td>Open Billing</td>
                                                             <td>
-                                                                <a
-                                                                    href="{{ url('/edit-open-billing', $openbilling->id) }}""><i
-                                                                        class="fa fa-pencil" aria-hidden="true"></i></a>
+                                                                <a href="{{ url('/edit-open-billing', $openbilling->id) }}""><i class="fa fa-pencil" aria-hidden="true"></i></a>
                                                                 <i class="fa fa-eye" aria-hidden="true"></i>
-                                                                <a href="{{ url('/invoice-open-billing-pdf', $openbilling->id) }}"
-                                                                    target="_blank"><i class="fa fa-file"
-                                                                        aria-hidden="true"></i></a>
+                                                                <a href="{{ url('/invoice-open-billing-pdf', $openbilling->id) }}" target="_blank"><i class="fa fa-file" aria-hidden="true"></i></a>
                                                             </td>
                                                         </tr>
                                                         @php
                                                             $totalAmount += $openbilling->totalamount;
                                                         @endphp
                                                     @endforeach
-
                                                 @endisset
-
                                             </tbody>
                                             <tr>
                                                 <td></td>
@@ -439,18 +366,6 @@
     </script>
 
     <script>
-        // 		jQuery(document).ready(function() {
-        //     			jQuery('#example').DataTable(
-
-        //          {
-
-        //       "aLengthMenu": [[5, 10, 25, -1], [5, 10, 25, "All"]],
-        //         "iDisplayLength": 10
-        //        }
-        //         );
-        // } );
-
-
         function checkAll(bx) {
             var cbs = document.getElementsByTagName('input');
             for (var i = 0; i < cbs.length; i++) {
@@ -459,8 +374,6 @@
                 }
             }
         }
-
-
         document.getElementById('user_delete').addEventListener("click", function() {
             var selectedItems = [];
             $('.users_checkbox:checked').each(function() {
@@ -498,8 +411,6 @@
                 });
             }
         });
-
-
         $(document).ready(function() {
             toastr.options.timeOut = 10000;
             @if (Session::has('error'))
