@@ -78,8 +78,6 @@ class MembershipController extends Controller
         }
         $credit = $reqPlan[0]->credits ?? 0;
 
-        // $subTotalWithoutDiscount = $paymentMethod->subTotal + ($paymentMethod->couponvalue ?? 0);
-        // $subTotal = ($subTotalWithoutDiscount - $paymentMethod->gst18);
         $data = [
             'guardian_name' => $user->name,
             "payment_method" => $paymentMethod->payment_method,
@@ -156,6 +154,51 @@ class MembershipController extends Controller
 
 
     public function getMembershipPlan(Request $request)
+    {
+        hasPermission('membership');
+        $branchId = $request->get('branch_id') ? (int) $request->get('branch_id') : auth('admin')->user()->branch_id;
+        $id = $request->input('id');
+        $data = MembershipPlan::where('id', $id)->first();
+        if (!$data) {
+            return response()->json(["status" => false, "message" => "Please Choose Membership Plan "]);
+        }
+        if ($request->coupon) {
+            $coupon = Coupon::where('coupon_name', $request->coupon);
+            if ($branchId) {
+                $coupon->where('branch_id', $branchId);
+            }
+            $coupon = $coupon->first();
+            if ($coupon == null) {
+                return response()->json(["status" => false, "message" => "Please enter a valid coupon code"]);
+            }
+            $data->coupan_name = $coupon->coupon_name ?? '';
+            $data->coupan_price = $coupon->discount ?? '';
+        }
+        // Original Plan Price 
+        $planPrice = $data->price;
+
+        // coupon calculation
+        $couponDiscount = 0;
+        if (isset($coupon) && !is_null($coupon) && $coupon->discount_type === 'flat') {
+            $couponDiscount = number_format($coupon->discount, 2, '.', '');
+        } elseif (isset($coupon) && !is_null($coupon) && $coupon->discount_type === 'percent') {
+            $couponDiscount = ($planPrice * $coupon->discount) / 100;
+            $couponDiscount = number_format($couponDiscount, 2, '.', '');
+        }
+        $data->discounted_amt = $couponDiscount;
+        $planPrice = $planPrice - $couponDiscount;
+        $data->subTotal = $planPrice;
+
+        // GST Calculation
+        $data->gst18Amt = $gst18Amt = ($planPrice * 18) / 100;
+        $data->gst9Amt = ($planPrice * 9) / 100;
+
+        $data->totalAmt = $planPrice + $gst18Amt;
+        return response()->json($data);
+    }
+
+
+    public function old_metMembershipPlan_niu(Request $request)
     {
         hasPermission('membership');
         $branchId = $request->get('branch_id') ? (int) $request->get('branch_id') : auth('admin')->user()->branch_id;

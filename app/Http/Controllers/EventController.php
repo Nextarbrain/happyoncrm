@@ -134,8 +134,8 @@ class EventController extends Controller
         $eventbooking->phone = $request->phone;
         $eventbooking->bill_name = $request->billing_name;
         $eventbooking->contact_person = $request->contact;
-        $eventbooking->kid_name = $request->kid_name;
-        $eventbooking->kid_dob = $request->kid_dob;
+        // $eventbooking->kid_name = $request->kid_name;
+        // $eventbooking->kid_dob = $request->kid_dob;
         $eventbooking->payment_method = $request->payment_method;
         $eventbooking->payment_status = $request->payment_status;
 
@@ -209,8 +209,8 @@ class EventController extends Controller
         $eventbooking->phone = $request->phone;
         $eventbooking->bill_name = $request->billing_name;
         $eventbooking->contact_person = $request->contact;
-        $eventbooking->kid_name = $request->kid_name;
-        $eventbooking->kid_dob = $request->kid_dob;
+        // $eventbooking->kid_name = $request->kid_name;
+        // $eventbooking->kid_dob = $request->kid_dob;
         $eventbooking->payment_method = $request->payment_method;
         $eventbooking->payment_status = $request->payment_status;
 
@@ -238,13 +238,10 @@ class EventController extends Controller
         couponCountUpdate($request->couponcode);
 
         if ($eventbooking->id) {
-
             $item_name = $request->item_name;
             $item_price = $request->item_price;
             $item_qty = $request->item_qty;
             $item_tax = $request->item_tax;
-
-
             for ($i = 0; $i <= count($item_name) - 1; $i++) {
                 $event_item = new EventItem();
                 if (isset($item_name[$i])) {

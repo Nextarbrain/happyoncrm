@@ -104,10 +104,7 @@
                                                                         </tr>
                                                                         @foreach ($kidsInvoice as $kidsInv)
                                                                             <tr style="border-top: 1px solid #000;">
-                                                                                <td style="font-size: 15px;">
-                                                                                    {{ $kidsInv['hours'] }}
-                                                                                    {{ $kidsInv['hours'] == 'Unlimited' ? '' : 'hr' }} Play Time
-                                                                                </td>
+                                                                                <td style="font-size: 15px;">{{ $kidsInv['hours'] }}</td>
                                                                                 <td style="font-size: 15px;text-align: center;">{{ $kidsInv['quantity'] }}</td>
                                                                                 <td style="font-size: 15px;">{{ $kidsInv['price'] }}</td>
                                                                                 <td style="font-size: 15px;text-align: right;">
@@ -149,18 +146,31 @@
                                                                                         @endif
                                                                                         @if (isset($gst18) && $gst18 != null && $gst18 != '0.00')
                                                                                             <tr style="border-top: 1px solid #000;">
-                                                                                                <td style="font-size: 15px;">Exclude GST@ 18% :</td>
-                                                                                                <td style="font-size: 15px;text-align: right;">{{ $gst18 }}</td>
+                                                                                                <td style="font-size: 15px;">CGST @ 9% :</td>
+                                                                                                <td style="font-size: 15px;text-align: right;">{{ round($gst18 / 2, 2) }}</td>
                                                                                             </tr>
+                                                                                            <tr style="border-bottom: 1px solid #000;">
+                                                                                                <td style="font-size: 15px;">SGST @ 9% :</td>
+                                                                                                <td style="font-size: 15px;text-align: right;">{{ round($gst18 / 2, 2) }}</td>
+                                                                                            </tr>
+
                                                                                             <tr style="border-top: 1px solid #000;">
-                                                                                                <td style="font-size: 15px;">Exclude GST@ 5% :</td>
-                                                                                                <td style="font-size: 15px;text-align: right;">{{ $gst5 }}</td>
+                                                                                                <td style="font-size: 15px;">CGST @ 2.5% :</td>
+                                                                                                <td style="font-size: 15px;text-align: right;">{{ round($gst5 / 2, 2) }}</td>
+                                                                                            </tr>
+                                                                                            <tr style="border-bottom: 1px solid #000;">
+                                                                                                <td style="font-size: 15px;">SGST @ 2.5% :</td>
+                                                                                                <td style="font-size: 15px;text-align: right;">{{ round($gst5 / 2, 2) }}</td>
                                                                                             </tr>
                                                                                         @endif
                                                                                         @if (isset($gst12) && $gst12 != null && $gst12 != '0.00')
                                                                                             <tr style="border-top: 1px solid #000;">
-                                                                                                <td style="font-size: 15px;">Exclude GST@ 12% :</td>
-                                                                                                <td style="font-size: 15px;text-align: right;">{{ $gst12 }}</td>
+                                                                                                <td style="font-size: 15px;">CGST @ 6% :</td>
+                                                                                                <td style="font-size: 15px;text-align: right;">{{ round($gst12 / 2, 2) }}</td>
+                                                                                            </tr>
+                                                                                            <tr style="border-bottom: 1px solid #000;">
+                                                                                                <td style="font-size: 15px;">SGST @ 6% :</td>
+                                                                                                <td style="font-size: 15px;text-align: right;">{{ round($gst12 / 2, 2) }}</td>
                                                                                             </tr>
                                                                                         @endif
                                                                                         <tr style="border-top: 1px solid #000;">
