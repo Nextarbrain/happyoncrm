@@ -300,7 +300,7 @@
                                                                 </div>
                                                             </div>
                                                             <hr>
-                                                            <div class="gst gst12 {{ $paymentMethod->gst12 === null ? 'd-none' : '' }}" id="gst12Container" style="display: flex; flex-direction: column;">
+                                                            <div class="gst gst12 {{ $paymentMethod->gst12 > 0 ? '' : 'd-none' }}" id="gst12Container" style="display: flex; flex-direction: column;">
                                                                 <div style="display: flex; justify-content: space-between;">
                                                                     <p id="cgst12Label">CGST @ 6%</p>
                                                                     <p id="cgst12Total">{{ round($paymentMethod->gst12 / 2, 2) }}</p>
