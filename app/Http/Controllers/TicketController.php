@@ -10,6 +10,8 @@ use App\Models\Event;
 use App\Models\Product;
 use App\Models\DayPrice;
 use App\Models\UserDetail;
+use App\Models\EventBooking;
+use App\Models\OpenBilling;
 use App\Models\Branch;
 use App\Models\UserProduct;
 use Illuminate\Http\Request;
@@ -931,62 +933,114 @@ class TicketController extends Controller
         }
     }
 
-    public function sales(Request $request)
+    public function salesReport(Request $request)
     {
         hasPermission('sales-report');
         $branchId = !empty($request->branch_id) && count($request->branch_id) > 0 ? $request->branch_id : (auth('admin')->user()->branch_id ? [strval(auth('admin')->user()->branch_id)] : null);
-        if (isset($request->daterange) && $request->daterange != "") {
-            $daterange = explode("-", $request->daterange);
-            $daterange[0] = date('y-m-d', strtotime($daterange[0]));
-            $daterange[1] = date('y-m-d', strtotime($daterange[1]));
+        if (empty($request->daterange)) {
+            return view('happyView.sales-report', ['sales' => [], 'events' => [], 'openBills' => []]);
+        }
+        [$startDate, $endDate] = $this->parseDateRange($request->daterange);
 
-            $sales = User::with('kids', 'userDetails', 'event', 'paymentInfo', 'branch')
-                ->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59'])
-                ->where('role', '!=', 0)
-                // ->whereHas('userDetails', function ($q) {
-                //     $q->where('membership_plan', 0);
-                // })
-                ->when($branchId, function ($q) use ($branchId) {
-                    $q->whereIn('branch_id', (array) $branchId);
-                })->get();
-            if (!$sales->isEmpty()) {
-                foreach ($sales as $i => $sale) {
-                    $ba5 = $ba12 = $ba18 = $ba0 = 0;
-                    $basicAmtArr = [];
-                    $product = UserProduct::where('user_id', $sale->id)->where('qty', '>', 0)->where('product_name', '!=', 'Extra Time')->get();
-                    if ($product->count() > 0) {
-                        foreach ($product as $prod) {
-                            $productTax = getTax($prod->product_name);
-                            $qty = $prod->qty;
-                            if ($prod->product_name == 'Socks') {
-                                $qty = $qty - $sale['kids']->count();
-                            }
-                            $baAmt = getAddedItemTotal($productTax, $qty, $prod->price);
-                            switch ($productTax) {
-                                case 5:
-                                    $ba5 += $baAmt;
-                                    break;
-                                case 18:
-                                    $ba18 += $baAmt;
-                                    break;
-                                case 12:
-                                    $ba12 += $baAmt;
-                                    break;
-                                case 0:
-                                    $ba0 += $baAmt;
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                        $basicAmtArr = ['18' => $ba18, '12' => $ba12, '5' => $ba5, '0' => $ba0];
-                    }
-                    $sales[$i]['basicAmtArr'] = $basicAmtArr;
+        $events = EventBooking::with('branch', 'eventItems')
+            ->whereBetween('booking_date', [$startDate, $endDate])
+            ->when($branchId, function ($q) use ($branchId) {
+                $q->whereIn('branch_id', (array) $branchId);
+            })->get();
+        if (!$events->isEmpty()) {
+            foreach ($events as $j => $event) {
+                if ($event->eventItems->count() > 0) {
+                    $this->appendTaxTotals($events[$j], $event->eventItems);
                 }
             }
-            // dd($sales);
-            return view('happyView.sales-report', compact('sales'));
         }
+
+        $openBills = OpenBilling::with('branch', 'openBillingItems')
+            ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->when($branchId, function ($q) use ($branchId) {
+                $q->whereIn('branch_id', (array) $branchId);
+            })->get();
+        if (!$openBills->isEmpty()) {
+            foreach ($openBills as $k => $bill) {
+                if ($bill->openBillingItems->count() > 0) {
+                    $this->appendTaxTotals($openBills[$k], $bill->openBillingItems);
+                }
+            }
+        }
+
+        $sales = User::with('kids', 'userDetails', 'event', 'paymentInfo', 'branch')
+            ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->where('role', '!=', 0)
+            ->when($branchId, function ($q) use ($branchId) {
+                $q->whereIn('branch_id', (array) $branchId);
+            })->get();
+        if (!$sales->isEmpty()) {
+            foreach ($sales as $i => $sale) {
+                $ba5 = $ba12 = $ba18 = $ba0 = 0;
+                $basicAmtArr = [];
+                $product = UserProduct::where('user_id', $sale->id)->where('qty', '>', 0)->where('product_name', '!=', 'Extra Time')->get();
+                if ($product->count() > 0) {
+                    foreach ($product as $prod) {
+                        $productTax = getTax($prod->product_name);
+                        $qty = $prod->qty;
+                        if ($prod->product_name == 'Socks') {
+                            $qty = $qty - $sale['kids']->count();
+                        }
+                        $baAmt = getAddedItemTotal($productTax, $qty, $prod->price);
+                        switch ($productTax) {
+                            case 5:
+                                $ba5 += $baAmt;
+                                break;
+                            case 18:
+                                $ba18 += $baAmt;
+                                break;
+                            case 12:
+                                $ba12 += $baAmt;
+                                break;
+                            case 0:
+                                $ba0 += $baAmt;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    $basicAmtArr = ['18' => $ba18, '12' => $ba12, '5' => $ba5, '0' => $ba0];
+                }
+                $sales[$i]['basicAmtArr'] = $basicAmtArr;
+            }
+        }
+        return view('happyView.sales-report', compact('sales', 'events', 'openBills'));
+    }
+    private function parseDateRange(string $daterange): array
+    {
+        $dates = explode("-", $daterange);
+        $start = date('Y-m-d', strtotime($dates[0]));
+        $end = date('Y-m-d', strtotime($dates[1]));
+        return [$start, $end];
+    }
+    private function appendTaxTotals(&$model, $items)
+    {
+        $totals = ['ba5' => 0, 'ba18' => 0, 'total5' => 0, 'total18' => 0];
+
+        foreach ($items as $item) {
+            $tax = $item->item_tax;
+            $totalPrice = $item->item_price * $item->item_qty;
+            $baAmt = getAddedItemTotal($tax, $item->item_qty, $item->item_price);
+
+            if ($tax == 5) {
+                $totals['ba5'] += $baAmt;
+                $totals['total5'] += $totalPrice;
+            } elseif ($tax == 18) {
+                $totals['ba18'] += $baAmt;
+                $totals['total18'] += $totalPrice;
+            }
+        }
+        $model['ba5'] = $totals['ba5'];
+        $model['ba18'] = $totals['ba18'];
+        $model['total18'] = $totals['total18'];
+        $model['total5'] = $totals['total5'];
+
+        // return $model->fill($totals);
     }
 
     public function update(Request $request)

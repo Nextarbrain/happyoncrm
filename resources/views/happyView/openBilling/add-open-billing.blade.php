@@ -133,8 +133,7 @@
                                                                     <div class="mb-4">
                                                                         <label>Tax</label>
                                                                         <select name="item_tax[]" id="item_tax" class="form-select item_tax">
-                                                                            <option value="18">18%</option>
-                                                                            <option value="12">12%</option>
+                                                                            <option value="18">18%</option>                                                                            
                                                                             <option value="5">5% </option>
                                                                             <option value="0">0% </option>
                                                                         </select>
@@ -184,7 +183,7 @@
                                                                 </div>
                                                             </div>
                                                             <hr>
-                                                            <div class="gst1" style="display: flex; flex-direction: column;">
+                                                            {{-- <div class="gst1" style="display: flex; flex-direction: column;">
                                                                 <div style="display: flex; justify-content: space-between;">
                                                                     <p id="cgst12Label">CGST @ 6%</p>
                                                                     <p id="cgst12Total"></p>
@@ -193,7 +192,7 @@
                                                                     <p id="sgst12Label">SGST @ 6%</p>
                                                                     <p id="sgst12Total"></p>
                                                                 </div>
-                                                            </div>
+                                                            </div> --}}
                                                             <hr>
                                                             <div class="gst1" style="display: flex; flex-direction: column;">
                                                                 <div style="display: flex; justify-content: space-between;">
@@ -491,7 +490,7 @@
                 loop_item_count +
                 '" placeholder="Qty" value="1" min="1" name="item_qty[]" oninput="validity.valid || (value = \'\');"></div></div><div class="col-md-2 input_wrap"><div class="mb-4"><label>Tax</label><select name="item_tax[]" id="item_tax' +
                 loop_item_count +
-                '" class="form-select"><option value="18">18%</option><option value="12">12%</option><option value="5">5% </option><option value="0">0% </option></select></div></div><div class="col-md-1"><i class="fa fa-trash fs-4 btn btn-danger" onclick="remove_image_more(' +
+                '" class="form-select"><option value="18">18%</option><option value="5">5% </option><option value="0">0% </option></select></div></div><div class="col-md-1"><i class="fa fa-trash fs-4 btn btn-danger" onclick="remove_image_more(' +
                 loop_item_count + ')" aria-hidden="true"></i></div></div>';
             jQuery('#item_box').append(html);
         }

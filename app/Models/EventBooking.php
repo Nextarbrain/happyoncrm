@@ -13,4 +13,8 @@ class EventBooking extends Model
     {
         return $this->belongsTo(Branch::class,'branch_id');
     }
+    public function eventItems()
+    {
+        return $this->hasMany(EventItem::class, 'event_booking_id', 'id');
+    }
 }
