@@ -113,16 +113,21 @@
                                                                             </tr>
                                                                         @endforeach
                                                                         @foreach ($userProducts as $prod)
+                                                                            @php
+                                                                                $productTax = getTax($prod->product_name);
+                                                                            @endphp
                                                                             <tr style="border-top: 1px solid #000;">
                                                                                 <td style="font-size: 15px;">{{ $prod->product_name }} </td>
                                                                                 @if ($prod->product_name == 'Socks')
                                                                                     <td style="font-size: 15px;text-align: center;">{{ $prod->qty - $kidTotal }}</td>
                                                                                     <td style="font-size: 15px;">{{ $prod->price }}</td>
-                                                                                    <td style="font-size: 15px;text-align: right;">{{ ($prod->qty - $kidTotal) * $prod->price }}</td>
+                                                                                    {{-- <td style="font-size: 15px;text-align: right;">{{ ($prod->qty - $kidTotal) * $prod->price }}</td> --}}
+                                                                                    <td style="font-size: 15px;text-align: right;">{{ getAddedItemTotal($productTax, ($prod->qty - $kidTotal), $prod->price) }}</td>
                                                                                 @else
                                                                                     <td style="font-size: 15px;text-align: center;">{{ $prod->qty }}</td>
                                                                                     <td style="font-size: 15px;">{{ $prod->price }}</td>
-                                                                                    <td style="font-size: 15px;text-align: right;">{{ $prod->qty * $prod->price }}</td>
+                                                                                    {{-- <td style="font-size: 15px;text-align: right;">{{ $prod->qty * $prod->price }}</td> --}}
+                                                                                    <td style="font-size: 15px;text-align: right;">{{ getAddedItemTotal($productTax, $prod->qty, $prod->price) }}</td>
                                                                                 @endif
                                                                             </tr>
                                                                         @endforeach

@@ -160,8 +160,7 @@
                                                                     <div class="mb-4">
                                                                         <label>Tax</label>
                                                                         <select name="item_tax[]" id="item_tax" class="form-select item_tax">
-                                                                            <option value="18">18%</option>
-                                                                            <option value="12">12%</option>
+                                                                            <option value="18">18%</option>                                                                            
                                                                             <option value="5">5%</option>
                                                                             <option value="0">0%</option>
                                                                         </select>
@@ -209,18 +208,7 @@
                                                                     <p id="sgst18Label">SGST @ 9%</p>
                                                                     <p id="sgst18Total"></p>
                                                                 </div>
-                                                            </div>
-                                                            <hr>
-                                                            <div class="gst1" style="display: flex; flex-direction: column;">
-                                                                <div style="display: flex; justify-content: space-between;">
-                                                                    <p id="cgst12Label">CGST @ 6%</p>
-                                                                    <p id="cgst12Total"></p>
-                                                                </div>
-                                                                <div style="display: flex; justify-content: space-between;">
-                                                                    <p id="sgst12Label">SGST @ 6%</p>
-                                                                    <p id="sgst12Total"></p>
-                                                                </div>
-                                                            </div>
+                                                            </div>                                                            
                                                             <hr>
                                                             <div class="gst1" style="display: flex; flex-direction: column;">
                                                                 <div style="display: flex; justify-content: space-between;">

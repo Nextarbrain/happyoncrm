@@ -162,7 +162,7 @@
                                                                         <div class="mb-4">
                                                                             <label>Tax</label>
                                                                             @php
-                                                                                $taxOptions = [18, 12, 5, 0];
+                                                                                $taxOptions = [18, 5, 0];
                                                                             @endphp
                                                                             <select name="item_tax[]" id="item_tax_{{ $loop_count_num }}" class="form-select item_tax">
                                                                                 @foreach ($taxOptions as $tax)
@@ -226,18 +226,7 @@
                                                                     <p id="sgst18Total">{{ round($eventbooking->gst18 / 2, 2) }}</p>
                                                                 </div>
                                                             </div>
-                                                            <hr>                                                            
-                                                            <div class="gst1" style="display: flex; flex-direction: column;">
-                                                                <div style="display: flex; justify-content: space-between;">
-                                                                    <p id="cgst12Label">CGST @ 6%</p>
-                                                                    <p id="cgst12Total">{{ round($eventbooking->gst12 / 2, 2) }}</p>
-                                                                </div>
-                                                                <div style="display: flex; justify-content: space-between;">
-                                                                    <p id="sgst12Label">SGST @ 6%</p>
-                                                                    <p id="sgst12Total">{{ round($eventbooking->gst12 / 2, 2) }}</p>
-                                                                </div>
-                                                            </div>
-                                                            <hr>                                                            
+                                                            <hr>
                                                             <div class="gst1" style="display: flex; flex-direction: column;">
                                                                 <div style="display: flex; justify-content: space-between;">
                                                                     <p id="cgst5Label">CGST @ 2.5%</p>

@@ -72,7 +72,7 @@
                                                     <th>2.5% GST</th>
                                                     <th>2.5% GST</th>
                                                     <th>Total</th>
-                                                    <th>Total</th>
+                                                    <th>Grand Total</th>
                                                     <th>Timer</th>
                                                     <th>kids</th>
                                                     <th>Hours</th>
@@ -81,8 +81,11 @@
                                                     <th>Branch</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>                                                
-                                                @foreach ($user_bookings as $key => $user_booking)
+                                            <tbody>
+                                                @php
+                                                    $gst9Ba = $gst9 = $gst9Total = $gst5Ba = $gst5 = $gst5Total = $gTotal = 0;
+                                                @endphp
+                                                @foreach ($sales as $key => $user_booking)
                                                     @php
                                                         $gst_18 = $gst_5 = $hourSockTotal = '0:00';
                                                         if (isset($user_booking->paymentInfo) && isset($user_booking->paymentInfo->gst18)) {
@@ -94,6 +97,16 @@
                                                         $hourSockTotal = $user_booking->paymentInfo?->amounts + $user_booking->paymentInfo?->gst5;
                                                         $bookingDate = isset($user_booking['event']->booking_date) ? date('d M Y', strtotime($user_booking['event']->booking_date)) : '';
                                                         $start_datetime = isset($user_booking['event']->Hours) ? $user_booking['event']->Hours : null;
+                                                        $gst5TotalAmt = (float) ($user_booking['basicAmtArr'][5] ?? 0) + (float) ($user_booking->paymentInfo?->gst5 ?? 0);
+                                                        $amount18 = (float) ($user_booking->paymentInfo?->amounts ?? 0) - $gst5TotalAmt;
+                                                        $subTotal18 = round($amount18 / 1.18, 2);
+                                                        $gst9Ba += $subTotal18;
+                                                        $gst9 += $gst_18;
+                                                        $gst9Total += $amount18;
+                                                        $gst5Ba += (float) $user_booking['basicAmtArr'][5] ?? 0;
+                                                        $gst5 += (float) $gst_5;
+                                                        $gst5Total += $gst5TotalAmt;
+                                                        $gTotal += (float) $user_booking->paymentInfo?->amounts ?? 0;
                                                     @endphp
                                                     <tr>
                                                         <td>{{ ++$key }}</td>
@@ -101,23 +114,45 @@
                                                         <td>{{ $user_booking->kids[0]->name ?? null }}</td>
                                                         <td>{{ isset($user_booking['event']->booking_date) ? date('d M, Y', strtotime($user_booking['event']->booking_date)) : '' }}</td>
                                                         <td>{{ $user_booking->userDetails->phone_no ?? null }}</td>
-                                                        <td>{{ $user_booking->paymentInfo?->subTotal ?? '' }}</td>
+                                                        <td>{{ $subTotal18 }}</td>
                                                         <td>{{ $gst_18 }}</td>
                                                         <td>{{ $gst_18 }}</td>
+                                                        <td>{{ $amount18 }}</td>
+                                                        <td>{{ $user_booking['basicAmtArr'][5] ?? '' }}</td>
+                                                        <td>{{ $gst_5 }}</td>
+                                                        <td>{{ $gst_5 }}</td>
+                                                        <td>{{ $gst5TotalAmt }}</td>
                                                         <td>{{ $user_booking->paymentInfo?->amounts ?? '' }}</td>
-                                                        <td>{{ $user_booking->paymentInfo?->gst5 ?? '0:00' }}</td>
-                                                        <td>{{ $gst_5 }}</td>
-                                                        <td>{{ $gst_5 }}</td>
-                                                        <td>{{ $user_booking->paymentInfo?->gst5 ?? '0:00' }}</td>
-                                                        <td>{{ $hourSockTotal }}</td>
                                                         <td>{{ remaining_time($bookingDate, $start_datetime, $user_booking->kids[0]->hours) }}</td>
-                                                        <td>{{ count($user_booking->kids) }}</td>                                                        
+                                                        <td>{{ count($user_booking->kids) }}</td>
                                                         <td>{{ $user_booking->kids[0]->hours ?? null }}</td>
                                                         <td>{{ $user_booking->paymentInfo?->payment_method ?? '' }}</td>
                                                         <td>{{ $user_booking->userDetails?->membership_plan == 1 ? 'Membership' : 'Ticket' }}</td>
                                                         <td>{{ $user_booking->branch?->name ?? '' }}</td>
-                                                    </tr>                                                    
-                                                @endforeach                                                
+                                                    </tr>
+                                                @endforeach
+                                                <tr>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>Total Amt.</td>
+                                                    <td></td>
+                                                    <td>{{ $gst9Ba }}</td>
+                                                    <td>{{ $gst9 }}</td>
+                                                    <td>{{ $gst9 }}</td>
+                                                    <td>{{ $gst9Total }}</td>
+                                                    <td>{{ $gst5Ba }}</td>
+                                                    <td>{{$gst5}}</td>
+                                                    <td>{{$gst5}}</td>
+                                                    <td>{{$gst5Total}}</td>
+                                                    <td>{{$gTotal}}</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>
