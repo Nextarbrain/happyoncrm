@@ -943,9 +943,9 @@ class TicketController extends Controller
             $sales = User::with('kids', 'userDetails', 'event', 'paymentInfo', 'branch')
                 ->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59'])
                 ->where('role', '!=', 0)
-                ->whereHas('userDetails', function ($q) {
-                    $q->where('membership_plan', 0);
-                })
+                // ->whereHas('userDetails', function ($q) {
+                //     $q->where('membership_plan', 0);
+                // })
                 ->when($branchId, function ($q) use ($branchId) {
                     $q->whereIn('branch_id', (array) $branchId);
                 })->get();
@@ -984,6 +984,7 @@ class TicketController extends Controller
                     $sales[$i]['basicAmtArr'] = $basicAmtArr;
                 }
             }
+            // dd($sales);
             return view('happyView.sales-report', compact('sales'));
         }
     }
@@ -1113,5 +1114,61 @@ class TicketController extends Controller
         // Make the POST request
         $response = Http::patch('https://api.reelo.io/v1/pos/integrations/e7499eb1-3ef1-4162-8dfb-8b5a55d3e6ba/update-bill', $postData);
         return redirect('/customers')->with('success', 'Successfully Updated!');
+    }
+    public function sales_ticket(Request $request)
+    {
+        hasPermission('sales-report');
+        $branchId = !empty($request->branch_id) && count($request->branch_id) > 0 ? $request->branch_id : (auth('admin')->user()->branch_id ? [strval(auth('admin')->user()->branch_id)] : null);
+        if (isset($request->daterange) && $request->daterange != "") {
+            $daterange = explode("-", $request->daterange);
+            $daterange[0] = date('y-m-d', strtotime($daterange[0]));
+            $daterange[1] = date('y-m-d', strtotime($daterange[1]));
+
+            $sales = User::with('kids', 'userDetails', 'event', 'paymentInfo', 'branch')
+                ->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59'])
+                ->where('role', '!=', 0)
+                ->whereHas('userDetails', function ($q) {
+                    $q->where('membership_plan', 0);
+                })
+                ->when($branchId, function ($q) use ($branchId) {
+                    $q->whereIn('branch_id', (array) $branchId);
+                })->get();
+            if (!$sales->isEmpty()) {
+                foreach ($sales as $i => $sale) {
+                    $ba5 = $ba12 = $ba18 = $ba0 = 0;
+                    $basicAmtArr = [];
+                    $product = UserProduct::where('user_id', $sale->id)->where('qty', '>', 0)->where('product_name', '!=', 'Extra Time')->get();
+                    if ($product->count() > 0) {
+                        foreach ($product as $prod) {
+                            $productTax = getTax($prod->product_name);
+                            $qty = $prod->qty;
+                            if ($prod->product_name == 'Socks') {
+                                $qty = $qty - $sale['kids']->count();
+                            }
+                            $baAmt = getAddedItemTotal($productTax, $qty, $prod->price);
+                            switch ($productTax) {
+                                case 5:
+                                    $ba5 += $baAmt;
+                                    break;
+                                case 18:
+                                    $ba18 += $baAmt;
+                                    break;
+                                case 12:
+                                    $ba12 += $baAmt;
+                                    break;
+                                case 0:
+                                    $ba0 += $baAmt;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        $basicAmtArr = ['18' => $ba18, '12' => $ba12, '5' => $ba5, '0' => $ba0];
+                    }
+                    $sales[$i]['basicAmtArr'] = $basicAmtArr;
+                }
+            }
+            return view('happyView.sales-report', compact('sales'));
+        }
     }
 }
