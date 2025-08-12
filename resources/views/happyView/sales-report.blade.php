@@ -105,7 +105,7 @@
                                                         $amount18 = (float) ($user_booking->paymentInfo?->amounts ?? 0) - $gst5TotalAmt;
                                                         $subTotal18 = round($amount18 / 1.18, 2);
                                                         $gst9Ba += $subTotal18;
-                                                        $gst9 += $gst_18;
+                                                        $gst9 += (float) $gst_18;
                                                         $gst9Total += $amount18;
                                                         $gst5 += (float) $gst_5;
                                                         $gst5Total += $gst5TotalAmt;
