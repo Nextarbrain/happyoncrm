@@ -133,12 +133,94 @@
                                                                     $timer = remaining_time($bookingDate, $start_datetime, $user_booking->kids[0]->hours);
                                                                 }
                                                             @endphp
-                                                            {{ $timer}}</td>
+                                                            {{ $timer }}</td>
                                                         <td>{{ count($user_booking->kids) }}</td>
                                                         <td>{{ $user_booking->kids[0]->hours ?? null }}</td>
                                                         <td>{{ $user_booking->paymentInfo?->payment_method ?? '' }}</td>
                                                         <td>{{ $user_booking->userDetails?->membership_plan == 1 ? 'Membership' : 'Ticket' }}</td>
                                                         <td>{{ $user_booking->branch?->name ?? '' }}</td>
+                                                    </tr>
+                                                @endforeach
+                                                @foreach ($events as $key => $event)
+                                                    @php
+                                                        $gst_18 = $gst_5 = '0:00';
+                                                        if ($event->gst18 !== null) {
+                                                            $gst_18 = number_format($event->gst18 / 2, 2);
+                                                        }
+                                                        if ($event->gst5 !== null) {
+                                                            $gst_5 = number_format($event->gst5 / 2, 2);
+                                                        }
+                                                        $gst9Ba += (float)$event->ba18;
+                                                        $gst9 += (float)$gst_18;
+                                                        $gst9Total += (float)$event->total18;
+                                                        $gst5Ba += (float)$event->ba5;
+                                                        $gst5 += (float) $gst_5;
+                                                        $gst5Total += (float)$event->total5;
+                                                        $gTotal += (float) $event->totalamount;
+                                                        $bookingDate = date('d M Y', strtotime($event->booking_date));
+                                                    @endphp
+                                                    <tr>
+                                                        <td>{{ ++$key }}</td>
+                                                        <td>--</td>
+                                                        <td>--</td>
+                                                        <td>{{ $bookingDate }}</td>
+                                                        <td>{{ $event->phone }}</td>
+                                                        <td>{{ $event->ba18 }}</td>
+                                                        <td>{{ $gst_18 }}</td>
+                                                        <td>{{ $gst_18 }}</td>
+                                                        <td>{{ $event->total18 }}</td>
+                                                        <td>{{ $event->ba5 }}</td>
+                                                        <td>{{ $gst_5 }}</td>
+                                                        <td>{{ $gst_5 }}</td>
+                                                        <td>{{ $event->total5 }}</td>
+                                                        <td>{{ $event->totalamount }}</td>
+                                                        <td>--</td>
+                                                        <td>--</td>
+                                                        <td>--</td>
+                                                        <td>{{ $event->payment_method }}</td>
+                                                        <td>Event Booking</td>
+                                                        <td>{{ $event->branch?->name ?? '' }}</td>
+                                                    </tr>
+                                                @endforeach
+                                                @foreach ($openBills as $key => $bill)
+                                                    @php
+                                                        $gst_18 = $gst_5 = '0:00';
+                                                        if ($bill->gst18 !== null) {
+                                                            $gst_18 = number_format($bill->gst18 / 2, 2);
+                                                        }
+                                                        if ($bill->gst5 !== null) {
+                                                            $gst_5 = number_format($bill->gst5 / 2, 2);
+                                                        }
+                                                        $gst9Ba += (float)$bill->ba18;
+                                                        $gst9 += (float)$gst_18;
+                                                        $gst9Total += (float)$bill->total18;
+                                                        $gst5Ba += (float)$bill->ba5;
+                                                        $gst5 += (float) $gst_5;
+                                                        $gst5Total += (float)$bill->total5;
+                                                        $gTotal += (float) $bill->totalamount;
+                                                        $bookingDate = date('d M Y', strtotime($bill->created_at));
+                                                    @endphp
+                                                    <tr>
+                                                        <td>{{ ++$key }}</td>
+                                                        <td>--</td>
+                                                        <td>--</td>
+                                                        <td>{{ $bookingDate }}</td>
+                                                        <td>{{ $bill->phone }}</td>
+                                                        <td>{{ $bill->ba18 }}</td>
+                                                        <td>{{ $gst_18 }}</td>
+                                                        <td>{{ $gst_18 }}</td>
+                                                        <td>{{ $bill->total18 }}</td>
+                                                        <td>{{ $bill->ba5 }}</td>
+                                                        <td>{{ $gst_5 }}</td>
+                                                        <td>{{ $gst_5 }}</td>
+                                                        <td>{{ $bill->total5 }}</td>
+                                                        <td>{{ $bill->totalamount }}</td>
+                                                        <td>--</td>
+                                                        <td>--</td>
+                                                        <td>--</td>
+                                                        <td>{{ $bill->payment_method }}</td>
+                                                        <td>Open Billing</td>
+                                                        <td>{{ $bill->branch?->name ?? '' }}</td>
                                                     </tr>
                                                 @endforeach
                                                 <tr>
