@@ -641,17 +641,17 @@
                 var val = parseFloat($(this).val()) || 0;
                 adult_price.push(val);
             });
-            $('input[name="price[]"]').each(function(index) {
-                var finalAdultPrice = parseFloat(select1Value[index]) * parseFloat(adult_price[index]);
-                finalPriceEach.push(finalAdultPrice);
-                $(this).val(finalAdultPrice);
-            });
-
-            // $('.final_price').each(function(index) {
+            // $('input[name="price[]"]').each(function(index) {
             //     var finalAdultPrice = parseFloat(select1Value[index]) * parseFloat(adult_price[index]);
             //     finalPriceEach.push(finalAdultPrice);
             //     $(this).val(finalAdultPrice);
             // });
+
+            $('.final_price').each(function(index) {
+                var finalAdultPrice = parseFloat(select1Value[index]) * parseFloat(adult_price[index]);
+                finalPriceEach.push(finalAdultPrice);
+                $(this).val(finalAdultPrice);
+            });
             let tax = [];
             $('select[name="tax[]"]').each(function(index) {
                 var val = parseFloat($(this).val()) || 0;
@@ -673,9 +673,8 @@
             let ba18Val = 0;
             let ba12Val = 0;
             let ba5Val = 0;
-            // $('input[name="price[]"]').each(function(index){
-
-            $('.final_price').each(function(index) {
+            $('input[name="price[]"]').each(function(index){
+            // $('.final_price').each(function(index) {
                 const rate = tax[index];
                 const finalPrice = finalPriceEach[index];
                 const divisor = taxRatesList[rate];

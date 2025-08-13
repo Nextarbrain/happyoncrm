@@ -162,7 +162,7 @@
                                                                         <div class="mb-4">
                                                                             <label>Tax</label>
                                                                             @php
-                                                                                $taxOptions = [18, 12, 5, 0];
+                                                                                $taxOptions = [18, 5, 0];
                                                                             @endphp
                                                                             <select name="item_tax[]" id="item_tax_{{ $loop_count_num }}" class="form-select item_tax">
                                                                                 @foreach ($taxOptions as $tax)
@@ -226,18 +226,7 @@
                                                                     <p id="sgst18Total">{{ round($eventbooking->gst18 / 2, 2) }}</p>
                                                                 </div>
                                                             </div>
-                                                            <hr>                                                            
-                                                            <div class="gst1" style="display: flex; flex-direction: column;">
-                                                                <div style="display: flex; justify-content: space-between;">
-                                                                    <p id="cgst12Label">CGST @ 6%</p>
-                                                                    <p id="cgst12Total">{{ round($eventbooking->gst12 / 2, 2) }}</p>
-                                                                </div>
-                                                                <div style="display: flex; justify-content: space-between;">
-                                                                    <p id="sgst12Label">SGST @ 6%</p>
-                                                                    <p id="sgst12Total">{{ round($eventbooking->gst12 / 2, 2) }}</p>
-                                                                </div>
-                                                            </div>
-                                                            <hr>                                                            
+                                                            <hr>
                                                             <div class="gst1" style="display: flex; flex-direction: column;">
                                                                 <div style="display: flex; justify-content: space-between;">
                                                                     <p id="cgst5Label">CGST @ 2.5%</p>
@@ -844,7 +833,7 @@
                 loop_item_count +
                 '" placeholder="Qty" value="1" min="1" name="item_qty[]" oninput="validity.valid || (value = \'\');"></div></div><div class="col-md-2 input_wrap"><div class="mb-4"><label>Tax</label><select name="item_tax[]" id="item_tax' +
                 loop_item_count +
-                '" class="form-select"><option value="18">18%</option><option value="12">12%</option><option value="5">5% </option><option value="0">0% </option></select></div></div><div class="col-md-1"><i class="fa fa-trash fs-4 btn btn-danger" onclick="remove_image_more(' +
+                '" class="form-select"><option value="18">18%</option><option value="5">5% </option><option value="0">0% </option></select></div></div><div class="col-md-1"><i class="fa fa-trash fs-4 btn btn-danger" onclick="remove_image_more(' +
                 loop_item_count + ',0)" aria-hidden="true"></i></div></div>';
             jQuery('#item_box').append(html);
         }
