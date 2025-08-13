@@ -191,8 +191,9 @@
                                                                     <p id="sgst18Total"></p>
                                                                 </div>
                                                             </div>
-                                                            <hr>
+                                                           
                                                             <div class="gst d-none" id="gst12Container" style="display: flex; flex-direction: column;">
+                                                                 <hr>
                                                                 <div style="display: flex; justify-content: space-between;">
                                                                     <p id="cgst12Label">CGST @ 6%</p>
                                                                     <p id="cgs12tTotal"></p>

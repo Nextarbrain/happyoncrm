@@ -390,6 +390,8 @@ class TicketController extends Controller
                 $branchId = $user['branch_id'] ?? null;
             }
             $kids = Kid::where('user_id', $id)->get();
+            $kidCount = count($kids);
+            $totalKidPrice = $kids->sum('kidPrice');
             $kid = [];
             foreach ($kids as $i => $k) {
                 $kid[$i]['id'] = $k->id;
@@ -401,7 +403,49 @@ class TicketController extends Controller
                 $kPrice = (float) $k->hours + ($k->extra_hour ? (float)$k->extra_hour : 0);
                 $kid[$i]['hours'] = $kPrice;
             }
+            // $product = UserProduct::where('user_id', $id)->where('qty', '>', 0)->where('product_name', '!=', 'Extra Time')->get();
             $product = UserProduct::where('user_id', $id)->where('qty', '>', 0)->where('product_name', '!=', 'Extra Time')->get();
+            $bAmt18 = 0;
+            $bAmt12 = 0;
+            $bAmt5 = 0;
+            $bAmt0 = 0;
+
+            if (count($product) > 0) {
+                foreach ($product as $item) {
+                    if ($item->product_name == 'Socks') {
+                        $qty = $item->qty - $kidCount;
+                    } else {
+                        $qty = $item->qty;
+                    }
+                    $ba = $item->price * $qty;
+                    $tax = Product::where('product_name', $item->product_name)
+                        ->where('branch_id', $branchId)
+                        ->value('product_tax');
+
+                    switch ($tax) {
+                        case 18:
+                            $bAmt18 += $ba;
+                            break;
+                        case 12:
+                            $bAmt12 += $ba;
+                            break;
+                        case 5:
+                            $bAmt5 += $ba;
+                            break;
+                        case 0:
+                            $bAmt0 += $ba;
+                            break;
+                        default:
+                            $bAmt18 += $ba;
+                    }
+                }
+            }
+            $kidPricebAmt = round($totalKidPrice / 1.18, 2);
+            $bAmt18 = round($bAmt18 / 1.18, 2);
+            $bAmt12 = round($bAmt12 / 1.12, 2);
+            $bAmt5 = round($bAmt5 / 1.05, 2);
+            $bAmt0 = round($bAmt0 / 1, 2);
+            $basicAmtArr = [$kidPricebAmt, $bAmt18, $bAmt12, $bAmt5, $bAmt0];
 
             $productData = Product::select('product_name', 'product_price', 'product_tax', 'id')
                 ->where('product_name', '!=', 'Extra Time');
@@ -409,8 +453,16 @@ class TicketController extends Controller
                 $productData->where('branch_id', $branchId);
             }
             $productData = $productData->get();
+
+            $isExtraTimePurchased = UserProduct::where('user_id', $id)->where('product_name', '=', "Extra Time",)->first();
+            $extraTimePrice = 0;
+            if($isExtraTimePurchased){
+                $extraTimePrice = $isExtraTimePurchased->product_price;
+            }
+
             $paymentMethod = PaymentMethod::where('user_id', $id)->first();
-            return view('happyView.tickets-edit', compact('user', 'kid', 'product', 'paymentMethod', 'productData', 'branches', 'branchId'));
+            
+            return view('happyView.tickets-edit', compact('extraTimePrice', 'basicAmtArr', 'user', 'kid', 'product', 'paymentMethod', 'productData', 'branches', 'branchId'));
         } else {
             abort(401);
         }
@@ -433,7 +485,6 @@ class TicketController extends Controller
                 $kidUpdatehrs->hours += .5;
                 $end_time = strtotime($kidUpdatehrs->end_time);
                 $kidUpdatehrs->end_time = date("H:i:s", strtotime('+30 minutes', $end_time));
-
                 $kidUpdatehrs->save();
             }
         }
@@ -689,7 +740,7 @@ class TicketController extends Controller
             $kidTotal = $kidValue->count();
             $totalKidPrice = $kidValue->sum('kidPrice');
 
-            $userProducts = UserProduct::where(['user_id' => $id])->where('qty', '>', 0)->where('product_name', '!=', 'Extra Time')->latest()->get();
+            $userProducts = UserProduct::where(['user_id' => $id])->where('qty', '>', 0)->where('price', '>', 0)->where('product_name', '!=', 'Extra Time')->latest()->get();
 
             $in_time = strtotime($user['event']->Hours);
             $in_time = date("h:i A", $in_time);
@@ -737,6 +788,7 @@ class TicketController extends Controller
                 }
             } else {
                 $kidsData = Kid::select('hours', 'kidPrice')->where('user_id', $id)->get();
+                $totalKidCount = $kidsData->count();
                 $kidsExtraData = Kid::select('extra_hour', 'extra_price', 'qty')->where('user_id', $id)->get();
                 foreach ($kidsData as $i => $k) {
                     $row = [];
@@ -747,7 +799,8 @@ class TicketController extends Controller
                     $row['hours'] = $hourText;
                     $row['quantity'] = 1;
                     $row['price'] = $k->kidPrice;
-                    $row['subtotal'] = $k->kidPrice;
+                    $totalKidPriceBasicAmt = $k->kidPrice / 1.18;
+                    $row['subtotal'] = round($totalKidPriceBasicAmt, 2);;
                     array_push($kidsInvoice, $row);
                     $rowExtra = [];
                     if ($kidsExtraData[$i]->qty !== null) {
@@ -1081,7 +1134,17 @@ class TicketController extends Controller
                     $kidsDetails->extra_price = $request->input('kid_price')[$i] - $oldPrice;
 
                     $old_end_time = $kidsDetails->end_time;
-                    $end_time = Carbon\Carbon::parse($old_end_time)->addMinutes($request->input('extra_time_select')[$i]);
+                    $endTimeToday = Carbon\Carbon::createFromFormat('H:i:s', $old_end_time);
+
+                    $extraMinutes = (int) ($request->input('extra_time_select')[$i] ?? 0);
+
+                    if (Carbon\Carbon::now()->greaterThan($endTimeToday)) {
+                        // Already passed
+                        $end_time = Carbon\Carbon::now()->addMinutes($extraMinutes);
+                    } else {
+                        $end_time = $endTimeToday->addMinutes($extraMinutes);
+                    }
+
                     $time_str = $end_time->toTimeString();
                     $kidsDetails->end_time = $time_str;
 
@@ -1169,60 +1232,164 @@ class TicketController extends Controller
         $response = Http::patch('https://api.reelo.io/v1/pos/integrations/e7499eb1-3ef1-4162-8dfb-8b5a55d3e6ba/update-bill', $postData);
         return redirect('/customers')->with('success', 'Successfully Updated!');
     }
-    public function sales_ticket(Request $request)
-    {
-        hasPermission('sales-report');
-        $branchId = !empty($request->branch_id) && count($request->branch_id) > 0 ? $request->branch_id : (auth('admin')->user()->branch_id ? [strval(auth('admin')->user()->branch_id)] : null);
-        if (isset($request->daterange) && $request->daterange != "") {
-            $daterange = explode("-", $request->daterange);
-            $daterange[0] = date('y-m-d', strtotime($daterange[0]));
-            $daterange[1] = date('y-m-d', strtotime($daterange[1]));
 
-            $sales = User::with('kids', 'userDetails', 'event', 'paymentInfo', 'branch')
-                ->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59'])
-                ->where('role', '!=', 0)
-                ->whereHas('userDetails', function ($q) {
-                    $q->where('membership_plan', 0);
-                })
-                ->when($branchId, function ($q) use ($branchId) {
-                    $q->whereIn('branch_id', (array) $branchId);
-                })->get();
-            if (!$sales->isEmpty()) {
-                foreach ($sales as $i => $sale) {
-                    $ba5 = $ba12 = $ba18 = $ba0 = 0;
-                    $basicAmtArr = [];
-                    $product = UserProduct::where('user_id', $sale->id)->where('qty', '>', 0)->where('product_name', '!=', 'Extra Time')->get();
-                    if ($product->count() > 0) {
-                        foreach ($product as $prod) {
-                            $productTax = getTax($prod->product_name);
-                            $qty = $prod->qty;
-                            if ($prod->product_name == 'Socks') {
-                                $qty = $qty - $sale['kids']->count();
-                            }
-                            $baAmt = getAddedItemTotal($productTax, $qty, $prod->price);
-                            switch ($productTax) {
-                                case 5:
-                                    $ba5 += $baAmt;
-                                    break;
-                                case 18:
-                                    $ba18 += $baAmt;
-                                    break;
-                                case 12:
-                                    $ba12 += $baAmt;
-                                    break;
-                                case 0:
-                                    $ba0 += $baAmt;
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                        $basicAmtArr = ['18' => $ba18, '12' => $ba12, '5' => $ba5, '0' => $ba0];
+
+    public function newTicketUpdate(Request $request)
+    {
+        hasPermission('tickets-edit');
+        $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
+        if (!$branchId) {
+            return redirect()->back()->with('error', 'Please select a branch first.');
+        }
+        $id = $request->input('id');
+        $user = User::where('id', $id)->first();
+        $booking_date = isset($user['event']->booking_date) ? $user['event']->booking_date : null;
+        $now = now()->format('Y-m-d');
+        if ($booking_date < $now) {
+            return redirect('/customers');
+        }
+        $userDetail = UserDetail::where('user_id', $id)->first();
+
+        // update payments
+        $paymentMethod = PaymentMethod::where('user_id', $id)->first();
+        $oldPayment = $paymentMethod->amounts;
+        $paymentMethod->amounts = $request->input('newTotalAmount');
+        $paymentMethod->subTotal = $request->input('newSubAmt');
+        $paymentMethod->payment_method = $this->getPaymentMethod($request->input('payment_mode'));
+        $paymentMethod->gst18 = ($request->input('gst18') !== '0.00') ? $request->input('gst18') : null;
+        $paymentMethod->gst12 = ($request->input('gst12') !== '0.00') ? $request->input('gst12') : null;
+        $paymentMethod->gst5 = ($request->input('gst5') !== '0.00') ? $request->input('gst5') : null;
+        $paymentMethod->save();
+
+        // update kids table for extra time
+        $kidids = $request->input('kidids');
+        if ($kidids) {
+            $isExtraTimeAdded = 0;
+            foreach ($kidids as $i => $row) {
+                $kidsDetails = Kid::where('id', $row)->first();
+                if ($request->input('extra_time_select')[$i] != null) {
+                    $isExtraTimeAdded = 1;
+                    $qty = $kidsDetails->qty ? $kidsDetails->qty : 0;
+                    $kidsDetails->qty = $qty + 1;
+
+                    $old_end_time = $kidsDetails->end_time;
+                    $endTimeToday = Carbon\Carbon::createFromFormat('H:i:s', $old_end_time);
+                    $extraMinutes = (int) ($request->input('extra_time_select')[$i] ?? 0);
+
+                    if (Carbon\Carbon::now()->greaterThan($endTimeToday)) {
+                        $end_time = Carbon\Carbon::now()->addMinutes($extraMinutes);
+                    } else {
+                        $end_time = $endTimeToday->addMinutes($extraMinutes);
                     }
-                    $sales[$i]['basicAmtArr'] = $basicAmtArr;
+                    $time_str = $end_time->toTimeString();
+                    $kidsDetails->end_time = $time_str;
+
+                    $newHours = $request->input('hours')[$i];
+                    if (str_contains($newHours, 'hours')) {
+                        $search = ' hours';
+                        $newHours = str_replace($search, '', $newHours);
+                    }
+                    $kidsDetails->extra_hour = $newHours - $kidsDetails->hours;
+                }
+                $kidsDetails->save();
+            }
+            // if extra time (30 Or 60 ) brought, add / update in user_product
+            if ($isExtraTimeAdded == 1) {
+                $newProd_extraTime = new UserProduct();
+                $newProd_extraTime->user_id = $id;
+                $newProd_extraTime->branch_id = $branchId;
+                $newProd_extraTime->product_name = 'Extra Time';
+                $newProd_extraTime->price = ($request->input('extraTimePrice'));
+                $newProd_extraTime->save();
+            }
+        }
+        
+        // update add-ons
+        if (isset($request->product_quantity)) {
+            foreach ($request->product_quantity as $key => $val) {
+                if ($val !== "0") {
+                    $product_add = UserProduct::find($request->extra_product_id[$key]);
+                    if (is_null($product_add)) {
+                        $product_add = new UserProduct();
+                    }
+                    $product_add->user_id = $id;
+                    $product_add->branch_id = $branchId;
+                    $product_add->product_name = $request->product_name[$key];
+                    $product_add->price = $request->final_price[$key] / $val;
+                    // $product_add->price = $request->price[$key] / $val;
+                    $product_add->qty = ($request->product_name[$key] == 'Socks') ? $val + count($kidids) : $val;
+                    $product_add->save();
                 }
             }
-            return view('happyView.sales-report', compact('sales'));
         }
+
+        // For sms
+        $user = User::with('kid', 'event')->where('id', $id)->first();
+        $start_datetime = isset($user['event']->Hours) ? $user['event']->Hours : null;
+        $end_datetime = isset($user['kid']->end_time) ? $user['kid']->end_time : null;
+        $booking_date = isset($user['event']->booking_date) ? $user['event']->booking_date : null;
+
+        $mobile = "91" . $userDetail->phone_no;
+        $added_time = "0:" . $request->input('extra_time_select')[0] . ":00";
+        $msg = "Your Playtime has been extended Updated details are: Date: $booking_date Time-In: $start_datetime Updated Time-Out: $end_datetime Added Time: $added_time Have a Gadget Free time of HappyOn Play!	";
+        $template_id = "1707168001515557376";
+        sendsms($mobile, $msg, $template_id);
+
+        $items = [];
+        if (isset($request["product_name"]) && is_array($request["product_name"])) {
+            for ($i = 0; $i < count($request["product_name"]); $i++) {
+                $items[] = [
+                    "name" => $request["product_name"][$i],
+                    "id" => uniqid(),
+                    "rate" => floatval($request["price"][$i]),
+                    "quantity" => intval($request["product_quantity"][$i]),
+                    "subtotal" => floatval($request["price"][$i]) * intval($request["product_quantity"][$i]),
+                    "category" => "",
+                    "addon" => []
+                ];
+            }
+        }
+        if (isset($request["kidName"]) && is_array($request["kidName"])) {
+            for ($i = 0; $i < count($request["kidName"]); $i++) {
+                $items[] = [
+                    "name" => $request["kidName"][$i],
+                    "id" => uniqid(),
+                    "rate" => floatval($request["kid_price"][$i]),
+                    "quantity" => intval($request["hours"][$i]),
+                    "subtotal" => floatval($request["kid_price"][$i]),
+                    "category" => "",
+                    "addon" => []
+                ];
+            }
+        }
+        $postData = [
+            "customer_key" =>  $paymentMethod->id,
+            "merchant_id" => env('MERCHANT_ID'),
+            "transaction" => [
+                "id" => $paymentMethod->id,
+                "type" => "dine_in",
+                "source" => "online",
+                "payment_type" => $paymentMethod->payment_method,
+                "gross_amount" => $request->totalAmount,
+                "net_amount" => $request->subTotal,
+                "amount" => $request->totalAmount,
+                "order_time" => $paymentMethod->updated_at,
+                "items" => $items,
+                "discount" => 0,
+                "table_number" => '',
+                "order_from" => "POS"
+            ]
+        ];
+        // Make the POST request
+        $response = Http::patch('https://api.reelo.io/v1/pos/integrations/e7499eb1-3ef1-4162-8dfb-8b5a55d3e6ba/update-bill', $postData);
+        return redirect('/customers')->with('success', 'Successfully Updated!');
+    }
+    private function getPaymentMethod(string $mode): string
+    {
+        return [
+            1 => 'UPI',
+            2 => 'Cash',
+            3 => 'Debit/Credit',
+        ][$mode] ?? null;
     }
 }

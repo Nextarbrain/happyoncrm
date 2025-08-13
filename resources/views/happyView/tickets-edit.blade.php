@@ -174,6 +174,8 @@
                                                                 @endforeach
                                                             @endif
                                                         </div>
+                                                        <div class="col-md-12 add_sock"></div>
+                                                        {{-- Add -ons purched at add tickets --}}
                                                         <table id="dataRow">
                                                             @if ($product)
                                                                 @foreach ($product as $socks_products)
@@ -193,8 +195,12 @@
                                                                                     <input type="hidden" value="{{ $socks_products->product_name }}" name="product_name[]">
                                                                                     <div class="col-md-3">
                                                                                         <div class=" input_wrap">
-                                                                                            <label>{{ $socks_products->product_name }} Qty </label>
-                                                                                            <input type="text" class="form-control" name="product_quantity[]" value="{{ isset($socks_products->qty) ? $socks_products->qty : '' }}" readonly>
+                                                                                            <label>{{ $socks_products->product_name }}Qty</label>
+                                                                                            <select name="product_quantity[]" onchange="calculateTotal()" class="form-select">
+                                                                                                @for ($i = 0; $i <= 10; $i++)
+                                                                                                    <option value="{{ $i }}" {{ $socks_products->qty == $i ? 'selected' : '' }}>{{ $i }}</option>
+                                                                                                @endfor
+                                                                                            </select>
                                                                                         </div>
                                                                                     </div>
                                                                                     <div class="col-md-3">
@@ -203,8 +209,7 @@
                                                                                             @php
                                                                                                 $productTax = getTax($socks_products->product_name);
                                                                                             @endphp
-                                                                                            {{-- <input type="number" class="form-control" placeholder="Price" value="{{ $socks_products->price }}" name="price[]" readonly> --}}
-                                                                                            <input type="number" class="form-control" placeholder="Price" value="{{ getAddedItemTotal($productTax, $socks_products->qty, $socks_products->price) }}" name="price[]" readonly>
+                                                                                            <input type="text" class="form-control" placeholder="Price" value="{{ getAddedItemTotal($productTax, $socks_products->qty, $socks_products->price) }}" name="price[]">
                                                                                         </div>
                                                                                     </div>
                                                                                     <div class="col-md-3">
@@ -222,12 +227,12 @@
                                                                                     </div>
                                                                                     <div class="col-md-3">
                                                                                         <div class="input_wrap dark">
-                                                                                            <label>Total</label>                                                                                            
-                                                                                            {{-- <input type="text" value="{{ getAddedItemTotal($productTax, $socks_products->qty, $socks_products->price) }}" class="final_price form-control"> --}}
-                                                                                            <input type="text" value="{{ $socks_products->price }}" class="final_price form-control">
+                                                                                            <label>Total</label>
+                                                                                            <input type="text" value="{{ $socks_products->price }}" class="final_price form-control" name="final_price[]">
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
+                                                                            </div>
                                                                         </td>
                                                                     </tr>
                                                                 @endforeach
@@ -237,7 +242,7 @@
                                                             @foreach ($productData as $pro)
                                                                 @if (!hasTwoProduct(request()->route('id'), $pro->product_name, $user['userDetails']->number_of_kids))
                                                                     <div class="h_btn">
-                                                                        <a href="javascript:void(0)" class="more_adult" @disabled(true) style="pointer-events: none;">+
+                                                                        <a href="javascript:void(0)" onclick="AddItems(event, '{{ $pro->product_name }}', '{{ $pro->product_price }}', '{{ $pro->product_tax }}', {{ $pro->id }})" class="more_adult">+
                                                                             {{ $pro->product_name }}</a>
                                                                     </div>
                                                                 @endif
@@ -301,8 +306,8 @@
                                                                     <p id="sgst18Total">{{ round($paymentMethod->gst18 / 2, 2) }}</p>
                                                                 </div>
                                                             </div>
-                                                            <hr>
                                                             <div class="gst gst12 {{ $paymentMethod->gst12 > 0 ? '' : 'd-none' }}" id="gst12Container" style="display: flex; flex-direction: column;">
+                                                                <hr>
                                                                 <div style="display: flex; justify-content: space-between;">
                                                                     <p id="cgst12Label">CGST @ 6%</p>
                                                                     <p id="cgst12Total">{{ round($paymentMethod->gst12 / 2, 2) }}</p>
@@ -332,6 +337,18 @@
 
                                                                 <input type="hidden" id="newSubAmt" name="newSubAmt" value={{ $paymentMethod->subTotal }}>
                                                                 <input type="hidden" id="oldSubAmt" value={{ $paymentMethod->subTotal }}>
+
+                                                                {{-- <input type="hidden" name="totalAmount" id="chargeAmount" value={{ $paymentMethod->amounts }}> --}}
+                                                                {{-- <input type="hidden" name="subTotal" id="subtotlSave" value="{{ $paymentMethod->subTotal }}"> --}}
+                                                                <input type="hidden" name="gst18" id="gst18" value="{{ $paymentMethod->gst18 }}">
+                                                                <input type="hidden" name="gst5" id="gst5" value="{{ $paymentMethod->gst5 }}">
+                                                                <input type="hidden" name="gst12" id="gst12" value="{{ $paymentMethod->gst12 }}">
+                                                                <input type="hidden" name="kidsOnlyPrice" id="kidsOnlyPrice" value="{{ $basicAmtArr[0] }}">
+                                                                <input type="hidden" name="ba18" id="ba18" value="{{ $basicAmtArr[1] }}">
+                                                                <input type="hidden" name="ba12" id="ba12" value="{{ $basicAmtArr[2] }}">
+                                                                <input type="hidden" name="ba5" id="ba5" value="{{ $basicAmtArr[3] }}">
+                                                                <input type="hidden" name="extraTimePrice" id="extraTimePrice" value="{{ $extraTimePrice }}">
+                                                                <input type="hidden" name="oldExtraTimePrice" id="oldExtraTimePrice" value="{{ $extraTimePrice }}">
                                                             </div>
                                                             <hr>
                                                             <div class="tearm_condition">
@@ -469,6 +486,120 @@
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.0/js/toastr.js"></script>
     <script>
+        //Kids Hours Options
+        $(document).on('change', 'select[id^="kid_hrs"]', function() {
+            var selectBoxId = $(this);
+            var inputTag = selectBoxId.closest('.child-div').find('.kid_price');
+            // Make the AJAX call to fetch data from the server
+            var baseUrl = "{{ URL::to('/') }}";
+            $.ajax({
+                url: baseUrl + '/get-price-kids',
+                type: 'GET',
+                data: {
+                    option: $(this).val()
+                },
+                success: function(data) {
+                    // Update the input tags with the received data
+                    inputTag.val(data);
+                    var sum = 0;
+                    $('.kid_price').each(function() {
+                        var val = parseFloat($(this).val()) || 0;
+                        sum += val;
+                    });
+                    var basicAmtKidPrice = (sum / 1.18);
+                    $("#kidsOnlyPrice").val(basicAmtKidPrice.toFixed(2));
+
+                    var totalDeductGst = sum - basicAmtKidPrice;
+                    $('#subtotal').text("₹ " + basicAmtKidPrice.toFixed(2));
+                    $('#subtotlSave').val(basicAmtKidPrice.toFixed(2));
+
+                    updateGST(totalDeductGst, ['cgst18Total', 'sgst18Total'], 'gst18');
+
+                    let finalAmount = sum;
+                    document.getElementById('totalAmount').innerHTML = '₹ ' + finalAmount.toFixed(2);
+                    $("#chargeAmount").val(finalAmount.toFixed(2));
+                },
+                error: function(xhr, status, error) {
+                    console.log(error);
+                }
+            });
+        });
+
+        function updateGST(taxAmount, selectors, inputName, containerId = null) {
+            const halfTax = (taxAmount / 2).toFixed(2);
+            selectors.forEach(id => {
+                $('#' + id).text("₹ " + halfTax);
+            });
+            $(`input[name="${inputName}"]`).val(taxAmount.toFixed(2));
+
+            if (containerId) {
+                const container = $('#' + containerId);
+                taxAmount > 0 ? container.removeClass('d-none') : container.addClass('d-none');
+            }
+        }
+    </script>
+    <script>
+        function AddItems(event, name, price, tax, id) {
+            var table = document.querySelector('#dataRow');
+            var newRow = document.createElement("tr");
+            var cell1 = document.createElement("td");
+
+            data =
+                `   <input type="hidden" name="extra_product_id[]"
+                    value="${id}"
+                    class="extra_product_id">
+                <input type="hidden" value="${price}" class="product_price">
+<div class="row mb-3">
+    <input type="hidden" value="${name}" name="product_name[]">
+    <div class="col-md-3">
+        <div class=" input_wrap">
+            <label>${name} Qty</label>
+            <select name="product_quantity[]" onchange="calculateTotal()" class="form-select">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="input_wrap dark">
+            <label>Price</label>
+            <input type="text" class="form-control" placeholder="Price" name="price[]" readonly>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="input_wrap dark">
+            <label>Tax</label>
+            <select name="tax[]" class="form-select">
+                <option value="${tax}">${tax}%</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="input_wrap dark">
+            <label>Total</label>
+            <input type="text" value="${price}" class="final_price form-control" name="final_price[]">
+        </div>
+    </div>
+</div>`;
+            if (name == 'Extra Time') {
+                alert('This Product Not Allowed Here');
+            } else {
+                cell1.innerHTML = data;
+                newRow.appendChild(cell1);
+                table.appendChild(newRow);
+                event.target.style.display = 'none';
+            }
+        }
+
         function AddExtratime(event) {
             const extraTimeDDown = event.target;
             const extraTimeValue = extraTimeDDown.value;
@@ -483,6 +614,7 @@
 
             const targetHourElement = document.getElementById(inputIdHour);
             const hiddenHourElement = document.getElementById(`kh_hour_${kidIndex}`);
+            const extraTimePrice = document.getElementById("extraTimePrice");
 
             if (hiddenHourElement.value == 'Unlimited') {
                 alert('Extra Time Not Allowed on unlimited Hours');
@@ -494,14 +626,15 @@
             if (extraTimeValue > 0) {
                 targetHourElement.value = parseFloat(hiddenHourElement.value) + addedHour + " hours";
                 targetPriceElement.value = parseFloat(hiddenPriceElement.value) + addedPrice;
+                extraTimePrice.value = parseFloat(extraTimePrice.value) + addedHour ;
             } else {
                 targetPriceElement.value = parseFloat(hiddenPriceElement.value);
                 targetHourElement.value = parseFloat(hiddenHourElement.value);
             }
-            calculateTotalAmount();
+            reCalculateWithExtraTime();
         }
 
-        function calculateTotalAmount() {
+        function reCalculateWithExtraTime() {
             const totalAmtElement = document.getElementById("totalAmount");
             const newTotalAmount = document.getElementById("newTotalAmount");
             const hiddenTotalAmtElement = document.getElementById("oldTotalAmt");
@@ -532,8 +665,104 @@
             newSubAmount.value = newSubA;
             subAmtElement.innerHTML = newSubA;
         }
-    </script>
 
+        function calculateTotal() {
+            var sum = 0;
+            var totalPrice = 0;
+            var taxAmount18 = 0;
+            var taxAmount12 = 0;
+            var taxAmount5 = 0;
+            var finalPriceEach = [];
+
+            $('.kid_price').each(function() {
+                var val = parseFloat($(this).val()) || 0;
+                sum += val;
+            });
+            addon_qty = [];
+            $('select[name="product_quantity[]"]').each(function() {
+                var val = parseFloat($(this).val()) || 0;
+                addon_qty.push(val);
+            });
+            addon_price = [];
+            $('.product_price').each(function() {
+                var val = parseFloat($(this).val()) || 0;
+                addon_price.push(val);
+            });
+            // $('input[name="price[]"]').each(function(index) {
+            //     var finalAdultPrice = parseFloat(addon_qty[index]) * parseFloat(addon_price[index]);
+            //     finalPriceEach.push(finalAdultPrice);
+            //     $(this).val(finalAdultPrice);
+            // });
+
+            $('.final_price').each(function(index) {
+                var finalAdultPrice = parseFloat(addon_qty[index]) * parseFloat(addon_price[index]);
+                finalPriceEach.push(finalAdultPrice);
+                $(this).val(finalAdultPrice);
+            });
+            let tax = [];
+            $('select[name="tax[]"]').each(function(index) {
+                var val = parseFloat($(this).val()) || 0;
+                tax.push(val);
+            });
+            $('input[name="kid_price[]"]').each(function(index) {
+                var val = parseFloat($(this).val()) || 0;
+                var bAmt = val / 1.18;
+                totalPrice += bAmt;
+                var taxAmount = (val - bAmt);
+                taxAmount18 += taxAmount;
+            });
+            const taxRatesList = {
+                '18': 1.18,
+                '12': 1.12,
+                '5': 1.05,
+                '0': 1.00
+            };
+            let ba18Val = 0;
+            let ba12Val = 0;
+            let ba5Val = 0;
+            $('input[name="price[]"]').each(function(index) {
+                // $('.final_price').each(function(index) {
+                const rate = tax[index];
+                const finalPrice = finalPriceEach[index];
+                const divisor = taxRatesList[rate];
+                const basicAmount = finalPrice / divisor;
+                totalPrice += basicAmount;
+                const taxAmount = finalPrice - basicAmount;
+                switch (rate) {
+                    case 18:
+                        taxAmount18 += taxAmount;
+                        ba18Val += basicAmount;
+                        $("#ba18").val(ba18Val.toFixed(2));
+                        break;
+                    case 12:
+                        taxAmount12 += taxAmount;
+                        ba12Val += basicAmount;
+                        $("#ba12").val(ba12Val.toFixed(2));
+                        break;
+                    case 5:
+                        taxAmount5 += taxAmount;
+                        ba5Val += basicAmount;
+                        $("#ba5").val(ba5Val.toFixed(2));
+                        break;
+                }
+                $(this).val(basicAmount.toFixed(2));
+            });
+            let subTotalPrice = 0;
+            subTotalPrice = totalPrice + taxAmount18 + taxAmount12 + taxAmount5;
+
+            $('#subtotal').text("₹ " + totalPrice.toFixed(2));
+            $('input[name="subTotal"]').val(totalPrice.toFixed(2));
+            $('input[name="newSubAmt"]').val(totalPrice.toFixed(2));
+
+            $('#totalAmount').text("₹ " + subTotalPrice.toFixed(2));
+            $('input[name="totalAmount"]').val(subTotalPrice.toFixed(2));
+            $('input[name="newTotalAmount"]').val(subTotalPrice.toFixed(2));
+
+            updateGST(taxAmount18, ['cgst18Total', 'sgst18Total'], 'gst18');
+            updateGST(taxAmount5, ['cgst5Total', 'sgst5Total'], 'gst5');
+            updateGST(taxAmount12, ['cgst12Total', 'sgst12Total'], 'gst12', 'gst12Container');
+        }
+    </script>
     <script>
         //Auto Fetch Membership Program
         $(document).ready(function() {
@@ -569,7 +798,6 @@
     </script>
 
     <script>
-        // Membership calculatePlan
         function calculatePlan(user) {
             if (user != "") {
                 $.ajax({
@@ -591,12 +819,10 @@
                             } else {
                                 document.getElementById('planDate').innerHTML = "";
                             }
-
                             document.getElementById("mobile_no").value = response.user_details.phone_no;
                             document.getElementById("credit_left").value = response.credit_left;
                             document.getElementById("kidsName2").value = response.user.name;
                             var hrs = document.getElementById('hrs').value;
-
                             document.getElementById("user_id").value = response.user.id;
                             document.getElementById("credit").value = hrs;
                             $('#resultmembership').css("display", "none");
@@ -624,7 +850,6 @@
     </script>
 
     <script>
-        //Otp Verification for Membership
         var baseUrl = "{{ URL::to('/') }}";
 
         function verifyMember() {
