@@ -13,4 +13,8 @@ class OpenBilling extends Model
     {
         return $this->belongsTo(Branch::class,'branch_id');
     }
+     public function openBillingItems()
+    {
+        return $this->hasMany(OpenBillingItem::class, 'open_billing_id', 'id');
+    }
 }
