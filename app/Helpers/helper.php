@@ -12,18 +12,18 @@ use Illuminate\Support\Facades\Log;
 function sendsms($phone, $msg, $template_id)
 {
     return true;
-    // $api_key = '461E1011B2C0F2';
-    // $contacts = $phone;
-    // $from = 'HAPYON';
-    // $sms_text = urlencode("$msg");
-    // $pe_id = '1701167959115997405';
-    // try{
-    //  $api_url = "https://kutility.org/app/smsapi/index.php?key=" . $api_key . "&campaign=12886&routeid=7&type=text&contacts=" . $contacts . "&senderid=" . $from . "&msg=" . $sms_text . "&template_id=" . $template_id . "&pe_id=" . $pe_id;
-    // $response = file_get_contents($api_url);
-    // return $response;
-    // }catch(Exception $e){
+    $api_key = '461E1011B2C0F2';
+    $contacts = $phone;
+    $from = 'HAPYON';
+    $sms_text = urlencode("$msg");
+    $pe_id = '1701167959115997405';
+    try{
+     $api_url = "https://kutility.org/app/smsapi/index.php?key=" . $api_key . "&campaign=12886&routeid=7&type=text&contacts=" . $contacts . "&senderid=" . $from . "&msg=" . $sms_text . "&template_id=" . $template_id . "&pe_id=" . $pe_id;
+    $response = file_get_contents($api_url);
+    return $response;
+    }catch(Exception $e){
 
-    // }
+    }
 
 }
 
@@ -126,7 +126,7 @@ function hasTwoProduct($userID, $name, $count)
     return UserProduct::where(['user_id' => $userID, 'product_name' => $name])->where('qty', '>', 0)->exists();
 }
 function getProductPrice($name, $branchId = null)
-{    
+{
     $product = Product::where('product_name', $name);
     if ($branchId) {
         $product->where('branch_id', $branchId);
