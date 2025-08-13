@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Log;
 
 function sendsms($phone, $msg, $template_id)
 {
-    return true;
     $api_key = '461E1011B2C0F2';
     $contacts = $phone;
     $from = 'HAPYON';
