@@ -84,6 +84,7 @@
                                             <tbody>
                                                 @php
                                                     $gst9Ba = $gst9 = $gst9Total = $gst5Ba = $gst5 = $gst5Total = $gTotal = 0;
+                                                    $counter = 1;
                                                 @endphp
                                                 @foreach ($sales as $key => $user_booking)
                                                     @php
@@ -112,7 +113,7 @@
                                                         $gTotal += (float) $user_booking->paymentInfo?->amounts ?? 0;
                                                     @endphp
                                                     <tr>
-                                                        <td>{{ ++$key }}</td>
+                                                        <td>{{ $counter++ }}</td>
                                                         <td>{{ $user_booking->name }}</td>
                                                         <td>{{ $user_booking->kids[0]->name ?? null }}</td>
                                                         <td>{{ isset($user_booking['event']->booking_date) ? date('d M, Y', strtotime($user_booking['event']->booking_date)) : '' }}</td>
@@ -160,7 +161,7 @@
                                                         $bookingDate = date('d M Y', strtotime($event->booking_date));
                                                     @endphp
                                                     <tr>
-                                                        <td>{{ ++$key }}</td>
+                                                         <td>{{ $counter++ }}</td>
                                                         <td>--</td>
                                                         <td>--</td>
                                                         <td>{{ $bookingDate }}</td>
@@ -201,7 +202,7 @@
                                                         $bookingDate = date('d M Y', strtotime($bill->created_at));
                                                     @endphp
                                                     <tr>
-                                                        <td>{{ ++$key }}</td>
+                                                         <td>{{ $counter++ }}</td>
                                                         <td>--</td>
                                                         <td>--</td>
                                                         <td>{{ $bookingDate }}</td>
