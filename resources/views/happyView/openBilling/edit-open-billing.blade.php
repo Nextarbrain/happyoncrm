@@ -195,8 +195,9 @@
                                                                     <p id="sgst18Total">{{ round($open_billing->gst18 / 2, 2) }}</p>
                                                                 </div>
                                                             </div>
-                                                            <hr>                                                            
+                                                                                                                  
                                                             {{-- <div class="gst1" style="display: flex; flex-direction: column;">
+                                                                 <hr>     
                                                                 <div style="display: flex; justify-content: space-between;">
                                                                     <p id="cgst12Label">CGST @ 6%</p>
                                                                     <p id="cgst12Total">{{ round($open_billing->gst12 / 2, 2) }}</p>
