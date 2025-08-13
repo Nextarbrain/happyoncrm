@@ -200,7 +200,11 @@
                                                                                     <div class="col-md-3">
                                                                                         <div class="input_wrap dark">
                                                                                             <label>Price</label>
-                                                                                            <input type="number" class="form-control" placeholder="Price" value="{{ $socks_products->price }}" name="price[]" readonly>
+                                                                                            @php
+                                                                                                $productTax = getTax($socks_products->product_name);
+                                                                                            @endphp
+                                                                                            {{-- <input type="number" class="form-control" placeholder="Price" value="{{ $socks_products->price }}" name="price[]" readonly> --}}
+                                                                                            <input type="number" class="form-control" placeholder="Price" value="{{ getAddedItemTotal($productTax, $socks_products->qty, $socks_products->price) }}" name="price[]" readonly>
                                                                                         </div>
                                                                                     </div>
                                                                                     <div class="col-md-3">
@@ -218,11 +222,9 @@
                                                                                     </div>
                                                                                     <div class="col-md-3">
                                                                                         <div class="input_wrap dark">
-                                                                                            <label>Total</label>
-                                                                                            @php
-                                                                                                $productTax = getTax($socks_products->product_name);
-                                                                                            @endphp
-                                                                                            <input type="text" value="{{ getAddedItemTotal($productTax, $socks_products->qty, $socks_products->price) }}" class="final_price form-control">
+                                                                                            <label>Total</label>                                                                                            
+                                                                                            {{-- <input type="text" value="{{ getAddedItemTotal($productTax, $socks_products->qty, $socks_products->price) }}" class="final_price form-control"> --}}
+                                                                                            <input type="text" value="{{ $socks_products->price }}" class="final_price form-control">
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
