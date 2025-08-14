@@ -157,7 +157,7 @@
                                                                         </div>
                                                                         <div class="col-md-3">
                                                                             <div class="mb-3 input_wrap dark">
-                                                                                <label>Extra Time</label>                                                                                
+                                                                                <label>Extra Time</label>
                                                                                 <select name="extra_time_select[]" class="form-select" id="time_{{ $i }}" onchange="AddExtratime(event)" {{ $isPastDate ? 'disabled' : '' }}>
                                                                                     <option value="">Select Here </option>
                                                                                     <option value="30">30 Min </option>
@@ -171,7 +171,7 @@
                                                         </div>
                                                         <div class="col-md-12 add_sock"></div>
                                                         {{-- Add -ons purched at add tickets --}}
-                                                        <table id="dataRow">                                                          
+                                                        <table id="dataRow">
                                                             @if ($product)
                                                                 @foreach ($product as $socks_products)
                                                                     @if ($socks_products->qty == $user['userDetails']->number_of_kids && strtolower($socks_products->product_name) == 'socks')
@@ -233,7 +233,7 @@
                                                                 @endforeach
                                                             @endif
                                                         </table>
-                                                        <div class="button_wrap">                                                           
+                                                        <div class="button_wrap">
                                                             @foreach ($productData as $pro)
                                                                 @if (!hasTwoProduct(request()->route('id'), $pro->product_name, $user['userDetails']->number_of_kids))
                                                                     <div class="h_btn">
@@ -343,6 +343,7 @@
                                                                 <input type="hidden" name="gst5" id="gst5" value="{{ $paymentMethod->gst5 }}">
                                                                 <input type="hidden" name="gst12" id="gst12" value="{{ $paymentMethod->gst12 }}">
                                                                 <input type="hidden" name="kidsOnlyPrice" id="kidsOnlyPrice" value="{{ $basicAmtArr[0] }}">
+                                                                <input type="hidden" name="kidsPriceNoDis" id="kidsPriceNoDis" value="{{ $basicAmtArr[0] }}">
                                                                 <input type="hidden" name="ba18" id="ba18" value="{{ $basicAmtArr[1] }}">
                                                                 <input type="hidden" name="ba12" id="ba12" value="{{ $basicAmtArr[2] }}">
                                                                 <input type="hidden" name="ba5" id="ba5" value="{{ $basicAmtArr[3] }}">
@@ -485,6 +486,9 @@
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.0/js/toastr.js"></script>
     <script>
+        // set coupon data to this
+        let couponDiscountAmt = {{ $coupon_discount ?? 0 }};        
+        let couponType = @json($coupon_type ?? '');
         //Kids Hours Options
         $(document).on('change', 'select[id^="kid_hrs"]', function() {
             var selectBoxId = $(this);
@@ -516,7 +520,7 @@
 
                     let finalAmount = sum;
                     document.getElementById('totalAmount').innerHTML = '₹ ' + finalAmount.toFixed(2);
-                    $("#chargeAmount").val(finalAmount.toFixed(2));
+                    // $("#chargeAmount").val(finalAmount.toFixed(2));
                 },
                 error: function(xhr, status, error) {
                     console.log(error);
@@ -760,6 +764,68 @@
             updateGST(taxAmount18, ['cgst18Total', 'sgst18Total'], 'gst18');
             updateGST(taxAmount5, ['cgst5Total', 'sgst5Total'], 'gst5');
             updateGST(taxAmount12, ['cgst12Total', 'sgst12Total'], 'gst12', 'gst12Container');
+
+            if (couponDiscountAmt > 0 && couponType == 'percent') {
+                updateDiscountAmt();
+            }
+        }
+
+        function updateDiscountAmt() {
+            let discount = couponDiscountAmt;
+            let subTotalBA = 0;
+            let payableTotalAmt = 0;
+            let perTotalDiscountAmt = 0;
+            let totalNewBa18 = 0;
+
+            ["#kidsPriceNoDis", "#ba18", "#ba12", "#ba5"].forEach(id => {
+                let ba = parseFloat($(id).val()) || 0;
+                if (id !== "#ba5") {
+                    let indDiscountAmt = (ba * discount) / 100;
+                    let newBa = (ba - indDiscountAmt);
+                    if (id == '#kidsPriceNoDis' || id == '#ba18') {
+                        totalNewBa18 += newBa;
+                    }
+                    if (id == '#kidsPriceNoDis') {
+                        $("#kidsOnlyPrice").val(newBa.toFixed(2));
+                    } else {
+                        $(id).val(newBa.toFixed(2));
+                    }
+                    perTotalDiscountAmt += indDiscountAmt;
+                    subTotalBA += newBa;
+                } else {
+                    subTotalBA += ba;
+                }
+            });
+            //updated GST for 18 and 12
+            let new18Gst = (totalNewBa18 * 18) / 100;
+            updateGST(new18Gst, ['cgst18Total', 'sgst18Total'], 'gst18');
+            let ba12 = parseFloat($('#ba12').val()) || 0;
+            let new12Gst = 0;
+            if (ba12 > 0) {
+                new12Gst = (ba12 * 12) / 100;
+                updateGST(new12Gst, ['cgs12tTotal', 'sgst12Total'], 'gst12');
+            } else {
+                document.querySelector('#gst12Container').classList.add('d-none');
+            }
+            discount = perTotalDiscountAmt;
+
+            $('#subtotal').text("₹ " + subTotalBA.toFixed(2));
+            $('#subtotlSave').val(subTotalBA.toFixed(2));
+            $('input[name="newSubAmt"]').val(subTotalBA.toFixed(2));
+
+            ["#gst5", "#gst18", "#gst12"].forEach(id => {
+                let gst = parseFloat($(id).val()) || 0;
+                payableTotalAmt += gst;
+            });
+
+            $('#couponValue').val(discount.toFixed(2));
+            $('#couponValueShow').html(discount.toFixed(2));
+
+            payableTotalAmt += subTotalBA;
+
+            document.getElementById('totalAmount').innerHTML = '₹ ' + payableTotalAmt.toFixed(2);
+            $('input[name="newTotalAmount"]').val(payableTotalAmt.toFixed(2));
+            // $("#chargeAmount").val(payableTotalAmt.toFixed(2));
         }
     </script>
     <script>
