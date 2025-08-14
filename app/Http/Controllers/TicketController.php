@@ -403,7 +403,6 @@ class TicketController extends Controller
                 $kPrice = (float) $k->hours + ($k->extra_hour ? (float)$k->extra_hour : 0);
                 $kid[$i]['hours'] = $kPrice;
             }
-            // $product = UserProduct::where('user_id', $id)->where('qty', '>', 0)->where('product_name', '!=', 'Extra Time')->get();
             $product = UserProduct::where('user_id', $id)->where('qty', '>', 0)->where('product_name', '!=', 'Extra Time')->get();
             $bAmt18 = 0;
             $bAmt12 = 0;
@@ -456,13 +455,18 @@ class TicketController extends Controller
 
             $isExtraTimePurchased = UserProduct::where('user_id', $id)->where('product_name', '=', "Extra Time",)->first();
             $extraTimePrice = 0;
-            if($isExtraTimePurchased){
+            if ($isExtraTimePurchased) {
                 $extraTimePrice = $isExtraTimePurchased->product_price;
             }
-
             $paymentMethod = PaymentMethod::where('user_id', $id)->first();
-            
-            return view('happyView.tickets-edit', compact('extraTimePrice', 'basicAmtArr', 'user', 'kid', 'product', 'paymentMethod', 'productData', 'branches', 'branchId'));
+            $booking_date = isset($user['event']->booking_date) ? $user['event']->booking_date : null;
+            $isPastDate = false;
+            $now = now()->format('Y-m-d');
+            if ($booking_date < $now) {
+                $isPastDate = true;
+            }
+
+            return view('happyView.tickets-edit', compact('isPastDate', 'extraTimePrice', 'basicAmtArr', 'user', 'kid', 'product', 'paymentMethod', 'productData', 'branches', 'branchId'));
         } else {
             abort(401);
         }
@@ -740,7 +744,7 @@ class TicketController extends Controller
             $kidTotal = $kidValue->count();
             $totalKidPrice = $kidValue->sum('kidPrice');
 
-            $userProducts = UserProduct::where(['user_id' => $id])->where('qty', '>', 0)->where('price', '>', 0)->where('product_name', '!=', 'Extra Time')->latest()->get();
+            $userProducts = UserProduct::where(['user_id' => $id])->where('qty', '>', 0)->where('product_name', '!=', 'Extra Time')->latest()->get();
 
             $in_time = strtotime($user['event']->Hours);
             $in_time = date("h:i A", $in_time);
@@ -1272,6 +1276,9 @@ class TicketController extends Controller
                     $qty = $kidsDetails->qty ? $kidsDetails->qty : 0;
                     $kidsDetails->qty = $qty + 1;
 
+                    $oldPrice = $kidsDetails->kidPrice;
+                    $kidsDetails->extra_price = $request->input('kid_price')[$i] - $oldPrice;
+
                     $old_end_time = $kidsDetails->end_time;
                     $endTimeToday = Carbon\Carbon::createFromFormat('H:i:s', $old_end_time);
                     $extraMinutes = (int) ($request->input('extra_time_select')[$i] ?? 0);
@@ -1303,12 +1310,19 @@ class TicketController extends Controller
                 $newProd_extraTime->save();
             }
         }
-        
+
         // update add-ons
         if (isset($request->product_quantity)) {
             foreach ($request->product_quantity as $key => $val) {
                 if ($val !== "0") {
-                    $product_add = UserProduct::find($request->extra_product_id[$key]);
+                    if ($request->product_name[$key] == 'Socks') {
+                        $product_add = UserProduct::firstWhere([
+                            'user_id' => $id,
+                            'product_name' => 'Socks'
+                        ]);
+                    } else {
+                        $product_add = UserProduct::find($request->extra_product_id[$key]);
+                    }
                     if (is_null($product_add)) {
                         $product_add = new UserProduct();
                     }
