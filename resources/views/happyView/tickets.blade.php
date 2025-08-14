@@ -1,10 +1,4 @@
 @include('happyView.includes.head')
-<style>
-    .is-hidden {
-        display: none !important;
-    }
-</style>
-
 <body>
     <!--wrapper-->
     <div class="wrapper">
@@ -633,7 +627,7 @@
             event.target.style.display = 'none';
         }
 
-        function calculateTotal() {            
+        function calculateTotal() {
             var sum = 0;
             var totalPrice = 0;
             var taxAmount18 = 0;

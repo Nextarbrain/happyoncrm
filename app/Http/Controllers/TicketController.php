@@ -14,6 +14,7 @@ use App\Models\EventBooking;
 use App\Models\OpenBilling;
 use App\Models\Branch;
 use App\Models\UserProduct;
+use App\Models\Coupon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
@@ -459,6 +460,14 @@ class TicketController extends Controller
                 $extraTimePrice = $isExtraTimePurchased->product_price;
             }
             $paymentMethod = PaymentMethod::where('user_id', $id)->first();
+            $coupon_type = '';
+            $coupon_discount = 0;
+            if ($paymentMethod['couponcode'] !== null) {
+                $coupon = Coupon::where('coupon_name', $paymentMethod['couponcode'])->where('branch_id', $branchId);
+                $coupon = $coupon->first();
+                $coupon_type = $coupon->discount_type;
+                $coupon_discount = $coupon->discount;
+            }
             $booking_date = isset($user['event']->booking_date) ? $user['event']->booking_date : null;
             $isPastDate = false;
             $now = now()->format('Y-m-d');
@@ -466,7 +475,7 @@ class TicketController extends Controller
                 $isPastDate = true;
             }
 
-            return view('happyView.tickets-edit', compact('isPastDate', 'extraTimePrice', 'basicAmtArr', 'user', 'kid', 'product', 'paymentMethod', 'productData', 'branches', 'branchId'));
+            return view('happyView.tickets-edit', compact('coupon_type',  'coupon_discount', 'isPastDate', 'extraTimePrice', 'basicAmtArr', 'user', 'kid', 'product', 'paymentMethod', 'productData', 'branches', 'branchId'));
         } else {
             abort(401);
         }
@@ -1096,147 +1105,7 @@ class TicketController extends Controller
         $model['ba18'] = $totals['ba18'];
         $model['total18'] = $totals['total18'];
         $model['total5'] = $totals['total5'];
-
-        // return $model->fill($totals);
     }
-
-    public function update(Request $request)
-    {
-        hasPermission('tickets-edit');
-        $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
-        if (!$branchId) {
-            return redirect()->back()->with('error', 'Please select a branch first.');
-        }
-        $id = $request->input('id');
-        $user = User::where('id', $id)->first();
-        $booking_date = isset($user['event']->booking_date) ? $user['event']->booking_date : null;
-        $now = now()->format('Y-m-d');
-        if ($booking_date < $now) {
-            return redirect('/customers');
-        }
-        $userDetail = UserDetail::where('user_id', $id)->first();
-
-        // update payments
-        $paymentMethod = PaymentMethod::where('user_id', $id)->first();
-        $oldPayment = $paymentMethod->amounts;
-
-        $paymentMethod->amounts = $request->input('newTotalAmount');
-        $paymentMethod->subTotal = $request->input('newSubAmt');
-        $paymentMethod->save();
-
-        // update kids
-        $kidids = $request->input('kidids');
-        if ($kidids) {
-            foreach ($kidids as $i => $row) {
-                $kidsDetails = Kid::where('id', $row)->first();
-
-                if ($request->input('extra_time_select')[$i] != null) {
-                    $qty = $kidsDetails->qty ? $kidsDetails->qty : 0;
-                    $kidsDetails->qty = $qty + 1;
-
-                    $oldPrice = $kidsDetails->kidPrice;
-                    $kidsDetails->extra_price = $request->input('kid_price')[$i] - $oldPrice;
-
-                    $old_end_time = $kidsDetails->end_time;
-                    $endTimeToday = Carbon\Carbon::createFromFormat('H:i:s', $old_end_time);
-
-                    $extraMinutes = (int) ($request->input('extra_time_select')[$i] ?? 0);
-
-                    if (Carbon\Carbon::now()->greaterThan($endTimeToday)) {
-                        // Already passed
-                        $end_time = Carbon\Carbon::now()->addMinutes($extraMinutes);
-                    } else {
-                        $end_time = $endTimeToday->addMinutes($extraMinutes);
-                    }
-
-                    $time_str = $end_time->toTimeString();
-                    $kidsDetails->end_time = $time_str;
-
-                    $newHours = $request->input('hours')[$i];
-                    if (str_contains($newHours, 'hours')) {
-                        $search = ' hours';
-                        $newHours = str_replace($search, '', $newHours);
-                    }
-                    $kidsDetails->extra_hour = $newHours - $kidsDetails->hours;
-                }
-                $kidsDetails->save();
-            }
-        }
-
-        // if extra time (30 Or 60 ) brought, added in user_product
-        if ($oldPayment !== $request->input('newTotalAmount')) {
-            $newProd_extraTime = new UserProduct();
-            $newProd_extraTime->user_id = $id;
-            $newProd_extraTime->branch_id = $branchId;
-            $newProd_extraTime->product_name = 'Extra Time';
-            $newProd_extraTime->price = ($request->input('newTotalAmount') - $oldPayment);
-            $newProd_extraTime->save();
-        }
-
-        // For sms
-        $user = User::with('kid', 'event')->where('id', $id)->first();
-        $start_datetime = isset($user['event']->Hours) ? $user['event']->Hours : null;
-        $end_datetime = isset($user['kid']->end_time) ? $user['kid']->end_time : null;
-        $booking_date = isset($user['event']->booking_date) ? $user['event']->booking_date : null;
-
-        $mobile = "91" . $userDetail->phone_no;
-        $added_time = "0:" . $request->input('extra_time_select')[0] . ":00";
-        $msg = "Your Playtime has been extended Updated details are: Date: $booking_date Time-In: $start_datetime Updated Time-Out: $end_datetime Added Time: $added_time Have a Gadget Free time of HappyOn Play!	";
-        $template_id = "1707168001515557376";
-        sendsms($mobile, $msg, $template_id);
-
-        $items = [];
-        if (isset($request["product_name"]) && is_array($request["product_name"])) {
-            for ($i = 0; $i < count($request["product_name"]); $i++) {
-                $items[] = [
-                    "name" => $request["product_name"][$i],
-                    "id" => uniqid(),
-                    "rate" => floatval($request["price"][$i]),
-                    "quantity" => intval($request["product_quantity"][$i]),
-                    "subtotal" => floatval($request["price"][$i]) * intval($request["product_quantity"][$i]),
-                    "category" => "",
-                    "addon" => []
-                ];
-            }
-        }
-
-        if (isset($request["kidName"]) && is_array($request["kidName"])) {
-            for ($i = 0; $i < count($request["kidName"]); $i++) {
-                $items[] = [
-                    "name" => $request["kidName"][$i],
-                    "id" => uniqid(),
-                    "rate" => floatval($request["kid_price"][$i]),
-                    "quantity" => intval($request["hours"][$i]),
-                    "subtotal" => floatval($request["kid_price"][$i]),
-                    "category" => "",
-                    "addon" => []
-                ];
-            }
-        }
-
-        $postData = [
-            "customer_key" =>  $paymentMethod->id,
-            "merchant_id" => env('MERCHANT_ID'),
-            "transaction" => [
-                "id" => $paymentMethod->id,
-                "type" => "dine_in",
-                "source" => "online",
-                "payment_type" => $paymentMethod->payment_method,
-                "gross_amount" => $request->totalAmount,
-                "net_amount" => $request->subTotal,
-                "amount" => $request->totalAmount,
-                "order_time" => $paymentMethod->updated_at,
-                "items" => $items,
-                "discount" => 0,
-                "table_number" => '',
-                "order_from" => "POS"
-            ]
-        ];
-        // Make the POST request
-        $response = Http::patch('https://api.reelo.io/v1/pos/integrations/e7499eb1-3ef1-4162-8dfb-8b5a55d3e6ba/update-bill', $postData);
-        return redirect('/customers')->with('success', 'Successfully Updated!');
-    }
-
 
     public function newTicketUpdate(Request $request)
     {
@@ -1255,8 +1124,7 @@ class TicketController extends Controller
         $userDetail = UserDetail::where('user_id', $id)->first();
 
         // update payments
-        $paymentMethod = PaymentMethod::where('user_id', $id)->first();
-        $oldPayment = $paymentMethod->amounts;
+        $paymentMethod = PaymentMethod::where('user_id', $id)->first();        
         $paymentMethod->amounts = $request->input('newTotalAmount');
         $paymentMethod->subTotal = $request->input('newSubAmt');
         $paymentMethod->payment_method = $this->getPaymentMethod($request->input('payment_mode'));
