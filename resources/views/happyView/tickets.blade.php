@@ -1,4 +1,9 @@
 @include('happyView.includes.head')
+<style>
+    .is-hidden {
+        display: none !important;
+    }
+</style>
 
 <body>
     <!--wrapper-->
@@ -136,9 +141,7 @@
                                                         </div>
                                                         <div class="col-md-12" id="parent-div">
                                                         </div>
-                                                        <table id="dataRow">
-
-                                                        </table>
+                                                        <table id="dataRow"></table>
                                                         <div class="button_wrap">
                                                             @foreach ($product as $pro)
                                                                 <div class="h_btn">
@@ -165,7 +168,6 @@
                                                                     <input type="text" name="couponcode" class="form-control" id="couponCode" placeholder="Any Discount Code">
                                                                     <input type="hidden" name="couponvalue" id="couponValue">
                                                                     <button type="button" id="couponCodebutton" class="btn btn-sm btn-primary ms-2">Apply</button>
-                                                                    <button type="button" class="btn btn-sm btn-warning ms-2 disabled d-none" id="remove-coupon">Remove</button>
                                                                 </diV>
                                                                 <p id="couponmsg"></p>
                                                             </div>
@@ -191,9 +193,9 @@
                                                                     <p id="sgst18Total"></p>
                                                                 </div>
                                                             </div>
-                                                           
+
                                                             <div class="gst d-none" id="gst12Container" style="display: flex; flex-direction: column;">
-                                                                 <hr>
+                                                                <hr>
                                                                 <div style="display: flex; justify-content: space-between;">
                                                                     <p id="cgst12Label">CGST @ 6%</p>
                                                                     <p id="cgs12tTotal"></p>
@@ -226,6 +228,7 @@
                                                                 <input type="hidden" id="adult_price_backend" value="{{ isset($result[0]['Adult']) ? $result[0]['Adult'] : 200 }}">
                                                                 <input type="hidden" id="socks_price_backend" value="{{ isset($result[0]['Socks']) ? $result[0]['Socks'] : '80' }}">
                                                                 <input type="hidden" name="kidsOnlyPrice" id="kidsOnlyPrice">
+                                                                <input type="hidden" name="kidsPriceNoDis" id="kidsPriceNoDis">
                                                                 <input type="hidden" name="ba18" id="ba18">
                                                                 <input type="hidden" name="ba12" id="ba12">
                                                                 <input type="hidden" name="ba5" id="ba5">
@@ -398,8 +401,10 @@
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.0/js/toastr.js"></script>
     <script>
-        let removeCouponDiscountAmt = '';
-        let removeCouponType = '';
+        // set coupon data to this 
+        let couponDiscountAmt = 0;
+        let couponType = '';
+
         //Get Phone List from Tickets
         $(document).ready(function() {
             var baseUrl = "{{ URL::to('/') }}";
@@ -481,12 +486,18 @@
             $('#couponmsg').removeAttr('style').text('');
             $('#couponCodebutton').prop('disabled', false);
             $('#subtotal').text("");
+            ['#cgst5Total', '#sgst5Total'].forEach(id => {
+                $(id).text('0');
+            });
+            $('#dataRow').empty();
 
             if (!numDivs) {
+                cgst5Total
                 const fieldsToReset = [
                     '#subtotlSave',
                     '#chargeAmount',
                     '#kidsOnlyPrice',
+                    '#kidsPriceNoDis',
                     '#ba18',
                     '#ba12',
                     '#ba5',
@@ -545,6 +556,7 @@
                     });
                     var basicAmtKidPrice = (sum / 1.18);
                     $("#kidsOnlyPrice").val(basicAmtKidPrice.toFixed(2));
+                    $("#kidsPriceNoDis").val(basicAmtKidPrice.toFixed(2));
 
                     var totalDeductGst = sum - basicAmtKidPrice;
                     $('#subtotal').text("₹ " + basicAmtKidPrice.toFixed(2));
@@ -621,7 +633,7 @@
             event.target.style.display = 'none';
         }
 
-        function calculateTotal() {
+        function calculateTotal() {            
             var sum = 0;
             var totalPrice = 0;
             var taxAmount18 = 0;
@@ -674,8 +686,8 @@
             let ba18Val = 0;
             let ba12Val = 0;
             let ba5Val = 0;
-            $('input[name="price[]"]').each(function(index){
-            // $('.final_price').each(function(index) {
+            $('input[name="price[]"]').each(function(index) {
+                // $('.final_price').each(function(index) {
                 const rate = tax[index];
                 const finalPrice = finalPriceEach[index];
                 const divisor = taxRatesList[rate];
@@ -711,6 +723,10 @@
             updateGST(taxAmount18, ['cgst18Total', 'sgst18Total'], 'gst18');
             updateGST(taxAmount5, ['cgst5Total', 'sgst5Total'], 'gst5');
             updateGST(taxAmount12, ['cgs12tTotal', 'sgst12Total'], 'gst12', 'gst12Container');
+
+            if (couponDiscountAmt > 0 && couponType == 'percent') {
+                updateDiscountAmt();
+            }
         }
 
         function updateGST(taxAmount, selectors, inputName, containerId = null) {
@@ -725,9 +741,63 @@
                 taxAmount > 0 ? container.removeClass('d-none') : container.addClass('d-none');
             }
         }
-    </script>
 
-    <script>
+        function updateDiscountAmt() {
+            let discount = couponDiscountAmt; // 25 P
+            let subTotalBA = 0;
+            let payableTotalAmt = 0;
+            let perTotalDiscountAmt = 0;
+            let totalNewBa18 = 0;
+
+            ["#kidsPriceNoDis", "#ba18", "#ba12", "#ba5"].forEach(id => {
+                let ba = parseFloat($(id).val()) || 0;
+                if (id !== "#ba5") {
+                    let indDiscountAmt = (ba * discount) / 100;
+                    let newBa = (ba - indDiscountAmt);
+                    if (id == '#kidsPriceNoDis' || id == '#ba18') {
+                        totalNewBa18 += newBa;
+                    }
+                    if (id == '#kidsPriceNoDis') {
+                        $("#kidsOnlyPrice").val(newBa.toFixed(2));
+                    } else {
+                        $(id).val(newBa.toFixed(2));
+                    }
+                    perTotalDiscountAmt += indDiscountAmt;
+                    subTotalBA += newBa;
+                } else {
+                    subTotalBA += ba;
+                }
+            });
+            //updated GST for 18 and 12
+            let new18Gst = (totalNewBa18 * 18) / 100;
+            updateGST(new18Gst, ['cgst18Total', 'sgst18Total'], 'gst18');
+            let ba12 = parseFloat($('#ba12').val()) || 0;
+            let new12Gst = 0;
+            if (ba12 > 0) {
+                new12Gst = (ba12 * 12) / 100;
+                updateGST(new12Gst, ['cgs12tTotal', 'sgst12Total'], 'gst12');
+            } else {
+                document.querySelector('#gst12Container').classList.add('d-none');
+            }
+            discount = perTotalDiscountAmt;
+
+            $('#subtotal').text("₹ " + subTotalBA.toFixed(2));
+            $('#subtotlSave').val(subTotalBA.toFixed(2));
+
+            ["#gst5", "#gst18", "#gst12"].forEach(id => {
+                let gst = parseFloat($(id).val()) || 0;
+                payableTotalAmt += gst;
+            });
+
+            $('#couponValue').val(discount.toFixed(2));            
+            $('#couponValueShow').html(discount.toFixed(2));
+
+            payableTotalAmt += subTotalBA;
+
+            document.getElementById('totalAmount').innerHTML = '₹ ' + payableTotalAmt.toFixed(2);
+            $("#chargeAmount").val(payableTotalAmt.toFixed(2));
+        }
+
         $("#couponCodebutton").on("click", function() {
             var branchId = $("#hiddenBranchId").val();
             $.ajax({
@@ -739,6 +809,8 @@
                 },
                 success: function(data) {
                     let sum = $("#chargeAmount").val();
+                    couponDiscountAmt = 0;
+                    couponType = '';
                     if (data.status === 400) {
                         $('#couponmsg').css('color', 'red').text(data.msg);
                         return false;
@@ -748,13 +820,12 @@
                         return false;
                     }
                     if (data != '') {
-                        let discount = removeCouponDiscountAmt = data.discount;
+                        let discount = couponDiscountAmt = data.discount;
                         let subTotalBA = 0;
                         let payableTotalAmt = 0;
                         let perTotalDiscountAmt = 0;
                         let totalNewBa18 = 0;
-                        removeCouponType = data.discount_type;
-                        $('#remove-coupon').removeClass('disabled');
+                        couponType = data.discount_type;
                         $('#couponCodebutton').addClass('disabled');
                         $('#couponmsg').css('color', '#0A5F59').text('Apply Coupon Successful!');
 
@@ -851,35 +922,11 @@
             });
         });
     </script>
-    <script>
-        //Coupon Code remove
-        $("#remove-coupon").on("click", function() {
-            const sum = $("#chargeAmount").val();
-            console.log('sum : ', sum);
-            const branchId = $("#hiddenBranchId").val();
-            let revertedSumAmt = 0;
 
-            if (removeCouponDiscountAmt !== '' || removeCouponType !== '') {
-                $('#couponCodeShow').html("Coupon");
-                $('#couponCodebutton').removeClass('disabled');
-                $('#remove-coupon').addClass('disabled');
-                $('#couponmsg').removeAttr('style').text('');
-                $('#couponValue').val('');
-                $('#couponCode').val('');
-                $('#couponValueShow').text('');
-                if (removeCouponType == 'flat') {
-                    revertedSumAmt = parseFloat(sum) + parseFloat(removeCouponDiscountAmt);
-                } else if (removeCouponType == 'percent') {
-                    revertedSumAmt = parseFloat(sum) / (1 - (parseFloat(removeCouponDiscountAmt) / 100));
-                } else {
-                    return false;
-                }
-                revertedSumAmt = parseFloat(revertedSumAmt);
-                $('#totalAmount').text('₹ ' + revertedSumAmt.toFixed(2));
-            }
-        });
-    </script>
 
+
+
+    {{-- here membership code started --}}
     <script>
         $(document).ready(function() {
             var baseUrl = "{{ URL::to('/') }}";
@@ -964,8 +1011,6 @@
                 });
             }
         }
-
-
 
         $(document).on('change', '#hrs', function() {
             var hrs = document.getElementById('hrs').value;

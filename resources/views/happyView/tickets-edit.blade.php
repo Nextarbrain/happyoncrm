@@ -157,12 +157,7 @@
                                                                         </div>
                                                                         <div class="col-md-3">
                                                                             <div class="mb-3 input_wrap dark">
-                                                                                <label>Extra Time</label>
-                                                                                @php
-                                                                                    $bookingDate = $user['event']->booking_date;
-                                                                                    $now = new DateTime();
-                                                                                    $isPastDate = $bookingDate < $now->format('Y-m-d');
-                                                                                @endphp
+                                                                                <label>Extra Time</label>                                                                                
                                                                                 <select name="extra_time_select[]" class="form-select" id="time_{{ $i }}" onchange="AddExtratime(event)" {{ $isPastDate ? 'disabled' : '' }}>
                                                                                     <option value="">Select Here </option>
                                                                                     <option value="30">30 Min </option>
@@ -176,7 +171,7 @@
                                                         </div>
                                                         <div class="col-md-12 add_sock"></div>
                                                         {{-- Add -ons purched at add tickets --}}
-                                                        <table id="dataRow">
+                                                        <table id="dataRow">                                                          
                                                             @if ($product)
                                                                 @foreach ($product as $socks_products)
                                                                     @if ($socks_products->qty == $user['userDetails']->number_of_kids && strtolower($socks_products->product_name) == 'socks')
@@ -196,7 +191,7 @@
                                                                                     <div class="col-md-3">
                                                                                         <div class=" input_wrap">
                                                                                             <label>{{ $socks_products->product_name }}Qty</label>
-                                                                                            <select name="product_quantity[]" onchange="calculateTotal()" class="form-select">
+                                                                                            <select name="product_quantity[]" onchange="calculateTotal()" class="form-select" {{ $isPastDate ? 'disabled' : '' }}>
                                                                                                 @for ($i = 0; $i <= 10; $i++)
                                                                                                     <option value="{{ $i }}" {{ $socks_products->qty == $i ? 'selected' : '' }}>{{ $i }}</option>
                                                                                                 @endfor
@@ -238,12 +233,16 @@
                                                                 @endforeach
                                                             @endif
                                                         </table>
-                                                        <div class="button_wrap">
+                                                        <div class="button_wrap">                                                           
                                                             @foreach ($productData as $pro)
                                                                 @if (!hasTwoProduct(request()->route('id'), $pro->product_name, $user['userDetails']->number_of_kids))
                                                                     <div class="h_btn">
-                                                                        <a href="javascript:void(0)" onclick="AddItems(event, '{{ $pro->product_name }}', '{{ $pro->product_price }}', '{{ $pro->product_tax }}', {{ $pro->id }})" class="more_adult">+
-                                                                            {{ $pro->product_name }}</a>
+                                                                        @if ($isPastDate)
+                                                                            <a href="javascript:void(0)" class="more_adult" style="pointer-events: none; opacity: 0.5; cursor: not-allowed;">+{{ $pro->product_name }}</a>
+                                                                        @else
+                                                                            <a href="javascript:void(0)" onclick="AddItems(event, '{{ $pro->product_name }}', '{{ $pro->product_price }}', '{{ $pro->product_tax }}', {{ $pro->id }})" class="more_adult">+
+                                                                                {{ $pro->product_name }}</a>
+                                                                        @endif
                                                                     </div>
                                                                 @endif
                                                             @endforeach
@@ -626,7 +625,7 @@
             if (extraTimeValue > 0) {
                 targetHourElement.value = parseFloat(hiddenHourElement.value) + addedHour + " hours";
                 targetPriceElement.value = parseFloat(hiddenPriceElement.value) + addedPrice;
-                extraTimePrice.value = parseFloat(extraTimePrice.value) + addedHour ;
+                extraTimePrice.value = parseFloat(extraTimePrice.value) + addedHour;
             } else {
                 targetPriceElement.value = parseFloat(hiddenPriceElement.value);
                 targetHourElement.value = parseFloat(hiddenHourElement.value);
