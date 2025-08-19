@@ -215,7 +215,7 @@
                                                                 <p id="couponValueShow">
                                                                     {{ $eventbooking->couponvalue }}</p>
                                                             </div>
-                                                            <hr>                                                            
+                                                            <hr>
                                                             <div class="gst" style="display: flex; flex-direction: column;">
                                                                 <div style="display: flex; justify-content: space-between;">
                                                                     <p id="cgst18Label">CGST @ 9%</p>
@@ -585,30 +585,7 @@
             }
         });
     </script>
-    <script>
-        var baseUrl = "{{ URL::to('/') }}";
-        $("#couponCodebutton").on("click", function() {
-            $('#couponmsg').html(`<p class="text-danger"></p>`);
-            var sum = $("#subtotalSave").val();
-            var chargeAmount = $("#chargeAmount").val();
-            $.ajax({
-                url: baseUrl + '/get-coupon',
-                type: 'GET',
-                data: {
-                    option: $("#couponCode").val()
-                },
-                success: function(data) {
-                    console.log(data.status);
-                    if (data.status == 400) {
-                        $('#couponmsg').html(`<p class="text-danger"> ${data.msg} </p>`);
-                    } else {
-                        var discount = 0;
-                        calculate_items_with_coupon(data);
-                    }
-                }
-            });
-        });
-    </script>
+
     {{-- {{NEW CALCULATION FLOW...START}} --}}
     <script>
         function calculate_amount() {
@@ -700,16 +677,17 @@
                     let basicAmt = 0;
 
                     const taxRatesList = {
-                        '18': 1.18,
-                        '12': 1.12,
-                        '5': 1.05,
+                        '18': 0.18,
+                        '12': 0.12,
+                        '5': 0.05,
                         '0': 1
                     };
                     if (taxRatesList.hasOwnProperty(taxRate)) {
-                        basicAmt = rowtotal / taxRatesList[taxRate];
-                        gstAmt = rowtotal - basicAmt;
+                        // basicAmt = rowtotal / taxRatesList[taxRate];
+                        // gstAmt = rowtotal - basicAmt;
+                        gstAmt = rowtotal * taxRatesList[taxRate];
                     }
-                    subTotal += basicAmt;
+                    subTotal += rowtotal;
 
                     if (taxRate === 18) gst18total += gstAmt;
                     else if (taxRate === 12) gst12total += gstAmt;
@@ -754,16 +732,22 @@
                     let discountAmt = 0;
 
                     const taxRatesList = {
-                        '18': 1.18,
-                        '12': 1.12,
-                        '5': 1.05,
+                        '18': 0.18,
+                        '12': 0.12,
+                        '5': 0.05,
                         '0': 1
                     };
                     if (taxRatesList.hasOwnProperty(taxRate)) {
-                        basicAmt = rowtotal / taxRatesList[taxRate];
-                        discountAmt = (basicAmt * discountRate) / 100;
-                        basicAmt = basicAmt - discountAmt;
-                        gstAmt = (basicAmt * taxRate) / 100;
+                        // basicAmt = rowtotal / taxRatesList[taxRate];
+                        // discountAmt = (basicAmt * discountRate) / 100;
+                        // basicAmt = basicAmt - discountAmt;
+                        // gstAmt = (basicAmt * taxRate) / 100;
+                        if (taxRate !== 5) {
+                            discountAmt = (rowtotal * discountRate) / 100;
+                        }
+                        basicAmt = rowtotal - discountAmt;
+                        gstAmt = (basicAmt * taxRatesList[taxRate]);
+
                     }
                     subTotal += basicAmt;
                     totalDiscount += discountAmt;

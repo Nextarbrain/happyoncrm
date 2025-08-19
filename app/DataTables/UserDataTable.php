@@ -8,6 +8,7 @@ use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\DataTables;
 use Carbon\Carbon;
+// use Illuminate\Support\Facades\Log;
 
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
@@ -120,28 +121,12 @@ class UserDataTable extends DataTable
             ->editColumn('remaining_time', function ($user) {
                 date_default_timezone_set('Asia/Kolkata');
 
-                $start_datetime = isset($user['event']->Hours) ? $user['event']->Hours : null;
-                $end_datetime = isset($user['firstKid']->end_time) ? $user['firstKid']->end_time : null;
+                $end_time = isset($user['firstKid']->end_time) ? $user['firstKid']->end_time : null;
                 $booking_date = isset($user['event']->booking_date) ? $user['event']->booking_date : null;
-                $start_date_time = $booking_date . ' ' . $start_datetime . ':00';
 
-                $start_time_unix = strtotime($start_date_time);
+                $end_datetime_unix = strtotime($booking_date . ' ' . $end_time);
 
-                if (isset($user['firstKid']->hours) && $user['firstKid']->hours == 'Unlimited') {
-                    $hourQty = 1;
-                } else {
-                    $hourQty = isset($user['firstKid']->hours) ? $user['firstKid']->hours : 0;
-                    $hourQty += isset($user['firstKid']->extra_hour) ? $user['firstKid']->extra_hour : 0;
-                }
-                if (strpos($hourQty, '.') !== false) {
-                    $totalSecond = $hourQty * 3600;
-                } else {
-                    $totalSecond = (int)$hourQty * 3600;
-                }
-
-                $end_time_unix_plus_one_hour = $start_time_unix + $totalSecond;
-                $remaining_seconds = $end_time_unix_plus_one_hour - time();
-
+                $remaining_seconds = $end_datetime_unix - time();
                 if ($remaining_seconds <= 0) {
                     $remaining_seconds = 0;
                 }
@@ -155,29 +140,12 @@ class UserDataTable extends DataTable
             ->addColumn('remaining_time', function ($user) {
                 date_default_timezone_set('Asia/Kolkata');
 
-                $start_datetime = isset($user['event']->Hours) ? $user['event']->Hours : null;
-                $end_datetime = isset($user['firstKid']->end_time) ? $user['firstKid']->end_time : null;
+                $end_time = isset($user['firstKid']->end_time) ? $user['firstKid']->end_time : null;
                 $booking_date = isset($user['event']->booking_date) ? $user['event']->booking_date : null;
-                $start_date_time = $booking_date . ' ' . $start_datetime . ':00';
 
-                $start_time_unix = strtotime($start_date_time);
+                $end_datetime_unix = strtotime($booking_date . ' ' . $end_time);
 
-                if (isset($user['firstKid']->hours) && $user['firstKid']->hours == 'Unlimited') {
-                    $hourQty = 1;
-                } else {
-                    $hourQty = isset($user['firstKid']->hours) ? (float)$user['firstKid']->hours : 0;
-                    $hourQty += isset($user['firstKid']->extra_hour) ? (float)$user['firstKid']->extra_hour : 0;
-                }
-
-                if (strpos($hourQty, '.') !== false) {
-                    $totalSecond = $hourQty * 3600;
-                } else {
-                    $totalSecond = (int)$hourQty * 3600;
-                }
-
-                $end_time_unix_plus_one_hour = $start_time_unix + $totalSecond;
-                $remaining_seconds = $end_time_unix_plus_one_hour - time();
-
+                $remaining_seconds = $end_datetime_unix - time();
                 if ($remaining_seconds <= 0) {
                     $remaining_seconds = 0;
                 }
