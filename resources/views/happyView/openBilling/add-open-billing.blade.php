@@ -422,8 +422,9 @@
                         // discountAmt = (basicAmt * discountRate) / 100;
                         // basicAmt = basicAmt - discountAmt;
                         // gstAmt = (basicAmt * taxRate) / 100;
-
-                        discountAmt = (rowtotal * discountRate) / 100;
+                        if(taxRate !== '5'){
+                            discountAmt = (rowtotal * discountRate) / 100;
+                        }                     
                         basicAmt = rowtotal - discountAmt;
                         gstAmt = (basicAmt * taxRatesList[taxRate]);
 
