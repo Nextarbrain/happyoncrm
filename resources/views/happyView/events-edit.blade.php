@@ -215,7 +215,7 @@
                                                                 <p id="couponValueShow">
                                                                     {{ $eventbooking->couponvalue }}</p>
                                                             </div>
-                                                            <hr>                                                            
+                                                            <hr>
                                                             <div class="gst" style="display: flex; flex-direction: column;">
                                                                 <div style="display: flex; justify-content: space-between;">
                                                                     <p id="cgst18Label">CGST @ 9%</p>
@@ -585,7 +585,7 @@
             }
         });
     </script>
-    
+
     {{-- {{NEW CALCULATION FLOW...START}} --}}
     <script>
         function calculate_amount() {
@@ -683,9 +683,9 @@
                         '0': 1
                     };
                     if (taxRatesList.hasOwnProperty(taxRate)) {
-                       // basicAmt = rowtotal / taxRatesList[taxRate];
-                       // gstAmt = rowtotal - basicAmt;
-                       gstAmt = rowtotal * taxRatesList[taxRate];
+                        // basicAmt = rowtotal / taxRatesList[taxRate];
+                        // gstAmt = rowtotal - basicAmt;
+                        gstAmt = rowtotal * taxRatesList[taxRate];
                     }
                     subTotal += rowtotal;
 
@@ -742,8 +742,9 @@
                         // discountAmt = (basicAmt * discountRate) / 100;
                         // basicAmt = basicAmt - discountAmt;
                         // gstAmt = (basicAmt * taxRate) / 100;
-
-                        discountAmt = (rowtotal * discountRate) / 100;
+                        if (taxRate !== '5') {
+                            discountAmt = (rowtotal * discountRate) / 100;
+                        }
                         basicAmt = rowtotal - discountAmt;
                         gstAmt = (basicAmt * taxRatesList[taxRate]);
 
