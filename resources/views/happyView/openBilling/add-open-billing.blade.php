@@ -422,7 +422,8 @@
                         // discountAmt = (basicAmt * discountRate) / 100;
                         // basicAmt = basicAmt - discountAmt;
                         // gstAmt = (basicAmt * taxRate) / 100;
-                        if(taxRate !== '5'){
+                        if(taxRate !== 5){
+                            console.log('DiscountC : ', taxRate);
                             discountAmt = (rowtotal * discountRate) / 100;
                         }                     
                         basicAmt = rowtotal - discountAmt;
