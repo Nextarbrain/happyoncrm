@@ -115,7 +115,8 @@
                                                     <tr>
                                                         <td>{{ $counter++ }}</td>
                                                         <td>{{ $user_booking->name }}</td>
-                                                        <td>{{ $user_booking->kids[0]->name ?? null }}</td>
+                                                        <!-- <td>{{ $user_booking->kids[0]->name ?? null }}</td> -->                                                        
+                                                        <td>{{ optional($user_booking->kids->first())->name ?? '' }}</td>
                                                         <td>{{ isset($user_booking['event']->booking_date) ? date('d M, Y', strtotime($user_booking['event']->booking_date)) : '' }}</td>
                                                         <td>{{ $user_booking->userDetails->phone_no ?? null }}</td>
                                                         <td>{{ $subTotal18 }}</td>
@@ -131,12 +132,16 @@
                                                             @php
                                                                 $timer = '--';
                                                                 if ($user_booking->userDetails?->membership_plan == 0) {
-                                                                    $timer = remaining_time($bookingDate, $start_datetime, $user_booking->kids[0]->hours);
+                                                                    $hours = optional($user_booking->kids->first())->hours;
+                                                                    if (!is_null($hours)) {
+                                                                        $timer = remaining_time($bookingDate, $start_datetime, $hours);
+                                                                    }                                                                    
                                                                 }
                                                             @endphp
                                                             {{ $timer }}</td>
                                                         <td>{{ count($user_booking->kids) }}</td>
-                                                        <td>{{ $user_booking->kids[0]->hours ?? null }}</td>
+                                                        <!-- <td>{{ $user_booking->kids[0]->hours ?? null }}</td> -->                                                        
+                                                        <td>{{ optional($user_booking->kids->first())->hours ?? '' }}</td>
                                                         <td>{{ $user_booking->paymentInfo?->payment_method ?? '' }}</td>
                                                         <td>{{ $user_booking->userDetails?->membership_plan == 1 ? 'Membership' : 'Ticket' }}</td>
                                                         <td>{{ $user_booking->branch?->name ?? '' }}</td>
