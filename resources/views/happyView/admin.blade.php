@@ -152,6 +152,7 @@
                                                                             <th>Tue</th>
                                                                             <th>Wed</th>
                                                                             <th>Thru</th>
+                                                                            <th>Branch</th>
                                                                         </tr>
                                                                     </thead>
                                                                     <tbody>
@@ -168,6 +169,7 @@
                                                                                 <td>{{ $hourplans->tuesday }}</td>
                                                                                 <td>{{ $hourplans->wednesday }}</td>
                                                                                 <td>{{ $hourplans->thursday }}</td>
+                                                                                <td>{{ optional($hourplans['branch'])->name ?? '' }}</td>
                                                                             </tr>
                                                                         @endforeach
                                                                     </tbody>
@@ -250,6 +252,7 @@
                                                                             <th>Friday</th>
                                                                             <th>Sat</th>
                                                                             <th>Sunday</th>
+                                                                            <th>Branch</th>
                                                                         </tr>
                                                                     </thead>
                                                                     <tbody>
@@ -264,7 +267,8 @@
                                                                                 <td>{{ $hourpln->Hour }}</td>
                                                                                 <td>{{ $hourpln->friday }}</td>
                                                                                 <td>{{ $hourpln->saturday }}</td>
-                                                                                <td>{{ $hourpln->sunday }}</td>
+                                                                                <td>{{ $hourpln->sunday }}</td>                                                                                
+                                                                                <td>{{ optional($hourpln['branch'])->name ?? '' }}</td>
                                                                             </tr>
                                                                         @endforeach
                                                                     </tbody>
