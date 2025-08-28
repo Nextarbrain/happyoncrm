@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class DayPrice extends Model
 {
     use HasFactory;
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class, 'branch_id');
+    }
 }
