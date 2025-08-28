@@ -198,29 +198,31 @@ class AdminController extends Controller
         }
         // Membership Plan data : membership_plans - end
 
-
         // Hour Plan data : Day_price -start
-        $hourPlan = DayPrice::whereNull('branch_id')->get();
+        $masterHourPlan = DayPrice::with('branch')->whereNull('branch_id')->get();
+        $hourPlan = collect();
 
         if ($branchId) {
-            $branchPlans = DayPrice::where('branch_id', $branchId)->get();
-            if ($branchPlans->count() === 3) {
+            $branchPlans = DayPrice::with('branch')->where('branch_id', $branchId)->get();
+            if ($branchPlans->count() === $masterHourPlan->count()) {
                 $hourPlan = $branchPlans->values();
             } else {
-                // Fill missing hours from default                
-                $requiredHours = $hourPlan->pluck('Hour')->toArray();
+                // Fill missing hours from default
+                $requiredHours = $masterHourPlan->pluck('Hour')->toArray();
                 foreach ($requiredHours as $hour) {
                     $branchHourPlan = DayPrice::where('branch_id', $branchId)->where('hour', $hour)->get();
                     if ($branchHourPlan->isEmpty()) {
                         $branchHourPlan = DayPrice::whereNull('branch_id')->where('hour', $hour)->get();
                     }
-                    $branchPlans = $branchPlans->merge($branchHourPlan);
+                    $branchPlans = $branchPlans->merge(items: $branchHourPlan);
                 }
                 $hourPlan = $branchPlans->values();
             }
+        } else {
+            $hourPlan = DayPrice::with('branch')->get();
         }
-        // $hourPlan = $branchPlans->sortBy('id')->values();
         // Hour Plan data : Day_price -end
+
         $users = User::where('role', 0);
         if ($branchId) {
             $users->where('branch_id', $branchId);
@@ -420,7 +422,7 @@ class AdminController extends Controller
                 $amountTicket[] = $data;
             }
             $totalTicketAmount = array_sum($amountTicket);
-            $totalTicket = $ticketSale->count();            
+            $totalTicket = $ticketSale->count();
             $upi_membership = MembershipBuyRenewable::select('amount')->where('payment_method', 'UPI')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
             if ($branchId) {
                 $upi_membership->where('branch_id', $branchId);
@@ -431,7 +433,7 @@ class AdminController extends Controller
             if ($branchId) {
                 $cash_membership->where('branch_id', $branchId);
             }
-            $cash_membership = $cash_membership->sum('amount');            
+            $cash_membership = $cash_membership->sum('amount');
 
             $card_membership = MembershipBuyRenewable::select('amount')->where('payment_method', 'Debit/Credit')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
             if ($branchId) {
@@ -896,7 +898,7 @@ class AdminController extends Controller
             if ($branchId) {
                 $cash->where('branch_id', $branchId);
             }
-            $cash = $cash->sum('amounts');            
+            $cash = $cash->sum('amounts');
             $card = PaymentMethod::select('amounts')->where('payment_method', 'Debit/Credit')
                 ->whereHas('user.userDetails', function ($q) {
                     $q->where('membership_plan', 0);
@@ -905,7 +907,7 @@ class AdminController extends Controller
             if ($branchId) {
                 $card->where('branch_id', $branchId);
             }
-            $card = $card->sum('amounts');            
+            $card = $card->sum('amounts');
             $upi = $upi + $upi_membership + $upi_event + $partial_upi + $upi_open;
             $cash = $cash + $cash_membership + $cash_event + $partial_cash + $cash_open;
             $card = $card + $card_membership + $card_event + $partial_card + $card_open;
@@ -1356,7 +1358,7 @@ class AdminController extends Controller
 
 
     public function DatawiseRecord(Request $request)
-    {       
+    {
         $applydate = base64_decode($request->date);
         $branchId = $request->branch_id ?? auth('admin')->user()->branch_id ?? null;
         $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
@@ -1395,7 +1397,7 @@ class AdminController extends Controller
                 $openbillings = $openbillings->get();
 
                 return view('happyView.openBilling.index', ['open_billings' => $openbillings, 'applydate' => $applydate]);
-            }           
+            }
 
 
             $event_bookings = EventBooking::where('payment_status', 'Paid')->whereDate('booking_date', $today);
