@@ -206,19 +206,13 @@
                             <div class="col-md-6">
                                 <div class="mb-4 input_wrap dark">
                                     <label for='date'>Date</label>
-                                    <input type="date" class="form-control" placeholder="date" name="date"
-                                        id="date" required
-                                        @if ((app()->environment('qa') && $branch_id == 8) || (app()->environment('production') && $branch_id == 2)) @else
-               readonly @endif>
+                                    <input type="date" class="form-control" placeholder="date" name="date" id="date" required readonly>
                                 </div>
                             </div>
                             <div class="col-md-6 input_wrap dark time">
                                 <div class="mb-4">
                                     <label for='time'>Time</label>
-                                    <input type="time" class="form-control" placeholder="Time" name="time"
-                                        id="time" required
-                                        @if ((app()->environment('qa') && $branch_id == 8) || (app()->environment('production') && $branch_id == 2)) @else
-               readonly @endif>
+                                    <input type="time" class="form-control" placeholder="Time" name="time" id="time" required readonly>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -398,6 +392,19 @@
         $(document).ready(function() {
             $('#branchId').change(function() {
                 getBranchPlan();
+                var selectedbranchId = $(this).val();
+
+                if (selectedbranchId === "2" || selectedbranchId === "8") {
+                    $('#date').prop('readonly', false); 
+                    $('#date').removeClass('dark');
+                    $('#time').prop('readonly', false); 
+                    $('#time').removeClass('dark');
+                } else {
+                    $('#date').prop('readonly', true);
+                    $('#date').addClass('dark');
+                    $('#time').prop('readonly', true);
+                    $('#time').addClass('dark');
+                }
             });
             $('#membershipPlan').change(function() {
                 getMembershipPlan();
