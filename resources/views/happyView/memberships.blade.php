@@ -45,7 +45,8 @@
                                     </div>
                                     <div class="col-md-9">
                                         <div class="message_wrap">
-                                            <textarea id="message" name="message" rows="4" cols="50" placeholder="Happy [Renewal Date] [Name]! As a valued member of our family playing area, we want to thank you for your continued support. To show our appreciation, we are offering you a special discount on your renewal fee. Come join us for some fun and games! We look forward to seeing you soon."></textarea>
+                                            <textarea id="message" name="message" rows="4" cols="50"
+                                                placeholder="Happy [Renewal Date] [Name]! As a valued member of our family playing area, we want to thank you for your continued support. To show our appreciation, we are offering you a special discount on your renewal fee. Come join us for some fun and games! We look forward to seeing you soon."></textarea>
                                             <i class="fa fa-pencil" aria-hidden="true"></i>
                                         </div>
                                     </div>
@@ -59,18 +60,22 @@
                                     <div class="col-md-6">
                                         <div id="datatable-buttons"></div>
                                     </div>
-                                    <div class="col-md-6 text-md-right d-flex justify-content-md-end justify-content-start align-items-center flex-wrap">
+                                    <div
+                                        class="col-md-6 text-md-right d-flex justify-content-md-end justify-content-start align-items-center flex-wrap">
                                         <div id="user_delete" class="mr-3 mb-2">
                                             @if (can('admin-membership-delete'))
-                                                <i class="fa fa-trash-o fa-lg" id="membership_div" style="cursor: pointer;" aria-hidden="true"></i>
+                                                <i class="fa fa-trash-o fa-lg" id="membership_div"
+                                                    style="cursor: pointer;" aria-hidden="true"></i>
                                             @endif
                                         </div>
                                         <div class="mr-2 mb-2 mx-3">
-                                            <input type="search" id="datatable-search" class="form-control form-control-sm" placeholder="Search...">
+                                            <input type="search" id="datatable-search"
+                                                class="form-control form-control-sm" placeholder="Search...">
                                         </div>
                                         <div class="mb-2">
                                             @if (can('membership-add'))
-                                                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#Addnew">ADD NEW +</button>
+                                                <button type="button" class="btn btn-sm btn-primary"
+                                                    data-bs-toggle="modal" data-bs-target="#Addnew">ADD NEW +</button>
                                             @endif
                                         </div>
                                     </div>
@@ -80,10 +85,12 @@
                             <div class="container">
                                 <div class="row table-responsive">
                                     <div class="data_table membartable">
-                                        <table id="example1" class="table table-striped text-center" style="width:100%">
+                                        <table id="example1" class="table table-striped text-center"
+                                            style="width:100%">
                                             <thead>
                                                 <tr>
-                                                    <th><input type="checkbox" name="checkAll-member" onclick="checkAll(this)"></th>
+                                                    <th><input type="checkbox" name="checkAll-member"
+                                                            onclick="checkAll(this)"></th>
                                                     <th>Kid Name</th>
                                                     <th>Date</th>
                                                     <th>Renewal</th>
@@ -100,7 +107,9 @@
                                             <tbody>
                                                 @foreach ($membershipUsers as $membershipUser)
                                                     <tr>
-                                                        <td><input name="member-check" type="checkbox" data-item-id="{{ $membershipUser->id }}" class="membership_checkbox"></td>
+                                                        <td><input name="member-check" type="checkbox"
+                                                                data-item-id="{{ $membershipUser->id }}"
+                                                                class="membership_checkbox"></td>
                                                         <td class="text-capitalize">
                                                             {{ optional($membershipUser['user'])->name ?? '' }}
                                                         </td>
@@ -135,9 +144,16 @@
                                                         </td>
                                                         <td class="status">SMS Sent</td>
                                                         <td>{{ optional($membershipUser['branch'])->name ?? '' }}</td>
-                                                        <td><a href="#"><i class="fa fa-whatsapp" aria-hidden="true"></i></a>
-                                                            <a target="_blank" class="btn btn-sm btn-primary" style="width: 30px; height: 30px; border-radius: 50%;" href="{{ url('invoice-membership-pdf/' . optional($membershipUser['user'])->id ?? '') }}"><i class="fa fa-file" aria-hidden="true"></i></a>
-                                                            <a class="btn btn-sm btn-dark" style="width: 30px; height: 30px; border-radius: 50%;" href="{{ url('membership-history/' . optional($membershipUser['user'])->id ?? '') }}"><i class="fa fa-list" aria-hidden="true"></i></a>
+                                                        <td><a href="#"><i class="fa fa-whatsapp"
+                                                                    aria-hidden="true"></i></a>
+                                                            <a target="_blank" class="btn btn-sm btn-primary"
+                                                                style="width: 30px; height: 30px; border-radius: 50%;"
+                                                                href="{{ url('invoice-membership-pdf/' . optional($membershipUser['user'])->id ?? '') }}"><i
+                                                                    class="fa fa-file" aria-hidden="true"></i></a>
+                                                            <a class="btn btn-sm btn-dark"
+                                                                style="width: 30px; height: 30px; border-radius: 50%;"
+                                                                href="{{ url('membership-history/' . optional($membershipUser['user'])->id ?? '') }}"><i
+                                                                    class="fa fa-list" aria-hidden="true"></i></a>
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -167,7 +183,8 @@
             <div class="modal-content">
                 <div class="modal-body">
                     <div class="h_btn">
-                        <button type="button" class="btn" style="pointer-events: none;">Add New membership</button>
+                        <button type="button" class="btn" style="pointer-events: none;">Add New
+                            membership</button>
                     </div>
                     <form action="{{ url('/add-membership-plan') }}" method="post">
                         @csrf
@@ -189,25 +206,33 @@
                             <div class="col-md-6">
                                 <div class="mb-4 input_wrap dark">
                                     <label for='date'>Date</label>
-                                    <input type="date" class="form-control" placeholder="date" name="date" id="date" required readonly>
+                                    <input type="date" class="form-control" placeholder="date" name="date"
+                                        id="date" required
+                                        @if ((app()->environment('qa') && $branch_id == 8) || (app()->environment('production') && $branch_id == 2)) @else
+               readonly @endif>
                                 </div>
                             </div>
                             <div class="col-md-6 input_wrap dark time">
                                 <div class="mb-4">
                                     <label for='time'>Time</label>
-                                    <input type="time" class="form-control" placeholder="Time" name="time" id="time" required readonly>
+                                    <input type="time" class="form-control" placeholder="Time" name="time"
+                                        id="time" required
+                                        @if ((app()->environment('qa') && $branch_id == 8) || (app()->environment('production') && $branch_id == 2)) @else
+               readonly @endif>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-4 input_wrap">
                                     <label for="name">Member Name <span>*</span></label>
-                                    <input type="text" class="form-control" placeholder="Name of Kid" name="name" id='name' required>
+                                    <input type="text" class="form-control" placeholder="Name of Kid"
+                                        name="name" id='name' required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-4 input_wrap">
                                     <label for="phone">Phone <span>*</span></label>
-                                    <input type="text" class="form-control" placeholder="Phone" name="phone" id="phone" maxlength="10" required>
+                                    <input type="text" class="form-control" placeholder="Phone" name="phone"
+                                        id="phone" maxlength="10" required>
                                 </div>
                             </div>
                             <div class="col-md-12 ">
@@ -240,9 +265,12 @@
                                 <div class="mb-4 input_wrap">
                                     <label for="coupon_code">COUPAN CODE</label>
                                     <div class="d-flex align-items-center">
-                                        <input type="text" class="form-control" placeholder="Any Discount Code" name="coupon_code" id="coupon_code">
-                                        <button type="button" class="btn btn-sm btn-primary ms-2" id="apply-coupon">Apply</button>
-                                        <button type="button" class="btn btn-sm btn-warning ms-2 disabled" id="remove-coupon">Remove</button>
+                                        <input type="text" class="form-control" placeholder="Any Discount Code"
+                                            name="coupon_code" id="coupon_code">
+                                        <button type="button" class="btn btn-sm btn-primary ms-2"
+                                            id="apply-coupon">Apply</button>
+                                        <button type="button" class="btn btn-sm btn-warning ms-2 disabled"
+                                            id="remove-coupon">Remove</button>
                                     </div>
                                     <p id="couponmsg"></p>
                                     <input type="hidden" id="plan_value">
@@ -259,7 +287,7 @@
                                     <p id="couponCodeShow">Coupon </span></p>
                                     <p id="couponValueShow"></p>
                                     <input type="hidden" id="couponDis" name="couponDis">
-                                </div>                                
+                                </div>
                                 <hr>
                                 <div class="gst" style="display: flex; flex-direction: column;">
                                     <div style="display: flex; justify-content: space-between;">
@@ -281,14 +309,16 @@
                                 <hr>
                             </div>
                             <div class="tearm_condition">
-                                <input type="checkbox" id="term-text" name="term-text" value="" checked="checked">
+                                <input type="checkbox" id="term-text" name="term-text" value=""
+                                    checked="checked">
                                 <p>By Agreeing to the <b>Terms and Condition</b>
                                     of HappyOn</p>
                             </div>
                             <div class="s_btn d-flex gap-2 my-3">
                                 <button type="submit" class="btn">Create
                                     Member and Add Credit</button>
-                                <a href="javascript:void(0);" class="btn btn-secondary" style="padding-top: 12px;font-size: 18px;" onclick="handleCancel()">Cancel</a>
+                                <a href="javascript:void(0);" class="btn btn-secondary"
+                                    style="padding-top: 12px;font-size: 18px;" onclick="handleCancel()">Cancel</a>
                             </div>
                         </div>
                     </form>
@@ -465,7 +495,7 @@
                     } else {
                         $('#plan_value').val(0);
                         $('#subtotal').val(0);
-                        $('#price').text('₹ 0');                        
+                        $('#price').text('₹ 0');
                         $('#cgstTotal').html(0);
                         $('#sgstTotal').html(0);
                         $('#gst18').val(0);
