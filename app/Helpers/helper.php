@@ -169,6 +169,12 @@ function branchName($branchId)
 // $template_id = "1707168821233182292";
 // dd(sendsms('7079322204', $msg, $template_id));
 
+function branchInfo($branchId)
+{
+    $branch = Branch::with('admin')->where('id', $branchId)->first();
+    return $branch;
+}
+
 
 
 
