@@ -36,7 +36,7 @@ class EventController extends Controller
 {
     public function eventBookingReport(Request $request)
     {
-        $branchId = !empty($request->branch_id) && count($request->branch_id) > 0 ? $request->branch_id : (auth('admin')->user()->branch_id ? [strval(auth('admin')->user()->branch_id)]: null);
+        $branchId = !empty($request->branch_id) && count($request->branch_id) > 0 ? $request->branch_id : (auth('admin')->user()->branch_id ? [strval(auth('admin')->user()->branch_id)] : null);
         if (isset($request->daterange) && $request->daterange != "") {
             $daterange = explode("-", $request->daterange);
             $daterange[0] = date('Y-m-d', strtotime($daterange[0]));
@@ -47,7 +47,6 @@ class EventController extends Controller
                     $event_bookings->whereIn('branch_id', $branchId);
                 }
                 $event_bookings = $event_bookings->get();
-
             } else {
                 $event_bookings = EventBooking::with('branch')->whereBetween('booking_date', [$daterange[0], $daterange[1]])->where('payment_status', 'Paid');
                 if ($branchId) {
@@ -62,15 +61,15 @@ class EventController extends Controller
     public function eventsView(Request $req)
     {
         $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
-        if($req->fromDate && $req->toDate){
+        if ($req->fromDate && $req->toDate) {
             $event_bookings = EventBooking::with('branch')->whereBetween('booking_date', [$req->fromDate, $req->toDate]);
             if ($branchId) {
                 $event_bookings->where('branch_id', $branchId);
             }
             $event_bookings = $event_bookings->get();
-        }else{
+        } else {
             $event_bookings = EventBooking::with('branch');
-            if($branchId) {
+            if ($branchId) {
                 $event_bookings->where('branch_id', $branchId);
             }
             $event_bookings = $event_bookings->latest()->get();
@@ -88,7 +87,7 @@ class EventController extends Controller
         $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $today = Carbon\Carbon::today();
         $event_bookings = EventBooking::with('branch')->whereDate('booking_date', '>=', $today);
-        if($branchId) {
+        if ($branchId) {
             $event_bookings->where('branch_id', $branchId);
         }
         $event_bookings = $event_bookings->latest()->get();
@@ -114,16 +113,17 @@ class EventController extends Controller
 
         $eventbooking = EventBooking::where('id', $request->id)->first();
         $eventitems = EventItem::where('event_booking_id', $request->id)->get();
-
-        return view('happyView.event-invoice', compact('eventbooking', 'eventitems'));
+        $branchId = $eventbooking->branch_id;
+        $branch = branchInfo($branchId);
+        return view('happyView.event-invoice', compact('eventbooking', 'eventitems', 'branch'));
     }
 
 
     public function editEventPost(Request $request)
     {
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
-        if(!$branchId) {
-           return redirect()->back()->with('error', 'Please select a branch first.');
+        if (!$branchId) {
+            return redirect()->back()->with('error', 'Please select a branch first.');
         }
         $id = $request->id;
         $eventbooking = EventBooking::where('id', $id)->first();
@@ -198,8 +198,8 @@ class EventController extends Controller
     {
         // $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
-        if(!$branchId) {
-           return redirect()->back()->with('error', 'Please select a branch first.');
+        if (!$branchId) {
+            return redirect()->back()->with('error', 'Please select a branch first.');
         }
         $eventbooking = new EventBooking();
         $eventbooking->booking_date = $request->booking_date;
