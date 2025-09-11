@@ -91,13 +91,13 @@
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap dark">
                                                                 <label for='date'>Date</label>
-                                                                <input type="date" class="form-control" placeholder="date" name="date" id="date" required readonly>
+                                                                <input type="date" class="form-control" placeholder="date" name="date" id="date" required {{  $branchId == 8 || $branchId == 2  ? '' : 'readonly' }}>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6 input_wrap dark time">
                                                             <div class="mb-4">
                                                                 <label for="time">Time</label>
-                                                                <input type="time" class="form-control" placeholder="Time" name="time" id="time" required readonly>
+                                                                <input type="time" class="form-control" placeholder="Time" name="time" id="time" required {{  $branchId == 8 || $branchId == 2  ? '' : 'readonly' }}>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">
