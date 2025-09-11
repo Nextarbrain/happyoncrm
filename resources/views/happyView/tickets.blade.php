@@ -1,4 +1,5 @@
 @include('happyView.includes.head')
+
 <body>
     <!--wrapper-->
     <div class="wrapper">
@@ -41,12 +42,14 @@
                                         <div class="tab_wrap_theme">
                                             <ul class="nav nav-tabs" role="tablist">
                                                 <li class="nav-item" role="presentation">
-                                                    <a class="nav-link active left" data-bs-toggle="tab" href="#paid" aria-selected="true" role="tab">
+                                                    <a class="nav-link active left" data-bs-toggle="tab" href="#paid"
+                                                        aria-selected="true" role="tab">
                                                         <p class="heading">Customer </p>
                                                     </a>
                                                 </li>
                                                 <li class="nav-item" role="presentation">
-                                                    <a class="nav-link right" data-bs-toggle="tab" href="#free" aria-selected="false" tabindex="-1" role="tab">
+                                                    <a class="nav-link right" data-bs-toggle="tab" href="#free"
+                                                        aria-selected="false" tabindex="-1" role="tab">
                                                         <p class="heading">Membership</p>
                                                     </a>
                                                 </li>
@@ -72,9 +75,12 @@
                                                         <div class="col-md-12">
                                                             <div class="mb-4 input_wrap">
                                                                 <label for='branchId'>Branch <span>*</span></label>
-                                                                <select name="branch_id" id="branchId" class="form-select" onchange="this.form.submit()" required>
+                                                                <select name="branch_id" id="branchId"
+                                                                    class="form-select" onchange="this.form.submit()"
+                                                                    required>
                                                                     @foreach ($branches as $branch)
-                                                                        <option value="{{ $branch['id'] }}" {{ $branch['id'] == $branchId ? 'selected' : '' }}>
+                                                                        <option value="{{ $branch['id'] }}"
+                                                                            {{ $branch['id'] == $branchId ? 'selected' : '' }}>
                                                                             {{ $branch['name'] }}</option>
                                                                     @endforeach
                                                                 </select>
@@ -85,25 +91,34 @@
                                                 <form action="{{ url('/add-tickets') }}" method="post">
                                                     @csrf
                                                     @if (auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
-                                                        <input type="hidden" name="branch_id" value="{{ $branchId }}" id="hiddenBranchId">
+                                                        <input type="hidden" name="branch_id"
+                                                            value="{{ $branchId }}" id="hiddenBranchId">
                                                     @endif
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap dark">
                                                                 <label for='date'>Date</label>
-                                                                <input type="date" class="form-control" placeholder="date" name="date" id="date" required {{  $branchId == 8 || $branchId == 2  ? '' : 'readonly' }}>
+                                                                <input type="date" class="form-control"
+                                                                    placeholder="date" name="date" id="date"
+                                                                    required
+                                                                    {{ $branchId == 8 || $branchId == 2 ? '' : 'readonly' }}>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6 input_wrap dark time">
                                                             <div class="mb-4">
                                                                 <label for="time">Time</label>
-                                                                <input type="time" class="form-control" placeholder="Time" name="time" id="time" required {{  $branchId == 8 || $branchId == 2  ? '' : 'readonly' }}>
+                                                                <input type="time" class="form-control"
+                                                                    placeholder="Time" name="time" id="time"
+                                                                    required
+                                                                    {{ $branchId == 8 || $branchId == 2 ? '' : 'readonly' }}>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap">
                                                                 <label for="phone">Phone <span>*</span></label>
-                                                                <input type="tel" class="form-control" placeholder="Phone" name="phone" id="phone" pattern="[0-9]{10}" maxlength="10" required>
+                                                                <input type="tel" class="form-control"
+                                                                    placeholder="Phone" name="phone" id="phone"
+                                                                    pattern="[0-9]{10}" maxlength="10" required>
                                                                 <div id="result" class="shadow phone-list"></div>
                                                             </div>
                                                         </div>
@@ -111,14 +126,17 @@
                                                             <div class="mb-4 input_wrap">
                                                                 <label for="nameOfKid">Guardian Name
                                                                     <span>*</span></label>
-                                                                <input type="text" class="form-control" placeholder="Name of Guardian" name="name_of_kid" id="nameOfKid" required>
+                                                                <input type="text" class="form-control"
+                                                                    placeholder="Name of Guardian" name="name_of_kid"
+                                                                    id="nameOfKid" required>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap">
                                                                 <label for="kidsQty">Number of kids
                                                                     <span>*</span></label>
-                                                                <select name="kids" id="kidsQty" class="form-select" required>
+                                                                <select name="kids" id="kidsQty"
+                                                                    class="form-select" required>
                                                                     <option value="">0</option>
                                                                     @for ($i = 1; $i <= 50; $i++)
                                                                         <option value="{{ $i }}">
@@ -130,7 +148,9 @@
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap">
                                                                 <label for="dob">Kid DOB <span>*</span></label>
-                                                                <input type="date" class="form-control" placeholder="DOB" name="dob" id="dob" required>
+                                                                <input type="date" class="form-control"
+                                                                    placeholder="DOB" name="dob" id="dob"
+                                                                    required>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-12" id="parent-div">
@@ -139,7 +159,10 @@
                                                         <div class="button_wrap">
                                                             @foreach ($product as $pro)
                                                                 <div class="h_btn">
-                                                                    <a href="javascript:void(0)" onclick="AddItems(event, '{{ $pro->product_name }}', '{{ $pro->product_price }}', '{{ $pro->product_tax }}')" class="more_adult" id="{{ Str::slug($pro->product_name) }}">+
+                                                                    <a href="javascript:void(0)"
+                                                                        onclick="AddItems(event, '{{ $pro->product_name }}', '{{ $pro->product_price }}', '{{ $pro->product_tax }}')"
+                                                                        class="more_adult"
+                                                                        id="{{ Str::slug($pro->product_name) }}">+
                                                                         {{ $pro->product_name }}</a>
                                                                 </div>
                                                             @endforeach
@@ -148,7 +171,8 @@
                                                         <div class="col-md-12">
                                                             <div class="mb-4 input_wrap">
                                                                 <label for="services">Payment Mode</label>
-                                                                <select name="payment_mode" id="services" class="form-select">
+                                                                <select name="payment_mode" id="services"
+                                                                    class="form-select">
                                                                     <option value="2">Cash</option>
                                                                     <option value="1">UPI</option>
                                                                     <option value="3">Debit/Credit </option>
@@ -159,9 +183,13 @@
                                                             <div class="mb-4 input_wrap">
                                                                 <label for="couponCode">COUPON CODE</label>
                                                                 <div class="d-flex">
-                                                                    <input type="text" name="couponcode" class="form-control" id="couponCode" placeholder="Any Discount Code">
-                                                                    <input type="hidden" name="couponvalue" id="couponValue">
-                                                                    <button type="button" id="couponCodebutton" class="btn btn-sm btn-primary ms-2">Apply</button>
+                                                                    <input type="text" name="couponcode"
+                                                                        class="form-control" id="couponCode"
+                                                                        placeholder="Any Discount Code">
+                                                                    <input type="hidden" name="couponvalue"
+                                                                        id="couponValue">
+                                                                    <button type="button" id="couponCodebutton"
+                                                                        class="btn btn-sm btn-primary ms-2">Apply</button>
                                                                 </diV>
                                                                 <p id="couponmsg"></p>
                                                             </div>
@@ -177,35 +205,44 @@
                                                                 <p id="couponValueShow"></p>
                                                             </div>
                                                             <hr>
-                                                            <div class="gst" style="display: flex; flex-direction: column;">
-                                                                <div style="display: flex; justify-content: space-between;">
+                                                            <div class="gst"
+                                                                style="display: flex; flex-direction: column;">
+                                                                <div
+                                                                    style="display: flex; justify-content: space-between;">
                                                                     <p id="cgst18Label">CGST @ 9%</p>
                                                                     <p id="cgst18Total"></p>
                                                                 </div>
-                                                                <div style="display: flex; justify-content: space-between;">
+                                                                <div
+                                                                    style="display: flex; justify-content: space-between;">
                                                                     <p id="sgst18Label">SGST @ 9%</p>
                                                                     <p id="sgst18Total"></p>
                                                                 </div>
                                                             </div>
 
-                                                            <div class="gst d-none" id="gst12Container" style="display: flex; flex-direction: column;">
+                                                            <div class="gst d-none" id="gst12Container"
+                                                                style="display: flex; flex-direction: column;">
                                                                 <hr>
-                                                                <div style="display: flex; justify-content: space-between;">
+                                                                <div
+                                                                    style="display: flex; justify-content: space-between;">
                                                                     <p id="cgst12Label">CGST @ 6%</p>
                                                                     <p id="cgs12tTotal"></p>
                                                                 </div>
-                                                                <div style="display: flex; justify-content: space-between;">
+                                                                <div
+                                                                    style="display: flex; justify-content: space-between;">
                                                                     <p id="sgst12Label">SGST @ 6%</p>
                                                                     <p id="sgst12Total"></p>
                                                                 </div>
                                                             </div>
                                                             <hr>
-                                                            <div class="gst" style="display: flex; flex-direction: column;">
-                                                                <div style="display: flex; justify-content: space-between;">
+                                                            <div class="gst"
+                                                                style="display: flex; flex-direction: column;">
+                                                                <div
+                                                                    style="display: flex; justify-content: space-between;">
                                                                     <p id="cgst5Label">CGST @ 2.5%</p>
                                                                     <p id="cgst5Total"></p>
                                                                 </div>
-                                                                <div style="display: flex; justify-content: space-between;">
+                                                                <div
+                                                                    style="display: flex; justify-content: space-between;">
                                                                     <p id="sgst5Label">SGST @ 2.5%</p>
                                                                     <p id="sgst5Total"></p>
                                                                 </div>
@@ -214,15 +251,21 @@
                                                             <div class="amount">
                                                                 <p>Total Amount</p>
                                                                 <p id="totalAmount"></p>
-                                                                <input type="hidden" name="totalAmount" id="chargeAmount">
-                                                                <input type="hidden" name="subTotal" id="subtotlSave">
+                                                                <input type="hidden" name="totalAmount"
+                                                                    id="chargeAmount">
+                                                                <input type="hidden" name="subTotal"
+                                                                    id="subtotlSave">
                                                                 <input type="hidden" name="gst18" id="gst18">
                                                                 <input type="hidden" name="gst5" id="gst5">
                                                                 <input type="hidden" name="gst12" id="gst12">
-                                                                <input type="hidden" id="adult_price_backend" value="{{ isset($result[0]['Adult']) ? $result[0]['Adult'] : 200 }}">
-                                                                <input type="hidden" id="socks_price_backend" value="{{ isset($result[0]['Socks']) ? $result[0]['Socks'] : '80' }}">
-                                                                <input type="hidden" name="kidsOnlyPrice" id="kidsOnlyPrice">
-                                                                <input type="hidden" name="kidsPriceNoDis" id="kidsPriceNoDis">
+                                                                <input type="hidden" id="adult_price_backend"
+                                                                    value="{{ isset($result[0]['Adult']) ? $result[0]['Adult'] : 200 }}">
+                                                                <input type="hidden" id="socks_price_backend"
+                                                                    value="{{ isset($result[0]['Socks']) ? $result[0]['Socks'] : '80' }}">
+                                                                <input type="hidden" name="kidsOnlyPrice"
+                                                                    id="kidsOnlyPrice">
+                                                                <input type="hidden" name="kidsPriceNoDis"
+                                                                    id="kidsPriceNoDis">
                                                                 <input type="hidden" name="ba18" id="ba18">
                                                                 <input type="hidden" name="ba12" id="ba12">
                                                                 <input type="hidden" name="ba5" id="ba5">
@@ -230,7 +273,8 @@
                                                             <hr>
                                                         </div>
                                                         <div class="tearm_condition">
-                                                            <input type="checkbox" id="term" name="term" value="" checked="checked">
+                                                            <input type="checkbox" id="term" name="term"
+                                                                value="" checked="checked">
                                                             <p>By Agreeing to the <b>Terms and Condition</b> of HappyOn
                                                             </p>
                                                         </div>
@@ -242,14 +286,16 @@
                                                 </form>
                                             </div>
                                             <div id="free" class="container tab-pane fade" role="tabpanel"><br>
-                                                <form action="{{ url('/update-membership') }}" method="post" id="my-form">
+                                                <form action="{{ url('/update-membership') }}" method="post"
+                                                    id="my-form">
                                                     @csrf
                                                     <div class="col-md-12">
                                                         @if (auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
                                                             <div class="col-md-12 ">
                                                                 <div class="mb-4 input_wrap">
                                                                     <label for="branch_id">Branch<span>*</span></label>
-                                                                    <select name="branch_id" id="branch_id" class="form-select" required>
+                                                                    <select name="branch_id" id="branch_id"
+                                                                        class="form-select" required>
                                                                         @foreach ($branches as $branch)
                                                                             <option value="{{ $branch['id'] }}">
                                                                                 {{ $branch['name'] }}</option>
@@ -260,25 +306,54 @@
                                                         @endif
                                                         <div class="mb-4 input_wrap">
                                                             <label for="mobile_no">Phone Number</label>
-                                                            <input type="text" class="form-control" placeholder="+91 0123456789" id="mobile_no" maxlength="10">
+                                                            <input type="text" class="form-control"
+                                                                placeholder="+91 0123456789" id="mobile_no"
+                                                                maxlength="10">
                                                             <div id="resultmembership" class="shadow phone-list">
                                                             </div>
                                                             <div class="happy_card">
                                                                 <div class="card_header">
                                                                     <div class="card_logo">
-                                                                        <img src="assets/images/happyon_logo.png" alt="logo">
+                                                                        <img src="assets/images/happyon_logo.png"
+                                                                            alt="logo">
                                                                     </div>
                                                                     <div class="card_symbol">
-                                                                        <svg width="48" height="44" viewBox="0 0 48 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                        <svg width="48" height="44"
+                                                                            viewBox="0 0 48 44" fill="none"
+                                                                            xmlns="http://www.w3.org/2000/svg">
                                                                             <g opacity="0.3">
-                                                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M0.194806 35.4381C0.208372 39.6656 3.65516 43.0672 7.89746 43.0503L16.0337 43.0178L16.0063 34.4678L0.191895 34.5309L0.194806 35.4381Z" fill="#878773" />
-                                                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M0.183275 31.8143L15.9929 31.7512L15.9649 23.0255L0.155273 23.0885L0.183275 31.8143Z" fill="#878773" />
-                                                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M0.106817 8.02616L0.109744 8.93816L15.9241 8.87512L15.8966 0.315622L7.7604 0.348055C3.51811 0.364966 0.0932657 3.80341 0.106817 8.02616Z" fill="#878773" />
-                                                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M40.0707 0.219304L18.6206 0.30481L18.7576 43.0073L29.6664 42.9638L29.5568 8.82082L47.7763 8.74819L47.7733 7.83619C47.7598 3.61344 44.3082 0.202412 40.0707 0.219304Z" fill="#878773" />
-                                                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M0.14641 20.3755L15.956 20.3125L15.928 11.5868L0.118408 11.6498L0.14641 20.3755Z" fill="#878773" />
-                                                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M32.3197 20.2472L47.8144 20.1855L47.7864 11.4597L32.2917 11.5215L32.3197 20.2472Z" fill="#878773" />
-                                                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M32.3564 31.6861L47.851 31.6243L47.823 22.8986L32.3284 22.9603L32.3564 31.6861Z" fill="#878773" />
-                                                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M32.3927 42.9527L40.2092 42.9216C44.4467 42.9047 47.8763 39.4757 47.8628 35.2482L47.8599 34.3409L32.3652 34.4027L32.3927 42.9527Z" fill="#878773" />
+                                                                                <path fill-rule="evenodd"
+                                                                                    clip-rule="evenodd"
+                                                                                    d="M0.194806 35.4381C0.208372 39.6656 3.65516 43.0672 7.89746 43.0503L16.0337 43.0178L16.0063 34.4678L0.191895 34.5309L0.194806 35.4381Z"
+                                                                                    fill="#878773" />
+                                                                                <path fill-rule="evenodd"
+                                                                                    clip-rule="evenodd"
+                                                                                    d="M0.183275 31.8143L15.9929 31.7512L15.9649 23.0255L0.155273 23.0885L0.183275 31.8143Z"
+                                                                                    fill="#878773" />
+                                                                                <path fill-rule="evenodd"
+                                                                                    clip-rule="evenodd"
+                                                                                    d="M0.106817 8.02616L0.109744 8.93816L15.9241 8.87512L15.8966 0.315622L7.7604 0.348055C3.51811 0.364966 0.0932657 3.80341 0.106817 8.02616Z"
+                                                                                    fill="#878773" />
+                                                                                <path fill-rule="evenodd"
+                                                                                    clip-rule="evenodd"
+                                                                                    d="M40.0707 0.219304L18.6206 0.30481L18.7576 43.0073L29.6664 42.9638L29.5568 8.82082L47.7763 8.74819L47.7733 7.83619C47.7598 3.61344 44.3082 0.202412 40.0707 0.219304Z"
+                                                                                    fill="#878773" />
+                                                                                <path fill-rule="evenodd"
+                                                                                    clip-rule="evenodd"
+                                                                                    d="M0.14641 20.3755L15.956 20.3125L15.928 11.5868L0.118408 11.6498L0.14641 20.3755Z"
+                                                                                    fill="#878773" />
+                                                                                <path fill-rule="evenodd"
+                                                                                    clip-rule="evenodd"
+                                                                                    d="M32.3197 20.2472L47.8144 20.1855L47.7864 11.4597L32.2917 11.5215L32.3197 20.2472Z"
+                                                                                    fill="#878773" />
+                                                                                <path fill-rule="evenodd"
+                                                                                    clip-rule="evenodd"
+                                                                                    d="M32.3564 31.6861L47.851 31.6243L47.823 22.8986L32.3284 22.9603L32.3564 31.6861Z"
+                                                                                    fill="#878773" />
+                                                                                <path fill-rule="evenodd"
+                                                                                    clip-rule="evenodd"
+                                                                                    d="M32.3927 42.9527L40.2092 42.9216C44.4467 42.9047 47.8763 39.4757 47.8628 35.2482L47.8599 34.3409L32.3652 34.4027L32.3927 42.9527Z"
+                                                                                    fill="#878773" />
                                                                             </g>
                                                                         </svg>
                                                                     </div>
@@ -292,7 +367,8 @@
                                                                         <p id="planDate"></p>
                                                                     </div>
                                                                     <div class="master_card">
-                                                                        <img src="assets/images/Mastercard.png" alt="mastercard">
+                                                                        <img src="assets/images/Mastercard.png"
+                                                                            alt="mastercard">
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -302,20 +378,26 @@
                                                             <div class="col-md-6">
                                                                 <div class="mb-4 input_wrap dark">
                                                                     <label for="credit_left">Credit Left</label>
-                                                                    <input type="text" class="form-control" placeholder="22 hrs" id="credit_left" name="credit_left" readonly>
-                                                                    <input type="hidden" id="user_id" name="user_id">
+                                                                    <input type="text" class="form-control"
+                                                                        placeholder="22 hrs" id="credit_left"
+                                                                        name="credit_left" readonly>
+                                                                    <input type="hidden" id="user_id"
+                                                                        name="user_id">
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <div class="mb-4 input_wrap dark">
                                                                     <label for="kidsName2">Kids Name</label>
-                                                                    <input type="text" class="form-control" placeholder="Kids Name" id="kidsName2" name="kidsName2" readonly>
+                                                                    <input type="text" class="form-control"
+                                                                        placeholder="Kids Name" id="kidsName2"
+                                                                        name="kidsName2" readonly>
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-6 ">
                                                                 <div class="mb-4 input_wrap">
                                                                     <label for="numberKids">Number of Kids</label>
-                                                                    <select name="number_of_kids" id="numberKids" class="form-select">
+                                                                    <select name="number_of_kids" id="numberKids"
+                                                                        class="form-select">
                                                                         <option value="1">1</option>
                                                                         <option value="2">2</option>
                                                                         <option value="3">3</option>
@@ -332,7 +414,8 @@
                                                             <div class="col-md-6 ">
                                                                 <div class="mb-4 input_wrap">
                                                                     <label for="hrs">Number of Hrs</label>
-                                                                    <select name="hrs" id="hrs" class="form-select">
+                                                                    <select name="hrs" id="hrs"
+                                                                        class="form-select">
                                                                         <option value="1">1</option>
                                                                         <option value="2">2</option>
                                                                         <option value="3">3</option>
@@ -350,14 +433,21 @@
                                                                 <div class="input_button">
                                                                     <div class="mb-4 input_wrap">
                                                                         <label for="response_otp">OTP</label>
-                                                                        <input type="text" class="form-control" placeholder="Enter OTP" id="response_otp" name="response_otp" maxlength="6" pattern="\d*" inputmode="numeric" required>
+                                                                        <input type="text" class="form-control"
+                                                                            placeholder="Enter OTP" id="response_otp"
+                                                                            name="response_otp" maxlength="6"
+                                                                            pattern="\d*" inputmode="numeric"
+                                                                            required>
                                                                         <div class="h_btn">
-                                                                            <a href="javascript:void(0)" onclick="verifyMember()">Send</a>
+                                                                            <a href="javascript:void(0)"
+                                                                                onclick="verifyMember()">Send</a>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                                 <div class="h_btn s_btn">
-                                                                    <button class="btn btn-primary" type="submit" id="submit-button">Use <span id="credit"></span> hours
+                                                                    <button class="btn btn-primary" type="submit"
+                                                                        id="submit-button">Use <span
+                                                                            id="credit"></span> hours
                                                                         Credit</button>
                                                                 </div>
                                                             </div>
@@ -395,7 +485,7 @@
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.0/js/toastr.js"></script>
     <script>
-        // set coupon data to this 
+        // set coupon data to this
         let couponDiscountAmt = 0;
         let couponType = '';
 
@@ -783,7 +873,7 @@
                 payableTotalAmt += gst;
             });
 
-            $('#couponValue').val(discount.toFixed(2));            
+            $('#couponValue').val(discount.toFixed(2));
             $('#couponValueShow').html(discount.toFixed(2));
 
             payableTotalAmt += subTotalBA;
@@ -874,7 +964,8 @@
 
                         payableTotalAmt += subTotalBA;
 
-                        document.getElementById('totalAmount').innerHTML = '₹ ' + payableTotalAmt.toFixed(2);
+                        document.getElementById('totalAmount').innerHTML = '₹ ' + payableTotalAmt
+                            .toFixed(2);
                         $("#chargeAmount").val(payableTotalAmt.toFixed(2));
                     } else {
                         let sumamount = 0;
@@ -905,7 +996,8 @@
                             var gstSocks = (socks_price * 5) / 100;
                             finalAmount += gstSocks;
                         }
-                        document.getElementById('totalAmount').innerHTML = '₹ ' + finalAmount.toFixed(2);
+                        document.getElementById('totalAmount').innerHTML = '₹ ' + finalAmount.toFixed(
+                            2);
                         $("#chargeAmount").val(finalAmount.toFixed(2));
                         $('#gst18').val(gstKid.toFixed(2));
                     }
@@ -1096,7 +1188,7 @@
             var minute = parseInt(time[1]);
             var now1 = new Date();
             var datetime = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour, minute);
-            if (datetime < now1) {
+            if (datetime > now1) {
                 alert('Please select current or future date and time');
 
                 dateInput.value = today;
