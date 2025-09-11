@@ -28,7 +28,7 @@ class OpenBillingController extends Controller
     public function openBillingReport(Request $request)
     {
         if (isset($request->daterange) && $request->daterange != "") {
-            $branchId = !empty($request->branch_id) && count($request->branch_id) > 0 ? $request->branch_id : (auth('admin')->user()->branch_id ? [strval(auth('admin')->user()->branch_id)]: null);
+            $branchId = !empty($request->branch_id) && count($request->branch_id) > 0 ? $request->branch_id : (auth('admin')->user()->branch_id ? [strval(auth('admin')->user()->branch_id)] : null);
             $daterange = explode("-", $request->daterange);
             $daterange[0] = date('y-m-d', strtotime($daterange[0]));
             $daterange[1] = date('y-m-d', strtotime($daterange[1]));
@@ -67,7 +67,7 @@ class OpenBillingController extends Controller
         $open_billing_items = OpenBillingItem::where('open_billing_id', $request->id)->get();
         $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
 
-        return view('happyView..openBilling.edit-open-billing', compact('open_billing', 'open_billing_items','branches'));
+        return view('happyView..openBilling.edit-open-billing', compact('open_billing', 'open_billing_items', 'branches'));
     }
 
     public function invoiceOpenBilling(Request $request)
@@ -75,8 +75,10 @@ class OpenBillingController extends Controller
 
         $openbilling = OpenBilling::where('id', $request->id)->first();
         $openbillingitems = OpenBillingItem::where('open_billing_id', $request->id)->get();
+        $branchId = $openbilling->branch_id;
+        $branch = branchInfo($branchId);
 
-        return view('happyView.openBilling.open-billing-invoice', compact('openbilling', 'openbillingitems'));
+        return view('happyView.openBilling.open-billing-invoice', compact('openbilling', 'openbillingitems', 'branch'));
     }
 
 
@@ -86,11 +88,11 @@ class OpenBillingController extends Controller
         $request->merge([
             'billing_name' => trim($request->input('billing_name')),
         ]);
-         $request->validate([
+        $request->validate([
             'billing_name' => 'required',
         ]);
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
-        if(!$branchId) {
+        if (!$branchId) {
             return redirect()->back()->with('error', 'Please select a branch first.');
         }
         $id = $request->id;
@@ -123,7 +125,7 @@ class OpenBillingController extends Controller
             $item_tax = $request->item_tax;
             $open_billing_item_ids = $request->open_billing_item_ids;
 
-            if($open_billing_item_ids !== null) {
+            if ($open_billing_item_ids !== null) {
                 for ($i = 0; $i <= count($open_billing_item_ids) - 1; $i++) {
 
                     if ($open_billing_item_ids[$i] > 0 && $open_billing_item_ids[$i] != null) {
@@ -143,7 +145,6 @@ class OpenBillingController extends Controller
                     }
                 }
             }
-
         }
         return redirect('/open-billing')->with('success', 'Successfully Updated!');
     }
@@ -153,12 +154,12 @@ class OpenBillingController extends Controller
         $request->merge([
             'billing_name' => trim($request->input('billing_name')),
         ]);
-         $request->validate([
+        $request->validate([
             'billing_name' => 'required',
         ]);
         // $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
-        if(!$branchId) {
+        if (!$branchId) {
             return redirect()->back()->with('error', 'Please select a branch first.');
         }
         $openbilling = new OpenBilling();

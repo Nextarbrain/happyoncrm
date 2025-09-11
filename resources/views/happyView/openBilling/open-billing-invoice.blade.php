@@ -18,32 +18,67 @@
     <table cellpadding="0" cellspacing="0" border-collapse="0" style="width:100%; height:700px;">
         <tbody>
             <tr>
-                <td style="text-align: center;"><img src="{{ asset('assets/images/happyon_logo.png') }}" alt="logo" style="height:60px"></td>
+                <td style="text-align: center;"><img src="{{ asset('assets/images/happyon_logo.png') }}" alt="logo"
+                        style="height:60px"></td>
             </tr>
             <tr>
-                <td style="font-size: 15px;font-weight: 600;text-align: center;">HappyOn Private Limited</td>
+                <td style="font-size: 15px;font-weight: 600;text-align: center;">
+                    @if ($branch->name !== null)
+                        {{ $branch->name }}
+                    @else
+                        HappyOn PrivateLimited
+                    @endif
+                </td>
             </tr>
             <tr>
-                <td style="font-size: 15px;text-align: center;">212 A, Times Square Grand, Sindhubhavan Road, Thaltej, <br>Ahmedabad -380059</td>
+                <td style="font-size: 15px;text-align: center;">
+                    {{ $branch->address ?? '212 A, Times Square Grand, Sindhubhavan Road, Thaltej,' }}
+                </td>
             </tr>
             <tr>
-                <td style="font-size: 15px;text-align: center;">Phone Number : +91 9328672178</td>
+                <td style="font-size: 15px;text-align: center;">
+                    {{ $branch->location ?? 'Ahmedabad' }} - {{ $branch->pincode ?? '380059' }}
+                </td>
             </tr>
             <tr>
-                <td style="font-size: 15px;text-align: center;">GSTIN : 24AAGCH20761ZC</td>
+                <td style="font-size: 15px;text-align: center;">
+                    @if ($branch->phone !== null)
+                        Phone Number : {{ $branch->phone }}
+                    @else
+                        Phone Number : +91 9328672178
+                    @endif
+                </td>
             </tr>
             <tr>
-                <td style="font-size: 15px;border-top: 1px solid #000;border-bottom: 1px solid #000;text-transform: capitalize;">Bill Name : {{ $openbilling->bill_name }}</td>
+                <td style="font-size: 15px;text-align: center;">
+                    Email : {{ $branch->admin->email ?? '' }}
+                </td>
+            </tr>
+            <tr>
+                <td style="font-size: 15px;text-align: center;">
+                    @if ($branch->gstno !== null)
+                        GSTIN : {{ $branch->gstno }}
+                    @else
+                        GSTIN : 24AAGCH2076N1ZC
+                    @endif
+                </td>
+            </tr>
+            <tr>
+                <td
+                    style="font-size: 15px;border-top: 1px solid #000;border-bottom: 1px solid #000;text-transform: capitalize;">
+                    Bill Name : {{ $openbilling->bill_name }}</td>
             </tr>
             <tr>
                 <td style="line-height: 37px;">
                     <table cellpadding="0" cellspacing="0" style="width: 100%;    border-collapse: collapse;">
                         <tbody>
                             <tr>
-                                <td style="font-size: 15px;">Date : {{ \Carbon\Carbon::parse($openbilling->created_at)->format('d M, Y') }}</td>
+                                <td style="font-size: 15px;">Date :
+                                    {{ \Carbon\Carbon::parse($openbilling->created_at)->format('d M, Y') }}</td>
                             </tr>
                             <tr>
-                                <td style="font-size: 15px;">{{ \Carbon\Carbon::parse($openbilling->created_at)->format('h:i a') }}</td>
+                                <td style="font-size: 15px;">
+                                    {{ \Carbon\Carbon::parse($openbilling->created_at)->format('h:i a') }}</td>
                                 <td style="font-size: 15px;text-align: right;"></td>
                             </tr>
                             <tr>
@@ -56,7 +91,8 @@
                         <tbody>
                             <tr>
                                 <td>
-                                    <table cellpadding="0" cellspacing="0" style="    border-collapse: collapse;width: 100%;">
+                                    <table cellpadding="0" cellspacing="0"
+                                        style="    border-collapse: collapse;width: 100%;">
                                         <tbody>
                                             <tr style="border-top: 1px solid #000;">
                                                 <td style="width: 20%;font-size: 15px;text-align: left;">Item</td>
@@ -67,15 +103,20 @@
                                             </tr>
                                             @foreach ($openbillingitems as $item)
                                                 <tr style="border-top: 1px solid #000;">
-                                                    <td style="font-size: 15px;width: 20%;text-align: left;">{{ $item->item_name }} </td>
-                                                    <td style="font-size: 15px;width: 20%;text-align: center;">{{ $item->item_price }}</td>
-                                                    <td style="font-size: 15px;width: 20%;text-align: center;">{{ $item->item_qty }}</td>
-                                                    <td style="font-size: 15px;width: 20%;text-align: center;">{{ $item->item_tax }}</td>
+                                                    <td style="font-size: 15px;width: 20%;text-align: left;">
+                                                        {{ $item->item_name }} </td>
+                                                    <td style="font-size: 15px;width: 20%;text-align: center;">
+                                                        {{ $item->item_price }}</td>
+                                                    <td style="font-size: 15px;width: 20%;text-align: center;">
+                                                        {{ $item->item_qty }}</td>
+                                                    <td style="font-size: 15px;width: 20%;text-align: center;">
+                                                        {{ $item->item_tax }}</td>
                                                     @php
                                                         $subtotal = $item->item_price * $item->item_qty;
                                                         $tax = ($subtotal * $item->item_tax) / 100;
                                                     @endphp
-                                                    <td style="width: 20%;font-size: 15px;text-align:right;">{{ $subtotal }}</td>
+                                                    <td style="width: 20%;font-size: 15px;text-align:right;">
+                                                        {{ $subtotal }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -84,66 +125,83 @@
                                         <tbody>
                                             <tr>
                                                 <td>
-                                                    <table cellpadding="0" cellspacing="0" style="width: 100%;border-collapse: collapse;">
+                                                    <table cellpadding="0" cellspacing="0"
+                                                        style="width: 100%;border-collapse: collapse;">
                                                         <tbody>
                                                             <tr style="border-top: 1px solid #000;">
                                                                 <td style="font-size: 15px;">Sub Total :</td>
-                                                                <td style="font-size: 15px;text-align: right;">{{ $openbilling->subtotal }}</td>
+                                                                <td style="font-size: 15px;text-align: right;">
+                                                                    {{ $openbilling->subtotal }}</td>
                                                             </tr>
                                                             @if (isset($openbilling->couponcode) && $openbilling->couponcode != null)
                                                                 <tr style="border-top: 1px solid #000;">
-                                                                    <td style="font-size: 15px;">Coupon ({{ $openbilling->couponcode }}) :</td>
-                                                                    <td style="font-size: 15px;text-align: right;"> {{ $openbilling->couponvalue }}</td>
+                                                                    <td style="font-size: 15px;">Coupon
+                                                                        ({{ $openbilling->couponcode }}) :</td>
+                                                                    <td style="font-size: 15px;text-align: right;">
+                                                                        {{ $openbilling->couponvalue }}</td>
                                                                 </tr>
                                                             @endif
                                                             @if (isset($openbilling->gst18) && $openbilling->gst18 != '0.00')
                                                                 <tr style="border-top: 1px solid #000;">
                                                                     <td style="font-size: 15px;">CGST @ 9% :</td>
-                                                                    <td style="font-size: 15px;text-align: right;"> {{ round($openbilling->gst18 / 2, 2) }}</td>
+                                                                    <td style="font-size: 15px;text-align: right;">
+                                                                        {{ round($openbilling->gst18 / 2, 2) }}</td>
                                                                 </tr>
                                                                 <tr style="border-bottom: 1px solid #000;">
                                                                     <td style="font-size: 15px;">SGST @ 9% :</td>
-                                                                    <td style="font-size: 15px;text-align: right;"> {{ round($openbilling->gst18 / 2, 2) }}</td>
-                                                                </tr>                                                               
+                                                                    <td style="font-size: 15px;text-align: right;">
+                                                                        {{ round($openbilling->gst18 / 2, 2) }}</td>
+                                                                </tr>
                                                             @endif
                                                             @if (isset($openbilling->gst12) && $openbilling->gst12 != '0.00')
                                                                 <tr style="border-top: 1px solid #000;">
                                                                     <td style="font-size: 15px;">CGST @ 6% :</td>
-                                                                    <td style="font-size: 15px;text-align: right;">{{ round($openbilling->gst12 / 2, 2) }}</td>
+                                                                    <td style="font-size: 15px;text-align: right;">
+                                                                        {{ round($openbilling->gst12 / 2, 2) }}</td>
                                                                 </tr>
                                                                 <tr style="border-bottom: 1px solid #000;">
                                                                     <td style="font-size: 15px;">SGST @ 6% :</td>
-                                                                    <td style="font-size: 15px;text-align: right;">{{ round($openbilling->gst12 / 2, 2) }}</td>
+                                                                    <td style="font-size: 15px;text-align: right;">
+                                                                        {{ round($openbilling->gst12 / 2, 2) }}</td>
                                                                 </tr>
                                                             @endif
                                                             @if (isset($openbilling->gst5) && $openbilling->gst5 != '0.00')
                                                                 <tr style="border-top: 1px solid #000;">
                                                                     <td style="font-size: 15px;">CGST @ 2.5% :</td>
-                                                                    <td style="font-size: 15px;text-align: right;">{{ round($openbilling->gst5 / 2, 2) }}</td>
+                                                                    <td style="font-size: 15px;text-align: right;">
+                                                                        {{ round($openbilling->gst5 / 2, 2) }}</td>
                                                                 </tr>
                                                                 <tr style="border-bottom: 1px solid #000;">
                                                                     <td style="font-size: 15px;">SGST @ 2.5% :</td>
-                                                                    <td style="font-size: 15px;text-align: right;">{{ round($openbilling->gst5 / 2, 2) }}</td>
+                                                                    <td style="font-size: 15px;text-align: right;">
+                                                                        {{ round($openbilling->gst5 / 2, 2) }}</td>
                                                                 </tr>
                                                             @endif
                                                             <tr style="border-top: 1px solid #000;">
-                                                                <td style="font-size: 15px;font-weight: 400;">Grant Total :</td>
-                                                                <td style="font-size: 15px;text-align: right;"> {{ $openbilling->totalamount }}</td>
+                                                                <td style="font-size: 15px;font-weight: 400;">Grant
+                                                                    Total :</td>
+                                                                <td style="font-size: 15px;text-align: right;">
+                                                                    {{ $openbilling->totalamount }}</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
                                                     <table style="width: 100%;border-collapse: collapse;">
                                                         <tbody>
                                                             <tr style="border-top: 1px solid #000;">
-                                                                <td style="font-size: 12px;text-align: center;">Note: This is a System Generated Invoice and does not required Signature</td>
+                                                                <td style="font-size: 12px;text-align: center;">Note:
+                                                                    This is a System Generated Invoice and does not
+                                                                    required Signature</td>
                                                             </tr>
                                                             <tr>
-                                                                <td style="text-align: center;font-size: 15px;font-weight: 600;">
+                                                                <td
+                                                                    style="text-align: center;font-size: 15px;font-weight: 600;">
                                                                     Thank you for visiting HappyON Party & Play
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <td style="text-align: center;font-size: 15px;"><a href="www.happyonplay.com">www.happyonplay.com</a></td>
+                                                                <td style="text-align: center;font-size: 15px;"><a
+                                                                        href="www.happyonplay.com">www.happyonplay.com</a>
+                                                                </td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
