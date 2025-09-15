@@ -329,6 +329,7 @@ class TicketController extends Controller
             }
 
             $dob_api = date('d/m/Y', strtotime($request->dob));
+            $branches = Branch::select('id', 'name')->where('id', $branchId)->first();
             $postData = [
                 "customer_key" => $paymentMethod->id,
                 "merchant_id" => env('MERCHANT_ID'),
@@ -337,7 +338,8 @@ class TicketController extends Controller
                     "mobile" => $request->phone,
                     "dob" => $dob_api,
                     "anniversary_date" => '',
-                    "email" => ""
+                    "email" => "",
+                    "tags" => ["crm-".$branches->name]
                 ],
                 "transaction" => [
                     "id" =>  $paymentMethod->id,
@@ -1124,7 +1126,7 @@ class TicketController extends Controller
         $userDetail = UserDetail::where('user_id', $id)->first();
 
         // update payments
-        $paymentMethod = PaymentMethod::where('user_id', $id)->first();        
+        $paymentMethod = PaymentMethod::where('user_id', $id)->first();
         $paymentMethod->amounts = $request->input('newTotalAmount');
         $paymentMethod->subTotal = $request->input('newSubAmt');
         $paymentMethod->payment_method = $this->getPaymentMethod($request->input('payment_mode'));
