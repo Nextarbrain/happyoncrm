@@ -91,7 +91,8 @@ class MembershipController extends Controller
             "subTotal" => $paymentMethod->subTotal,
             "gst18" => $paymentMethod->gst18,
             "totalAmount" => $paymentMethod->amounts,
-        ];
+            "branch" => branchInfo($branchId),
+        ];        
         return view('receipt.membership-invoice', $data);
     }
 

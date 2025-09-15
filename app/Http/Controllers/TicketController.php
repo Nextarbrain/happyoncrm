@@ -264,7 +264,8 @@ class TicketController extends Controller
                 "totalAmount" => $paymentMethod->amounts,
                 'kidsInvoice' => $kidsInvoice,
                 "distinctHours" => $distinctHour,
-                "userProducts" => $userProducts
+                "userProducts" => $userProducts,
+                "branch" => branchInfo($branchId),
             ];
             $mobile = "91" . $request->input('phone');
             $time_in = now()->format('h:i:s A');
@@ -732,6 +733,7 @@ class TicketController extends Controller
         $id = $request->id;
         $user = User::with('membership', 'userDetails', 'event', 'paymentInfo')->where('id', $id)->latest()->first();
         $paymentMethod = PaymentMethod::where('user_id', $id)->first();
+        $branchId = $paymentMethod->branch_id;
 
         if ($user['userDetails']->membership_plan == 1) {
             $data = [
@@ -746,6 +748,7 @@ class TicketController extends Controller
                 "gst18" => $paymentMethod->gst18,
                 "gst12" => $paymentMethod->gst12,
                 "totalAmount" => $paymentMethod->amounts,
+                "branch" => branchInfo($branchId),
             ];
             return view('receipt.membership-invoice', $data);
         } else {
@@ -848,7 +851,8 @@ class TicketController extends Controller
                 "gst12" => $paymentMethod->gst12,
                 "totalAmount" => $paymentMethod->amounts,
                 'kidsInvoice' => $kidsInvoice,
-                'userProducts' => $userProducts
+                'userProducts' => $userProducts,
+                "branch" => branchInfo($branchId),
             ];
 
             return view('receipt.index', $data);
