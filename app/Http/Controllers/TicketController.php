@@ -330,6 +330,7 @@ class TicketController extends Controller
             }
 
             $dob_api = date('d/m/Y', strtotime($request->dob));
+            $branches = Branch::select('id', 'name')->where('id', $branchId)->first();
             $postData = [
                 "customer_key" => $paymentMethod->id,
                 "merchant_id" => env('MERCHANT_ID'),
@@ -338,7 +339,8 @@ class TicketController extends Controller
                     "mobile" => $request->phone,
                     "dob" => $dob_api,
                     "anniversary_date" => '',
-                    "email" => ""
+                    "email" => "",
+                    "tags" => ["crm-".$branches->name]
                 ],
                 "transaction" => [
                     "id" =>  $paymentMethod->id,
