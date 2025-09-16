@@ -619,6 +619,7 @@
     <script>
         //Kids Hours Options
         $(document).on('change', 'select[id^="kid_hrs"]', function() {
+            var dateInput = $('#date').val() || new Date().toISOString().split("T")[0];
             var selectBoxId = $(this);
             var inputTag = selectBoxId.closest('.child-div').find('.kid_price');
             // Make the AJAX call to fetch data from the server
@@ -628,6 +629,7 @@
                 type: 'GET',
                 data: {
                     option: $(this).val(),
+                    date: dateInput,
                     branch_id: $('#hiddenBranchId').val(),
                 },
                 success: function(data) {
