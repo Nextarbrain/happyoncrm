@@ -49,7 +49,9 @@
                                         <div class="tab_wrap_theme">
                                             <ul class="nav nav-tabs" role="tablist">
                                                 <li class="nav-item" role="presentation">
-                                                    <a class="nav-link active rounded" data-bs-toggle="tab" href="#paid" aria-selected="true" role="tab" style="pointer-events: none;">
+                                                    <a class="nav-link active rounded" data-bs-toggle="tab"
+                                                        href="#paid" aria-selected="true" role="tab"
+                                                        style="pointer-events: none;">
                                                         <p class="heading">Open Billing </p>
                                                     </a>
                                                 </li>
@@ -58,14 +60,38 @@
                                         </div>
                                         <div class="tab-content">
                                             <div id="paid" class="container tab-pane active" role="tabpanel"><br>
-                                                <form action="{{ url('/add-open-billing-post') }}" method="post" id="my-form">
+                                                @if (auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                    <form method="GET" action="{{ route('addOpenBillingView') }}">
+                                                        <div class="col-md-12">
+                                                            <div class="mb-4 input_wrap">
+                                                                <label for='branchId'>Branch <span>*</span></label>
+                                                                <select name="branch_id" id="branchId"
+                                                                    class="form-select" onchange="this.form.submit()"
+                                                                    required>
+                                                                    @foreach ($branches as $branch)
+                                                                        <option value="{{ $branch['id'] }}"
+                                                                            {{ $branch['id'] == $branchId ? 'selected' : '' }}>
+                                                                            {{ $branch['name'] }}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                @endif
+                                                <form action="{{ url('/add-open-billing-post') }}" method="post"
+                                                    id="my-form">
                                                     @csrf
                                                     <div class="row">
                                                         @if (auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                            <input type="hidden" name="branch_id"
+                                                                value="{{ $branchId }}" id="hiddenBranchId">
+                                                        @endif
+                                                        {{-- @if (auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
                                                             <div class="col-md-12 ">
                                                                 <div class="mb-4 input_wrap">
                                                                     <label>Branch<span>*</span></label>
-                                                                    <select name="branch_id" class="form-select" id="branchId" required>
+                                                                    <select name="branch_id" class="form-select"
+                                                                        id="branchId" required>
                                                                         @foreach ($branches as $branch)
                                                                             <option value="{{ $branch['id'] }}">
                                                                                 {{ $branch['name'] }}</option>
@@ -74,27 +100,34 @@
                                                                 </div>
                                                             </div>
                                                         @else
-                                                            <input type="hidden" name="branch_id" id="branchId" value="{{ auth('admin')->user()->branch_id }}">
-                                                        @endif
+                                                            <input type="hidden" name="branch_id" id="branchId"
+                                                                value="{{ auth('admin')->user()->branch_id }}">
+                                                        @endif --}}
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap dark">
                                                                 <label>Current Date</label>
-                                                                <input type="date" class="form-control" placeholder="date" id="date" required readonly>
+                                                                <input type="date" class="form-control"
+                                                                    placeholder="date" id="date" required
+                                                                    {{ $branchId == 8 || $branchId == 2 ? '' : 'readonly' }}>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6 input_wrap dark time">
                                                             <div class="mb-4">
                                                                 <label>current Time</label>
-                                                                <input type="time" class="form-control" placeholder="Time" id="time" required readonly>
+                                                                <input type="time" class="form-control"
+                                                                    placeholder="Time" id="time" required readonly>
                                                             </div>
                                                         </div>
 
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap">
                                                                 <label>Billing Name <span>*</span></label>
-                                                                <input type="text" class="form-control" placeholder="Billing Name" name="billing_name" required>
+                                                                <input type="text" class="form-control"
+                                                                    placeholder="Billing Name" name="billing_name"
+                                                                    required>
                                                                 @error('billing_name')
-                                                                    <span class="text-danger font-weight-bold text-capitalize">{{ $message }}</span>
+                                                                    <span
+                                                                        class="text-danger font-weight-bold text-capitalize">{{ $message }}</span>
                                                                 @enderror
                                                             </div>
                                                         </div>
@@ -102,7 +135,9 @@
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap">
                                                                 <label for="phone">Phone<span>*</span></label>
-                                                                <input type="tel" class="form-control" placeholder="Phone" name="phone" id="phone" pattern="[0-9]{10}" maxlength="10" required>
+                                                                <input type="tel" class="form-control"
+                                                                    placeholder="Phone" name="phone" id="phone"
+                                                                    pattern="[0-9]{10}" maxlength="10" required>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-12" id="item_box">
@@ -112,27 +147,42 @@
                                                                 <div class="col-md-3 input_wrap">
                                                                     <div class="mb-4">
                                                                         <label>Item</label>
-                                                                        <input type="text" class="form-control item_name" id="item_name" placeholder="Item" name="item_name[]" onkeyup="searchProductData(event)" required>
-                                                                        <div id="searchResult" class="shadow phone-list">
+                                                                        <input type="text"
+                                                                            class="form-control item_name"
+                                                                            id="item_name" placeholder="Item"
+                                                                            name="item_name[]"
+                                                                            onkeyup="searchProductData(event)" required>
+                                                                        <div id="searchResult"
+                                                                            class="shadow phone-list">
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-3 input_wrap">
                                                                     <div class="mb-4">
                                                                         <label>Prices</label>
-                                                                        <input type="text" class="form-control item_price" id="item_price" placeholder="Prices" name="item_price[]" oninput="validatePrice(this)">
+                                                                        <input type="text"
+                                                                            class="form-control item_price"
+                                                                            id="item_price" placeholder="Prices"
+                                                                            name="item_price[]"
+                                                                            oninput="validatePrice(this)">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-3 input_wrap">
                                                                     <div class="mb-4">
                                                                         <label>Qty</label>
-                                                                        <input type="number" class="form-control item_qty" id="item_qty" placeholder="Qty" value="1" min="1" oninput="validity.valid||(value='');" name="item_qty[]">
+                                                                        <input type="number"
+                                                                            class="form-control item_qty"
+                                                                            id="item_qty" placeholder="Qty"
+                                                                            value="1" min="1"
+                                                                            oninput="validity.valid||(value='');"
+                                                                            name="item_qty[]">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-2 input_wrap">
                                                                     <div class="mb-4">
                                                                         <label>Tax</label>
-                                                                        <select name="item_tax[]" id="item_tax" class="form-select item_tax">
+                                                                        <select name="item_tax[]" id="item_tax"
+                                                                            class="form-select item_tax">
                                                                             <option value="18">18%</option>
                                                                             <option value="5">5% </option>
                                                                             <option value="0">0% </option>
@@ -140,13 +190,19 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-1">
-                                                                    <i class="fa fa-plus fs-4 btn btn-primary" onclick="add_item_more()" style="background:#0A5F59;" aria-hidden="true"></i>
+                                                                    <i class="fa fa-plus fs-4 btn btn-primary"
+                                                                        onclick="add_item_more()"
+                                                                        style="background:#0A5F59;"
+                                                                        aria-hidden="true"></i>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="row mb-4">
-                                                            <div class="col-lg-12 d-flex justify-content-between align-items-center">
-                                                                <a href="javascript:void(0)" class="btn btn-primary" onclick="calculate_amount()" style="background:#0A5F59;">Calculate</a>
+                                                            <div
+                                                                class="col-lg-12 d-flex justify-content-between align-items-center">
+                                                                <a href="javascript:void(0)" class="btn btn-primary"
+                                                                    onclick="calculate_amount()"
+                                                                    style="background:#0A5F59;">Calculate</a>
                                                                 <div id="errorMsg"></div>
                                                             </div>
                                                         </div>
@@ -154,9 +210,14 @@
                                                             <div class="mb-4 input_wrap">
                                                                 <label>COUPON CODE</label>
                                                                 <div class="d-flex">
-                                                                    <input type="text" name="couponcode" class="form-control" id="couponCode" placeholder="Any Discount Code">
-                                                                    <input type="hidden" name="couponvalue" id="couponValue">
-                                                                    <button type="button" id="couponCodebutton" class="btn btn-primary" onclick="calculate_amount()">Apply</button>
+                                                                    <input type="text" name="couponcode"
+                                                                        class="form-control" id="couponCode"
+                                                                        placeholder="Any Discount Code">
+                                                                    <input type="hidden" name="couponvalue"
+                                                                        id="couponValue">
+                                                                    <button type="button" id="couponCodebutton"
+                                                                        class="btn btn-primary"
+                                                                        onclick="calculate_amount()">Apply</button>
                                                                 </diV>
                                                                 <p id="couponmsg"></p>
                                                             </div>
@@ -172,12 +233,15 @@
                                                                 <p id="couponValueShow"></p>
                                                             </div>
                                                             <hr>
-                                                            <div class="gst" style="display: flex; flex-direction: column;">
-                                                                <div style="display: flex; justify-content: space-between;">
+                                                            <div class="gst"
+                                                                style="display: flex; flex-direction: column;">
+                                                                <div
+                                                                    style="display: flex; justify-content: space-between;">
                                                                     <p id="cgst18Label">CGST @ 9%</p>
                                                                     <p id="cgst18Total"></p>
                                                                 </div>
-                                                                <div style="display: flex; justify-content: space-between;">
+                                                                <div
+                                                                    style="display: flex; justify-content: space-between;">
                                                                     <p id="sgst18Label">SGST @ 9%</p>
                                                                     <p id="sgst18Total"></p>
                                                                 </div>
@@ -195,12 +259,15 @@
                                                                 </div>
                                                             </div> --}}
                                                             <hr>
-                                                            <div class="gst1" style="display: flex; flex-direction: column;">
-                                                                <div style="display: flex; justify-content: space-between;">
+                                                            <div class="gst1"
+                                                                style="display: flex; flex-direction: column;">
+                                                                <div
+                                                                    style="display: flex; justify-content: space-between;">
                                                                     <p id="cgst5Label">CGST @ 2.5%</p>
                                                                     <p id="cgst5Total"></p>
                                                                 </div>
-                                                                <div style="display: flex; justify-content: space-between;">
+                                                                <div
+                                                                    style="display: flex; justify-content: space-between;">
                                                                     <p id="sgst5Label">SGST @ 2.5%</p>
                                                                     <p id="sgst5Total"></p>
                                                                 </div>
@@ -209,8 +276,10 @@
                                                             <div class="amount">
                                                                 <p>Total Amount</p>
                                                                 <p id="totalAmount"></p>
-                                                                <input type="hidden" name="totalAmount" id="chargeAmount">
-                                                                <input type="hidden" name="subtotal" id="subtotalSave">
+                                                                <input type="hidden" name="totalAmount"
+                                                                    id="chargeAmount">
+                                                                <input type="hidden" name="subtotal"
+                                                                    id="subtotalSave">
                                                                 <input type="hidden" name="gst18" id="gst18">
                                                                 <input type="hidden" name="gst12" id="gst12">
                                                                 <input type="hidden" name="gst5" id="gst5">
@@ -220,7 +289,8 @@
                                                         <div class="col-md-12">
                                                             <div class="mb-4 input_wrap">
                                                                 <label>Payment Mode</label>
-                                                                <select name="payment_method" id="payment_method" class="form-select">
+                                                                <select name="payment_method" id="payment_method"
+                                                                    class="form-select">
                                                                     <option value="UPI">UPI</option>
                                                                     <option value="Cash">Cash</option>
                                                                     <option value="Debit/Credit">Debit/Credit</option>
@@ -228,7 +298,8 @@
                                                             </div>
                                                         </div>
                                                         <div class="tearm_condition">
-                                                            <input type="checkbox" id="terms" name="terms" value="" checked="checked">
+                                                            <input type="checkbox" id="terms" name="terms"
+                                                                value="" checked="checked">
                                                             <p>By Agreeing to the <b>Terms and Condition</b> of HappyOn
                                                             </p>
                                                         </div>
@@ -348,7 +419,8 @@
 
             for (let i = 0; i < item_price.length; i++) {
                 if (item_qty[i] == 0 || item_price[i] == 0) {
-                    $('#errorMsg').html('<span class="alert alert-danger">Minimum Qty/Price should be 1.</span>').fadeOut(8000);
+                    $('#errorMsg').html('<span class="alert alert-danger">Minimum Qty/Price should be 1.</span>').fadeOut(
+                        8000);
                 } else {
                     let qty = parseFloat(item_qty[i]) || 0;
                     let price = parseFloat(item_price[i]) || 0;
@@ -400,7 +472,8 @@
                 discountRate = data.discount;
             for (let i = 0; i < item_price.length; i++) {
                 if (item_qty[i] == 0 || item_price[i] == 0) {
-                    $('#errorMsg').html('<span class="alert alert-danger">Minimum Qty/Price should be 1.</span>').fadeOut(8000);
+                    $('#errorMsg').html('<span class="alert alert-danger">Minimum Qty/Price should be 1.</span>').fadeOut(
+                        8000);
                 } else {
                     let qty = parseFloat(item_qty[i]) || 0;
                     let price = parseFloat(item_price[i]) || 0;
@@ -422,10 +495,10 @@
                         // discountAmt = (basicAmt * discountRate) / 100;
                         // basicAmt = basicAmt - discountAmt;
                         // gstAmt = (basicAmt * taxRate) / 100;
-                        if(taxRate !== 5){
+                        if (taxRate !== 5) {
                             console.log('DiscountC : ', taxRate);
                             discountAmt = (rowtotal * discountRate) / 100;
-                        }                     
+                        }
                         basicAmt = rowtotal - discountAmt;
                         gstAmt = (basicAmt * taxRatesList[taxRate]);
 
@@ -564,7 +637,7 @@
             var minute = parseInt(time[1]);
             var now1 = new Date();
             var datetime = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour, minute);
-            if (datetime < now1) {
+            if (datetime > now1) {
                 alert('Please select current or future date and time');
 
                 dateInput.value = today;
