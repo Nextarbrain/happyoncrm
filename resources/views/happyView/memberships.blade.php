@@ -215,7 +215,8 @@
                                 <div class="mb-4">
                                     <label for='time'>Time</label>
                                     <input type="time" class="form-control" placeholder="Time" name="time"
-                                        id="time" required readonly>
+                                        id="time" required
+                                        {{ $branchId == 8 || $branchId == 2 ? '' : 'readonly' }}>
                                 </div>
                             </div>
                             <div class="col-md-6">
