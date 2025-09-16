@@ -57,7 +57,11 @@ class OpenBillingController extends Controller
     public function addOpenBillingView(Request $request)
     {
         $branches = Branch::select('id', 'name')->where('status', 'Active')->get()->toArray();
-        return view('happyView.openBilling.add-open-billing', compact('branches'));
+        $branchId = $request->get('branch_id') ? (int) $request->get('branch_id') : auth('admin')->user()->branch_id;
+        if ($branchId === null) {
+            $branchId = $branches[0]['id'] ?? null;
+        }
+        return view('happyView.openBilling.add-open-billing', compact('branches', 'branchId'));
     }
 
     public function editOpenBillingView(Request $request)
