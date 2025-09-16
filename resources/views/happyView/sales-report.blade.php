@@ -266,8 +266,8 @@
                                                         <td>{{ $bill->branch?->name ?? '' }}</td>
                                                     </tr>
                                                 @endforeach
-                                            </tbody>
-                                            <tfoot>
+                                            {{-- </tbody>
+                                            <tfoot> --}}
                                                 <tr>
                                                     <td></td>
                                                     <td></td>
@@ -290,7 +290,7 @@
                                                     <td></td>
                                                     <td></td>
                                                 </tr>
-                                            </tfoot>
+                                            </tbody>
                                         </table>
                                     </div>
                                 </div>
