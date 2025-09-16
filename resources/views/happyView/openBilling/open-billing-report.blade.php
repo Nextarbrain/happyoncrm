@@ -1,4 +1,5 @@
 @include('happyView.includes.head')
+
 <body>
     <!--wrapper-->
     <div class="wrapper">
@@ -36,26 +37,28 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="dashboard_left">
-							<div class="container-fluid">                                
+                            <div class="container-fluid">
                                 <div class="row mb-2">
                                     <div class="col">
-                                        <h5 class="mb-0">Open Billing List ({{ count($open_billings) }})</h5>										
+                                        <h5 class="mb-0">Open Billing List ({{ count($open_billings) }})</h5>
                                     </div>
                                 </div>
-                                <div class="row mb-3 align-items-center">                                    
+                                <div class="row mb-3 align-items-center">
                                     <div class="col-md-6">
                                         <div id="datatable-buttons"></div>
                                     </div>
-                                    <div class="col-md-6 text-md-right d-flex justify-content-md-end justify-content-start align-items-center flex-wrap">                                       
-                                         <div class="mr-2 mb-2 mx-3">
+                                    <div
+                                        class="col-md-6 text-md-right d-flex justify-content-md-end justify-content-start align-items-center flex-wrap">
+                                        <div class="mr-2 mb-2 mx-3">
                                             Search:
                                         </div>
                                         <div class="mb-2">
-                                            <input type="search" id="datatable-search" class="form-control form-control-sm">
+                                            <input type="search" id="datatable-search"
+                                                class="form-control form-control-sm">
                                         </div>
                                     </div>
                                 </div>
-                            </div>                            
+                            </div>
                             <!-- data table  -->
                             <div class="container">
                                 <div class="row table-responsive">
@@ -108,6 +111,7 @@
                                                         $total += $open_billing->totalamount;
                                                     @endphp
                                                 @endforeach
+                                            <tfoot class="total-row">
                                                 <tr>
                                                     <td></td>
                                                     <td></td>
@@ -121,6 +125,7 @@
                                                     <td></td>
                                                     <td></td>
                                                 </tr>
+                                            </tfoot>
                                             </tbody>
                                         </table>
                                     </div>
@@ -167,11 +172,21 @@
                     '<"col-md-4 d-flex align-items-center"i>' +
                     '<"col-md-4 d-flex justify-content-center"l>' +
                     '<"col-md-4 d-flex justify-content-end"p>>',
-                buttons: ['copy', 'csv', 'print', 'colvis'],
+                buttons: [{
+                    extend: 'copyHtml5',
+                    text: 'Copy',
+                    footer: true,
+                }, {
+                    extend: 'csvHtml5',
+                    footer: true,
+                }, {
+                    extend: 'print',
+                    footer: true
+                }, 'colvis'],
                 responsive: true,
                 info: true
             });
-            table.buttons().container().appendTo('#datatable-buttons');            
+            table.buttons().container().appendTo('#datatable-buttons');
             // Bind custom search input
             $('#datatable-search').on('keyup', function() {
                 table.search(this.value).draw();
@@ -181,4 +196,5 @@
         });
     </script>
 </body>
+
 </html>
