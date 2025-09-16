@@ -928,35 +928,51 @@ class TicketController extends Controller
 
     public function getPriceKids(Request $request)
     {
-        $today = Carbon\Carbon::now('Asia/Kolkata')->format('l');
+        $date = $request->get('date') ?? Carbon\Carbon::now('Asia/Kolkata')->toDateString();
+
+        $dayName = Carbon\Carbon::parse($date)->format('l');
+
         $branchId = $request->get('branch_id') ?? session('branch_id');
 
-        $value = DayPrice::where('branch_id', $branchId)->where('Hour', $request->get('option'))->first();
+        $value = DayPrice::where('branch_id', $branchId)
+            ->where('Hour', $request->get('option'))
+            ->first();
+
         if ($value == null) {
-            $value = DayPrice::whereNull('branch_id')->where('Hour', $request->get('option'))->first();
+            $value = DayPrice::whereNull('branch_id')
+                ->where('Hour', $request->get('option'))
+                ->first();
         }
 
-        if ($value != null) {
-            if ($today == "Monday") {
-                $data = $value->monday;
-            } elseif ($today == "Tuesday") {
-                $data = $value->tuesday;
-            } elseif ($today == "Wednesday") {
-                $data = $value->wednesday;
-            } elseif ($today == "Thursday") {
-                $data = $value->thursday;
-            } elseif ($today == "Friday") {
-                $data = $value->friday;
-            } elseif ($today == "Saturday") {
-                $data = $value->saturday;
+            if ($value != null) {
+                switch ($dayName) {
+                    case "Monday":
+                        $data = $value->monday;
+                        break;
+                    case "Tuesday":
+                        $data = $value->tuesday;
+                        break;
+                    case "Wednesday":
+                        $data = $value->wednesday;
+                        break;
+                    case "Thursday":
+                        $data = $value->thursday;
+                        break;
+                    case "Friday":
+                        $data = $value->friday;
+                        break;
+                    case "Saturday":
+                        $data = $value->saturday;
+                        break;
+                    default:
+                        $data = $value->sunday;
+                }
+                return response()->json($data);
             } else {
-                $data = $value->sunday;
+                return response()->json(0);
             }
-            return response()->json($data);
-        } else {
-            echo 0;
-        }
     }
+
 
     public function addUser(Request $request)
     {
