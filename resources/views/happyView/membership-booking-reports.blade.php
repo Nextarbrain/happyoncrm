@@ -107,11 +107,12 @@
                                                     @php
                                                         $subtotal +=
                                                             ($membershipUser['paymentInfo']->subTotal ?? 0) -
-                                                                    ($membershipUser['paymentInfo']->gst18 ?? 0);
+                                                            ($membershipUser['paymentInfo']->gst18 ?? 0);
                                                         $gst18 += optional($membershipUser['paymentInfo'])->gst18 ?? 0;
                                                         $total += $membershipUser->amount;
                                                     @endphp
                                                 @endforeach
+                                            <tfoot class="total-row">
                                                 <tr>
                                                     <td></td>
                                                     <td></td>
@@ -123,6 +124,7 @@
                                                     <td></td>
                                                     <td></td>
                                                 </tr>
+                                            </tfoot>
                                             </tbody>
                                         </table>
                                     </div>
@@ -170,7 +172,17 @@
                     '<"col-md-4 d-flex align-items-center"i>' +
                     '<"col-md-4 d-flex justify-content-center"l>' +
                     '<"col-md-4 d-flex justify-content-end"p>>',
-                buttons: ['copy', 'csv', 'print', 'colvis'],
+                buttons: [{
+                    extend: 'copyHtml5',
+                    text: 'Copy',
+                    footer: true,
+                }, {
+                    extend: 'csvHtml5',
+                    footer: true,
+                }, {
+                    extend: 'print',
+                    footer: true
+                }, 'colvis'],
                 responsive: true,
                 info: true
             });
