@@ -92,7 +92,7 @@ class MembershipController extends Controller
             "gst18" => $paymentMethod->gst18,
             "totalAmount" => $paymentMethod->amounts,
             "branch" => branchInfo($branchId),
-        ];        
+        ];
         return view('receipt.membership-invoice', $data);
     }
 
@@ -137,7 +137,7 @@ class MembershipController extends Controller
             $membershipUsers->where('branch_id', $branchId);
         }
         $membershipUsers = $membershipUsers->latest()->get();
-        return view('happyView.memberships', compact('membership', 'membershipUsers', 'branches'));
+        return view('happyView.memberships', compact('membership', 'membershipUsers', 'branches', 'branchId'));
     }
 
     public function membershipHistory()
@@ -175,7 +175,7 @@ class MembershipController extends Controller
             $data->coupan_name = $coupon->coupon_name ?? '';
             $data->coupan_price = $coupon->discount ?? '';
         }
-        // Original Plan Price 
+        // Original Plan Price
         $planPrice = $data->price;
 
         // coupon calculation
