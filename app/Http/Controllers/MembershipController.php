@@ -143,7 +143,8 @@ class MembershipController extends Controller
     public function membershipHistory()
     {
         hasPermission('membership-history');
-        $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        // $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
+        $branchId = null;
         $membershipUsers = MembershipHistory::with('user', 'kid', 'userDetails', 'membershipBuy', 'branch');
         if ($branchId) {
             $membershipUsers->where('branch_id', $branchId);
