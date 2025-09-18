@@ -1374,7 +1374,7 @@ class AdminController extends Controller
                     $membershipUsers->where('branch_id', $branchId);
                 }
                 $membershipUsers = $membershipUsers->get();
-                return view('happyView.memberships', compact('membership', 'membershipUsers', 'applydate', 'branches'));
+                return view('happyView.memberships', compact('membership', 'membershipUsers', 'applydate', 'branches', 'branchId'));
             }
 
             if ($request->key == "event_booking") {
@@ -1385,7 +1385,7 @@ class AdminController extends Controller
                 }
                 $event_bookings = $event_bookings->get();
 
-                return view('happyView.events', ['event_bookings' => $event_bookings, 'applydate' => $applydate]);
+                return view('happyView.events', ['event_bookings' => $event_bookings, 'applydate' => $applydate, 'branchId' => $branchId]);
             }
 
             if ($request->key == "openbillings") {
@@ -1396,7 +1396,7 @@ class AdminController extends Controller
                 }
                 $openbillings = $openbillings->get();
 
-                return view('happyView.openBilling.index', ['open_billings' => $openbillings, 'applydate' => $applydate]);
+                return view('happyView.openBilling.index', ['open_billings' => $openbillings, 'applydate' => $applydate, 'branchId' => $branchId]);
             }
 
 
@@ -1417,7 +1417,7 @@ class AdminController extends Controller
                 $user->where('branch_id', $branchId);
             }
             $user = $user->latest()->get();
-            return view('happyView.customer', compact('user', 'applydate', 'event_bookings', 'openbillings'));
+            return view('happyView.customer', compact('user', 'applydate', 'event_bookings', 'openbillings', 'branchId'));
         } else {
             $daterange = explode("-", base64_decode($request->date));
             $daterange[0] = date('Y-m-d', strtotime($daterange[0]));
@@ -1432,7 +1432,7 @@ class AdminController extends Controller
                 }
                 $membershipUsers = $membershipUsers->get();
 
-                return view('happyView.memberships', compact('membership', 'membershipUsers', 'applydate', 'branches'));
+                return view('happyView.memberships', compact('membership', 'membershipUsers', 'applydate', 'branches', 'branchId'));
             }
 
             if ($request->key == "event_booking") {
@@ -1450,7 +1450,7 @@ class AdminController extends Controller
                     $event_bookings = $event_bookings->get();
                 }
 
-                return view('happyView.events', ['event_bookings' => $event_bookings, 'applydate' => $applydate]);
+                return view('happyView.events', ['event_bookings' => $event_bookings, 'applydate' => $applydate, 'branchId' => $branchId]);
             }
 
             if ($request->key == "openbillings") {
@@ -1461,7 +1461,7 @@ class AdminController extends Controller
                 }
                 $openbillings = $openbillings->get();
 
-                return view('happyView.openBilling.index', ['open_billings' => $openbillings, 'applydate' => $applydate]);
+                return view('happyView.openBilling.index', ['open_billings' => $openbillings, 'applydate' => $applydate, 'branchId' => $branchId]);
             }
             $event_bookings = EventBooking::where('payment_status', 'Paid')->whereBetween('booking_date', [$daterange[0], $daterange[1]]);
             if ($branchId) {
@@ -1481,7 +1481,7 @@ class AdminController extends Controller
             }
             $user = $user->latest()->get();
 
-            return view('happyView.customer', compact('applydate', 'event_bookings', 'openbillings', 'user'));
+            return view('happyView.customer', compact('applydate', 'event_bookings', 'openbillings', 'user', 'branchId'));
         }
     }
 
