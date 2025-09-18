@@ -61,14 +61,17 @@
                     </div>
                     <div class="col-md-3 mt-1">
                         @if (auth('admin')->user()->branch_id == null && auth('admin')->user()->isSuperAdmin == 1)
-                        <form id="branchFilterForm" action="{{ url('/datawise-record-show') }}" method="POST">
-                            @csrf
+                            <form id="branchFilterForm" action="{{ url('/datawise-record-show') }}" method="POST">
+                                @csrf
                                 <label>Branch:</label>
                                 <div class="d-flex">
-                                    <select name="branch_id" class="form-control" id="branch_id" onchange="document.getElementById('branchFilterForm').submit();">
+                                    <select name="branch_id" class="form-control" id="branch_id"
+                                        onchange="document.getElementById('branchFilterForm').submit();">
                                         <option value="">-- All Branches --</option>
                                         @foreach ($branches as $branch)
-                                            <option value="{{ $branch['id'] }}" {{ $branchId == $branch['id'] ? 'selected' : '' }}>{{ $branch['name']."-".$branch['type'] }}</option>
+                                            <option value="{{ $branch['id'] }}"
+                                                {{ $branchId == $branch['id'] ? 'selected' : '' }}>
+                                                {{ $branch['name'] . '-' . $branch['type'] }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -96,7 +99,7 @@
                                         <img src="assets/images/user-s.png" alt="icon">
                                     </div>
                                 </div>
-                                <a href="{{ url('datawise-record-show/' . $applydate) }}">
+                                <a href="{{ url('datawise-record-show/' . $applydate . '/' . $branchId) }}">
                                     <div class="d_card_footer">
                                         <p class="text-white">Updated hour ago</p>
                                         <img src="assets/images/right.png" alt="icon">
@@ -117,7 +120,7 @@
                                         <img src="assets/images/bag.png" alt="icon">
                                     </div>
                                 </div>
-                                <a href="{{ url('datawise-record-show/' . $applydate) }}">
+                                <a href="{{ url('datawise-record-show/' . $applydate . '/' . $branchId) }}">
                                     <div class="d_card_footer">
                                         <p class="text-black">Updated hour ago</p>
                                         <img src="assets/images/right-arrow.png" alt="icon">
@@ -138,7 +141,7 @@
                                         <img src="assets/images/user.png" alt="icon">
                                     </div>
                                 </div>
-                                <a href="{{ url('datawise-record-show/' . $applydate) }}">
+                                <a href="{{ url('datawise-record-show/' . $applydate . '/' . $branchId) }}">
                                     <div class="d_card_footer">
                                         <p class="text-white">Updated hour ago</p>
                                         <img src="assets/images/right.png" alt="icon">
@@ -159,7 +162,7 @@
                                         <img src="assets/images/smily.png" alt="icon">
                                     </div>
                                 </div>
-                                <a href="{{ url('datawise-record-show/' . $applydate) }}">
+                                <a href="{{ url('datawise-record-show/' . $applydate . '/' . $branchId) }}">
                                     <div class="d_card_footer">
                                         <p class="text-white">Updated hour ago</p>
                                         <img src="assets/images/right.png" alt="icon">
@@ -202,7 +205,8 @@
                                                 <img src="assets/images/membar.png" alt="icon">
                                             </div>
                                         </div>
-                                        <a href="{{ url('datawise-record-show/' . $applydate) }}?key=membership">
+                                        <a
+                                            href="{{ url('datawise-record-show/' . $applydate . '/' . $branchId) }}?key=membership">
                                             <div class="d_card_footer">
                                                 <p class="text-white">Updated hour ago</p>
                                                 <img src="assets/images/right.png" alt="icon">
@@ -223,7 +227,8 @@
                                                 <img src="assets/images/membar.png" alt="icon">
                                             </div>
                                         </div>
-                                        <a href="{{ url('datawise-record-show/' . $applydate) }}?key=openbillings">
+                                        <a
+                                            href="{{ url('datawise-record-show/' . $applydate . '/' . $branchId) }}?key=openbillings">
                                             <div class="d_card_footer">
                                                 <p class="text-white">Updated hour ago</p>
                                                 <img src="assets/images/right.png" alt="icon">
@@ -415,7 +420,8 @@
                                         </div>
                                     </a>
                                 @else
-                                    <a href="{{ url('datawise-record-show/' . $applydate) }}?key=event_booking">
+                                    <a
+                                        href="{{ url('datawise-record-show/' . $applydate . '/' . $branchId) }}?key=event_booking">
                                         <div class="d_card_footer">
                                             <p class="text-white">{{ $event_booking }} Events</p>
                                             <img src="assets/images/right.png" alt="icon">
@@ -487,7 +493,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.0/js/toastr.js"></script>
     <script>
         $('#reservation').daterangepicker({
-            maxDate: new Date(),          
+            maxDate: new Date(),
         });
     </script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -562,7 +568,7 @@
                                 }
                             }
                         }
-                    });                    
+                    });
                 }
             }
         });
@@ -604,18 +610,18 @@
             let numberValue = parseFloat(elementText);
             if (!isNaN(numberValue)) {
                 let formattedNumber = numberValue.toLocaleString('en-IN');
-                $('#' + elementId).text('₹'+formattedNumber);
+                $('#' + elementId).text('₹' + formattedNumber);
             } else {
                 $('#' + elementId).text('Invalid number format');
             }
         }
 
         $(document).ready(function() {
-            formatNumber('ticketSell',"{{ $totalTicketAmount }}");
-            formatNumber('total_sell',"{{ $totalSales }}");
-            formatNumber('coupon_code_value',"{{ $couponvalue }}");
-            formatNumber('total_member_amount',"{{ $totalMemberAmount }}");
-            formatNumber('total_open_billing_sale',"{{ $totalOpenBillingSales }}");            
+            formatNumber('ticketSell', "{{ $totalTicketAmount }}");
+            formatNumber('total_sell', "{{ $totalSales }}");
+            formatNumber('coupon_code_value', "{{ $couponvalue }}");
+            formatNumber('total_member_amount', "{{ $totalMemberAmount }}");
+            formatNumber('total_open_billing_sale', "{{ $totalOpenBillingSales }}");
         });
 
         function branchWiseData(selectElement) {

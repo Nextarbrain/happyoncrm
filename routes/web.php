@@ -47,7 +47,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::get('/admin', [AdminController::class, 'adminPlansView'])->name('admin');
 
 
-    Route::get('/datawise-record-show/{date}', [AdminController::class, 'DatawiseRecord']);
+    Route::get('/datawise-record-show/{date}/{branch_id?}', [AdminController::class, 'DatawiseRecord']);
     Route::get('/month_wise_sale', [AdminController::class, 'monthWise'])->name('monthWise');
 
     Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
@@ -91,7 +91,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
 
 
     //Route::get('/edit-tickets-view/{id}', [TicketController::class, 'editTicketsView']);
-    Route::get('/tickets-edit-view/{id}', [TicketController::class, 'ticketEdit']);    
+    Route::get('/tickets-edit-view/{id}', [TicketController::class, 'ticketEdit']);
     Route::post('/update-tickets', [TicketController::class, 'newTicketUpdate']);
     Route::get('/invoice-pdf/{id}', [TicketController::class, 'invoiceGenerate']);
     Route::post('/tickets-booking-report', [TicketController::class, 'ticketsBookingReport'])->name('ticketsBookingReport');
@@ -111,7 +111,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::delete('/delete-customer', [TicketController::class, 'deleteCustomer']);
     Route::get('/customer-filter', [TicketController::class, 'filterCustomer']);
     Route::get('/upcomingbirthdays', [TicketController::class, 'upcomingBirthdaysView'])->name('upcomingBirthdays');
-    Route::post('/sales-report', [TicketController::class, 'salesReport'])->name('sales-report');    
+    Route::post('/sales-report', [TicketController::class, 'salesReport'])->name('sales-report');
 
     /******************* Membership Routes **************/
 
