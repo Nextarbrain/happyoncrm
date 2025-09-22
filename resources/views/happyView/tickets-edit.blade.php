@@ -789,7 +789,7 @@
             const extraTimeValue = extraTimeDDown.value;
             let addedPrice = 0;
             let addedHour = 0;
-            if (branchId == 8) {
+            if (branchId == 8 || branchId == 2) {
                 addedPrice = extraTimeValue == 30 ? 200 : 300;
                 addedHour = extraTimeValue == 30 ? 0.5 : 1;
             } else {
