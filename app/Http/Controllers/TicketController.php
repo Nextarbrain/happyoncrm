@@ -1008,10 +1008,19 @@ class TicketController extends Controller
         try {
             if (can('tickets-delete') || can('customers-delete')) {
                 $selectedItems = $request->input('selectedItems');
+                $userIds = collect($selectedItems)->pluck('userId')->toArray();
+                $paymentIds = collect($selectedItems)->pluck('paymentId')->filter()->toArray();
+                if (!empty($paymentIds)) {
+                    PaymentMethod::whereIn('id', $paymentIds)->delete();
+                }
+
+                if (!empty($userIds)) {
+                    User::whereIn('id', $userIds)->delete();
+                }
                 // PaymentMethod::whereIn('user_id', $selectedItems)->delete();
                 // UserProduct::whereIn('user_id', $selectedItems)->delete();
                 // Kid::whereIn('user_id', $selectedItems)->delete();
-                User::whereIn('id', $selectedItems)->delete();
+                // User::whereIn('id', $selectedItems)->delete();
                 return response()->json(['success' => true]);
             } else {
                 return response()->json(['success' => false], 400);

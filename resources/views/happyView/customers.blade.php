@@ -86,18 +86,25 @@
     <script>
         $(document).ready(function() {
             if ($('#custom-toolbar').length) {
-                $('#custom-toolbar').html(`<a href="#" id="user_delete" class="btn btn-sm me-2">@if (can('tickets-delete'))
+                $('#custom-toolbar').html(
+                    `<a href="#" id="user_delete" class="btn btn-sm me-2">@if (can('tickets-delete'))
                 <i class="fa fa-trash-o fa-lg" aria-hidden="true"></i>@endif</a>@if (can('customers-add'))
-                <a href="{{ url('/tickets') }}" class="btn btn-sm btn-primary">Add New +</a> @endif`);
+                <a href="{{ url('/tickets') }}" class="btn btn-sm btn-primary">Add New +</a> @endif`
+                );
             } else {
                 console.error('#custom-toolbar not found!');
             }
             $('.dt-buttons button').addClass('btn-sm');
-            document.getElementById('user_delete').addEventListener("click", function() {              
+            document.getElementById('user_delete').addEventListener("click", function() {
                 var selectedItems = [];
                 $('.users_checkbox:checked').each(function() {
                     var userId = $(this).data('item-id');
-                    selectedItems.push(userId);
+                    var paymentId = $(this).data('item-paymentid');
+
+                    selectedItems.push({
+                        userId: userId,
+                        paymentId: paymentId || ''
+                    });
                 });
 
                 var baseUrl = "{{ URL::to('/') }}";
