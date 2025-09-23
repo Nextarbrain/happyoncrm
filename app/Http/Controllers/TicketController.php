@@ -1011,19 +1011,20 @@ class TicketController extends Controller
                 $userIds = collect($selectedItems)->pluck('userId')->toArray();
                 $paymentIds = collect($selectedItems)->pluck('paymentId')->filter()->toArray();
                 $date = collect($selectedItems)->pluck('date')->filter()->toArray();
-                if (!empty($paymentIds)) {
-                    PaymentMethod::whereIn('id', $paymentIds)->delete();
-                }
+                User::whereIn('id', $selectedItems)->delete();
+                // if (!empty($paymentIds)) {
+                //     PaymentMethod::whereIn('id', $paymentIds)->delete();
+                // }
 
-                if (!empty($userIds)) {
-                    User::whereIn('id', $userIds)->delete();
-                }
-                if (!empty($userIds)) {
-                    UserProduct::whereIn('user_id', $userIds)->whereIn(DB::raw('DATE(created_at)'), $date)->delete();
-                }
-                if (!empty($userIds)) {
-                    Kid::whereIn('user_id', $userIds)->whereIn(DB::raw('DATE(created_at)'), $date)->delete();
-                }
+                // if (!empty($userIds)) {
+                //     User::whereIn('id', $userIds)->delete();
+                // }
+                // if (!empty($userIds)) {
+                //     UserProduct::whereIn('user_id', $userIds)->whereIn(DB::raw('DATE(created_at)'), $date)->delete();
+                // }
+                // if (!empty($userIds)) {
+                //     Kid::whereIn('user_id', $userIds)->whereIn(DB::raw('DATE(created_at)'), $date)->delete();
+                // }
                 return response()->json(['success' => true]);
             } else {
                 return response()->json(['success' => false], 400);
