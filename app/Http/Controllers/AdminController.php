@@ -575,10 +575,14 @@ class AdminController extends Controller
                     $card += isset($memberTicket['paymentInfo']) ? $memberTicket['paymentInfo']->amounts : 0;
                 }
             }
+            // dd($upi, $upi_membership, $upi_event, $partial_upi, $upi_open);
+            // $upi =  $upi + $upi_membership + $upi_event + $partial_upi + $upi_open;
+            // $cash = $cash + $cash_membership + $cash_event + $partial_cash + $cash_open;
+            // $card = $card + $card_membership + $card_event + $partial_card + $card_open;
 
-            $upi =  $upi + $upi_membership + $upi_event + $partial_upi + $upi_open;
-            $cash = $cash + $cash_membership + $cash_event + $partial_cash + $cash_open;
-            $card = $card + $card_membership + $card_event + $partial_card + $card_open;
+            $upi =  $upi +  $upi_event + $partial_upi + $upi_open;
+            $cash = $cash + $cash_event + $partial_cash + $cash_open;
+            $card = $card +  $card_event + $partial_card + $card_open;
 
 
             $gst18 = PaymentMethod::select('gst18')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
