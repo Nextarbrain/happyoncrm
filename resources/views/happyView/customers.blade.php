@@ -100,10 +100,12 @@
                 $('.users_checkbox:checked').each(function() {
                     var userId = $(this).data('item-id');
                     var paymentId = $(this).data('item-paymentid');
+                    var date = $(this).data('item-date');
 
                     selectedItems.push({
                         userId: userId,
-                        paymentId: paymentId || ''
+                        paymentId: paymentId || '',
+                        date: date,
                     });
                 });
 
