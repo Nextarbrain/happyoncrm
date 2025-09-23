@@ -309,7 +309,8 @@
                                     <div class="col-md-5 payment_left">
                                         <h6>Payments</h6>
                                         <div class="row">
-                                            <a href="{{ url('/payment-method-filter/' . $applydate) }}?key=Cash">
+                                            <a
+                                                href="{{ url('/payment-method-filter/' . $applydate . '/' . $branchId) }}?key=Cash">
                                                 <div class="payment d-flex justify-content-between align-items-center">
                                                     <h4><img src="assets/images/EllipseGreen.jpg" alt="icon">
                                                         Cash
@@ -317,7 +318,8 @@
                                                     <p>₹{{ $cash }}</p>
                                                 </div>
                                             </a>
-                                            <a href="{{ url('/payment-method-filter/' . $applydate) }}?key=UPI">
+                                            <a
+                                                href="{{ url('/payment-method-filter/' . $applydate . '/' . $branchId) }}?key=UPI">
                                                 <div class="payment d-flex justify-content-between align-items-center">
                                                     <h4><img src="assets/images/EllipseYellow.jpg" alt="icon">
                                                         &nbsp;UPI
@@ -326,7 +328,7 @@
                                                 </div>
                                             </a>
                                             <a
-                                                href="{{ url('/payment-method-filter/' . $applydate) }}?key=Debit/Credit">
+                                                href="{{ url('/payment-method-filter/' . $applydate . '/' . $branchId) }}?key=Debit/Credit">
                                                 <div class="payment d-flex justify-content-between align-items-center">
                                                     <h4><img src="assets/images/EllipseBlue.jpg" alt="icon">
                                                         &nbsp;Debit/Credit</h4>
