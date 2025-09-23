@@ -51,7 +51,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::get('/month_wise_sale', [AdminController::class, 'monthWise'])->name('monthWise');
 
     Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
-    Route::get('/payment-method-filter/{date}', [AdminController::class, 'paymentMethodFilter'])->name('paymentMethodFilter');
+    Route::get('/payment-method-filter/{date}/{branch_id?}', [AdminController::class, 'paymentMethodFilter'])->name('paymentMethodFilter');
 
     /******** Staff ********* */
     Route::get('/staffs', [StaffController::class, 'staffsView'])->name('staffs');
