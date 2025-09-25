@@ -1011,7 +1011,7 @@ class TicketController extends Controller
                 $userIds = collect($selectedItems)->pluck('userId')->toArray();
                 $paymentIds = collect($selectedItems)->pluck('paymentId')->filter()->toArray();
                 $date = collect($selectedItems)->pluck('date')->filter()->toArray();
-                User::whereIn('id', $selectedItems)->delete();
+                User::whereIn('id', $userIds)->delete();
                 // if (!empty($paymentIds)) {
                 //     PaymentMethod::whereIn('id', $paymentIds)->delete();
                 // }
