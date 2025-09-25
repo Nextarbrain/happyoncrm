@@ -1022,9 +1022,9 @@ class TicketController extends Controller
                 // if (!empty($userIds)) {
                 //     UserProduct::whereIn('user_id', $userIds)->whereIn(DB::raw('DATE(created_at)'), $date)->delete();
                 // }
-                // if (!empty($userIds)) {
-                //     Kid::whereIn('user_id', $userIds)->whereIn(DB::raw('DATE(created_at)'), $date)->delete();
-                // }
+                if (!empty($userIds)) {
+                    Kid::whereIn('user_id', $userIds)->whereIn(DB::raw('DATE(created_at)'), $date)->delete();
+                }
                 return response()->json(['success' => true]);
             } else {
                 return response()->json(['success' => false], 400);
