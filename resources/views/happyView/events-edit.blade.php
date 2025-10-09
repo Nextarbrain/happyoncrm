@@ -43,7 +43,8 @@
                                         <div class="tab_wrap_theme">
                                             <ul class="nav nav-tabs" role="tablist">
                                                 <li class="nav-item" role="presentation">
-                                                    <a class="nav-link active rounded" data-bs-toggle="tab" href="#paid" aria-selected="true" role="tab">
+                                                    <a class="nav-link active rounded" data-bs-toggle="tab"
+                                                        href="#paid" aria-selected="true" role="tab">
                                                         <p class="heading">Event Booking </p>
                                                     </a>
                                                 </li>
@@ -53,71 +54,102 @@
                                         <div class="tab-content">
 
                                             <div id="paid" class="container tab-pane active" role="tabpanel"><br>
-                                                <form action="{{ url('/edit-event-post') }}" method="post" id="my-form">
+                                                <form action="{{ url('/edit-event-post') }}" method="post"
+                                                    id="my-form">
                                                     @csrf
-                                                    <input type="hidden" value="{{ $eventbooking->id }}" name="id">
+                                                    <input type="hidden" value="{{ $eventbooking->id }}"
+                                                        name="id">
 
                                                     <div class="row">
                                                         @if (auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
                                                             <div class="col-md-12">
                                                                 <div class="mb-4 input_wrap">
                                                                     <label>Branch <span>*</span></label>
-                                                                    <select name="branch_id" id="branchId" class="form-select" disabled>
+                                                                    <select name="branch_id" id="branchId"
+                                                                        class="form-select" disabled>
                                                                         @foreach ($branches as $branch)
-                                                                            <option value="{{ $branch['id'] }}" {{ isset($eventbooking['branch_id']) && $eventbooking['branch_id'] === $branch['id'] ? 'selected' : '' }}>{{ $branch['name'] }}</option>
+                                                                            <option value="{{ $branch['id'] }}"
+                                                                                {{ isset($eventbooking['branch_id']) && $eventbooking['branch_id'] === $branch['id'] ? 'selected' : '' }}>
+                                                                                {{ $branch['name'] }}</option>
                                                                         @endforeach
 
                                                                     </select>
-                                                                    <input type="hidden" name="branch_id" value="{{ $eventbooking['branch_id'] }}">
+                                                                    <input type="hidden" name="branch_id"
+                                                                        value="{{ $eventbooking['branch_id'] }}">
                                                                 </div>
                                                             </div>
                                                         @else
-                                                            <input type="hidden" name="branch_id" id="branchId" value="{{ auth('admin')->user()->branch_id }}">
+                                                            <input type="hidden" name="branch_id" id="branchId"
+                                                                value="{{ auth('admin')->user()->branch_id }}">
                                                         @endif
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap dark">
                                                                 <label>Booking Date </label>
-                                                                <input type="date" class="form-control" placeholder="date" id='date' value="{{ date('Y-m-d', strtotime($eventbooking->created_at)) }}" required readonly>
+                                                                <input type="date" class="form-control"
+                                                                    placeholder="date" id='date'
+                                                                    value="{{ date('Y-m-d', strtotime($eventbooking->created_at)) }}"
+                                                                    required readonly>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6 input_wrap dark time">
                                                             <div class="mb-4">
                                                                 <label>Booking Time</label>
-                                                                <input type="time" class="form-control" placeholder="Time" id='time' value="{{ date('H:i', strtotime($eventbooking->created_at)) }}" required readonly>
+                                                                <input type="time" class="form-control"
+                                                                    placeholder="Time" id='time'
+                                                                    value="{{ date('H:i', strtotime($eventbooking->created_at)) }}"
+                                                                    required readonly>
                                                             </div>
                                                         </div>
 
                                                         <div class="col-md-6">
                                                             <div class="mb-4 input_wrap">
                                                                 <label>Event Date</label>
-                                                                <input type="date" class="form-control" placeholder="Booking Date" id="booking_date" name="booking_date" value="{{ $eventbooking->booking_date }}" maxlength="10" required>
+                                                                <input type="date" class="form-control"
+                                                                    placeholder="Booking Date" id="booking_date"
+                                                                    name="booking_date"
+                                                                    value="{{ $eventbooking->booking_date }}"
+                                                                    maxlength="10" required>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-3 input_wrap time">
                                                             <div class="mb-4">
                                                                 <label>Booking From</label>
-                                                                <input type="time" class="form-control" placeholder="Booking Time From" id="time_from" name="booking_time_from" value="{{ $eventbooking->booking_time_from }}" required>
+                                                                <input type="time" class="form-control"
+                                                                    placeholder="Booking Time From" id="time_from"
+                                                                    name="booking_time_from"
+                                                                    value="{{ $eventbooking->booking_time_from }}"
+                                                                    required>
                                                             </div>
                                                         </div>
 
                                                         <div class="col-md-3 input_wrap time">
                                                             <div class="mb-4">
                                                                 <label>Booking To</label>
-                                                                <input type="time" class="form-control" placeholder="Booking Time To" id="time_to" name="booking_time_to" value="{{ $eventbooking->booking_time_to }}" required>
+                                                                <input type="time" class="form-control"
+                                                                    placeholder="Booking Time To" id="time_to"
+                                                                    name="booking_time_to"
+                                                                    value="{{ $eventbooking->booking_time_to }}"
+                                                                    required>
                                                             </div>
                                                         </div>
 
                                                         <div class="col-md-4">
                                                             <div class="mb-4 input_wrap">
                                                                 <label for="phone">Phone <span>*</span></label>
-                                                                <input type="tel" class="form-control" placeholder="Phone" value="{{ $eventbooking->phone }}" name="phone" id="phone" pattern="[0-9]{10}" required>
+                                                                <input type="tel" class="form-control"
+                                                                    placeholder="Phone"
+                                                                    value="{{ $eventbooking->phone }}" name="phone"
+                                                                    id="phone" pattern="[0-9]{10}" required>
 
                                                             </div>
                                                         </div>
                                                         <div class="col-md-4">
                                                             <div class="mb-4 input_wrap">
                                                                 <label>Billing Name <span>*</span></label>
-                                                                <input type="text" class="form-control" placeholder="Billing Name" value="{{ $eventbooking->bill_name }}" name="billing_name" required>
+                                                                <input type="text" class="form-control"
+                                                                    placeholder="Billing Name"
+                                                                    value="{{ $eventbooking->bill_name }}"
+                                                                    name="billing_name" required>
 
                                                             </div>
                                                         </div>
@@ -125,7 +157,9 @@
                                                             <div class="mb-4 input_wrap">
                                                                 <label for="contact">Contact Person
                                                                     <span>*</span></label>
-                                                                <input type="text" class="form-control" placeholder="Contact"value="{{ $eventbooking->contact_person }}" name="contact" required>
+                                                                <input type="text" class="form-control"
+                                                                    placeholder="Contact"value="{{ $eventbooking->contact_person }}"
+                                                                    name="contact" required>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-12" id="item_box">
@@ -137,25 +171,46 @@
                                                             @endphp
                                                             @foreach ($eventitems as $key => $item)
                                                                 <div class="row items_{{ $loop_count_num }}">
-                                                                    <input type="hidden" class="form-control event_item_ids" value="{{ $item->id }}" id="item_id" name="event_item_ids[]">
+                                                                    <input type="hidden"
+                                                                        class="form-control event_item_ids"
+                                                                        value="{{ $item->id }}" id="item_id"
+                                                                        name="event_item_ids[]">
                                                                     <div class="col-md-3 input_wrap">
                                                                         <div class="mb-4">
                                                                             <label>Item</label>
-                                                                            <input type="text" class="form-control item_name" value="{{ $item->item_name }}" id="item_name" placeholder="Item" name="item_name[]" onkeyup="searchProductData(event)" required>
-                                                                            <div id="searchResult" class="shadow phone-list">
+                                                                            <input type="text"
+                                                                                class="form-control item_name"
+                                                                                value="{{ $item->item_name }}"
+                                                                                id="item_name" placeholder="Item"
+                                                                                name="item_name[]"
+                                                                                onkeyup="searchProductData(event)"
+                                                                                required>
+                                                                            <div id="searchResult"
+                                                                                class="shadow phone-list">
                                                                             </div>
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-md-3 input_wrap">
                                                                         <div class="mb-4">
                                                                             <label>Prices</label>
-                                                                            <input type="text" class="form-control item_price" value="{{ $item->item_price }}" id="item_price" placeholder="Prices" name="item_price[]" oninput="validatePrice(this)">
+                                                                            <input type="text"
+                                                                                class="form-control item_price"
+                                                                                value="{{ $item->item_price }}"
+                                                                                id="item_price" placeholder="Prices"
+                                                                                name="item_price[]"
+                                                                                oninput="validatePrice(this)">
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-md-3 input_wrap">
                                                                         <div class="mb-4">
                                                                             <label>Qty</label>
-                                                                            <input type="number" class="form-control item_qty" id="item_qty" value="{{ $item->item_qty }}" placeholder="Qty" value="1" min="1" name="item_qty[]" oninput="validity.valid||(value='');">
+                                                                            <input type="number"
+                                                                                class="form-control item_qty"
+                                                                                id="item_qty"
+                                                                                value="{{ $item->item_qty }}"
+                                                                                placeholder="Qty" value="1"
+                                                                                min="1" name="item_qty[]"
+                                                                                oninput="validity.valid||(value='');">
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-md-2 input_wrap">
@@ -164,9 +219,13 @@
                                                                             @php
                                                                                 $taxOptions = [18, 5, 0];
                                                                             @endphp
-                                                                            <select name="item_tax[]" id="item_tax_{{ $loop_count_num }}" class="form-select item_tax">
+                                                                            <select name="item_tax[]"
+                                                                                id="item_tax_{{ $loop_count_num }}"
+                                                                                class="form-select item_tax">
                                                                                 @foreach ($taxOptions as $tax)
-                                                                                    <option value="{{ $tax }}" {{ $item->item_tax == $tax ? 'selected' : '' }}>
+                                                                                    <option
+                                                                                        value="{{ $tax }}"
+                                                                                        {{ $item->item_tax == $tax ? 'selected' : '' }}>
                                                                                         {{ $tax }}%
                                                                                     </option>
                                                                                 @endforeach
@@ -175,9 +234,15 @@
                                                                     </div>
                                                                     <div class="col-md-1">
                                                                         @if ($loop_count_num == 1)
-                                                                            <i class="fa fa-plus fs-4 btn btn-primary" onclick="add_item_more()" style="background:#0A5F59;" aria-hidden="true"></i>
+                                                                            <i class="fa fa-plus fs-4 btn btn-primary"
+                                                                                onclick="add_item_more()"
+                                                                                style="background:#0A5F59;"
+                                                                                aria-hidden="true"></i>
                                                                         @else
-                                                                            </a><i class="fa fa-trash fs-4 btn btn-danger" onclick="remove_image_more({{ $loop_count_num }}, {{ $item->id }})" aria-hidden="true"></i></a>
+                                                                            </a><i
+                                                                                class="fa fa-trash fs-4 btn btn-danger"
+                                                                                onclick="remove_image_more({{ $loop_count_num }}, {{ $item->id }})"
+                                                                                aria-hidden="true"></i></a>
                                                                         @endif
                                                                     </div>
                                                                 </div>
@@ -187,8 +252,11 @@
                                                             @endforeach
                                                         </div>
                                                         <div class="row mb-4">
-                                                            <div class="col-lg-12 d-flex justify-content-between align-items-center">
-                                                                <a href="javascript:void(0)" class="btn btn-primary" onclick="calculate_amount()" style="background:#0A5F59;">Calculate</a>
+                                                            <div
+                                                                class="col-lg-12 d-flex justify-content-between align-items-center">
+                                                                <a href="javascript:void(0)" class="btn btn-primary"
+                                                                    onclick="calculate_amount()"
+                                                                    style="background:#0A5F59;">Calculate</a>
                                                                 <div id="errorMsg"></div>
                                                             </div>
                                                         </div>
@@ -196,9 +264,16 @@
                                                             <div class="mb-4 input_wrap">
                                                                 <label>COUPON CODE</label>
                                                                 <div class="d-flex">
-                                                                    <input type="text" name="couponcode" class="form-control" id="couponCode" placeholder="Any Discount Code" value="{{ $eventbooking->couponcode }}">
-                                                                    <input type="hidden" name="couponvalue" id="couponValue" value="{{ $eventbooking->couponvalue }}">
-                                                                    <button type="button" id="couponCodebutton" class="btn btn-primary" onclick="calculate_amount()">Apply</button>
+                                                                    <input type="text" name="couponcode"
+                                                                        class="form-control" id="couponCode"
+                                                                        placeholder="Any Discount Code"
+                                                                        value="{{ $eventbooking->couponcode }}">
+                                                                    <input type="hidden" name="couponvalue"
+                                                                        id="couponValue"
+                                                                        value="{{ $eventbooking->couponvalue }}">
+                                                                    <button type="button" id="couponCodebutton"
+                                                                        class="btn btn-primary"
+                                                                        onclick="calculate_amount()">Apply</button>
                                                                 </diV>
                                                                 <p id="couponmsg"></p>
                                                             </div>
@@ -216,37 +291,58 @@
                                                                     {{ $eventbooking->couponvalue }}</p>
                                                             </div>
                                                             <hr>
-                                                            <div class="gst" style="display: flex; flex-direction: column;">
-                                                                <div style="display: flex; justify-content: space-between;">
+                                                            <div class="gst"
+                                                                style="display: flex; flex-direction: column;">
+                                                                <div
+                                                                    style="display: flex; justify-content: space-between;">
                                                                     <p id="cgst18Label">CGST @ 9%</p>
-                                                                    <p id="cgst18Total">{{ round($eventbooking->gst18 / 2, 2) }}</p>
+                                                                    <p id="cgst18Total">
+                                                                        {{ round($eventbooking->gst18 / 2, 2) }}</p>
                                                                 </div>
-                                                                <div style="display: flex; justify-content: space-between;">
+                                                                <div
+                                                                    style="display: flex; justify-content: space-between;">
                                                                     <p id="sgst18Label">SGST @ 9%</p>
-                                                                    <p id="sgst18Total">{{ round($eventbooking->gst18 / 2, 2) }}</p>
+                                                                    <p id="sgst18Total">
+                                                                        {{ round($eventbooking->gst18 / 2, 2) }}</p>
                                                                 </div>
                                                             </div>
                                                             <hr>
-                                                            <div class="gst1" style="display: flex; flex-direction: column;">
-                                                                <div style="display: flex; justify-content: space-between;">
+                                                            <div class="gst1"
+                                                                style="display: flex; flex-direction: column;">
+                                                                <div
+                                                                    style="display: flex; justify-content: space-between;">
                                                                     <p id="cgst5Label">CGST @ 2.5%</p>
-                                                                    <p id="cgst5Total">{{ round($eventbooking->gst5 / 2, 2) }}</p>
+                                                                    <p id="cgst5Total">
+                                                                        {{ round($eventbooking->gst5 / 2, 2) }}</p>
                                                                 </div>
-                                                                <div style="display: flex; justify-content: space-between;">
+                                                                <div
+                                                                    style="display: flex; justify-content: space-between;">
                                                                     <p id="sgst5Label">SGST @ 2.5%</p>
-                                                                    <p id="sgst5Total">{{ round($eventbooking->gst5 / 2, 2) }}</p>
+                                                                    <p id="sgst5Total">
+                                                                        {{ round($eventbooking->gst5 / 2, 2) }}</p>
                                                                 </div>
                                                             </div>
                                                             <hr>
                                                             <div class="amount">
                                                                 <p>Total Amount</p>
-                                                                <p id="totalAmount">{{ number_format($eventbooking->totalamount, 2) }}
+                                                                <p id="totalAmount">
+                                                                    {{ number_format($eventbooking->totalamount, 2) }}
                                                                 </p>
-                                                                <input type="hidden" value="{{ $eventbooking->totalamount }}" name="totalAmount" id="chargeAmount">
-                                                                <input type="hidden" value="{{ $eventbooking->subtotal }}" name="subtotal" id="subtotalSave">
-                                                                <input type="hidden" value="{{ $eventbooking->gst18 }}" name="gst18" id="gst18">
-                                                                <input type="hidden" value="{{ $eventbooking->gst12 }}" name="gst12" id="gst12">
-                                                                <input type="hidden" value="{{ $eventbooking->gst5 }}" name="gst5" id="gst5">
+                                                                <input type="hidden"
+                                                                    value="{{ $eventbooking->totalamount }}"
+                                                                    name="totalAmount" id="chargeAmount">
+                                                                <input type="hidden"
+                                                                    value="{{ $eventbooking->subtotal }}"
+                                                                    name="subtotal" id="subtotalSave">
+                                                                <input type="hidden"
+                                                                    value="{{ $eventbooking->gst18 }}" name="gst18"
+                                                                    id="gst18">
+                                                                <input type="hidden"
+                                                                    value="{{ $eventbooking->gst12 }}" name="gst12"
+                                                                    id="gst12">
+                                                                <input type="hidden"
+                                                                    value="{{ $eventbooking->gst5 }}" name="gst5"
+                                                                    id="gst5">
                                                             </div>
                                                             <br>
                                                         </div>
@@ -254,11 +350,18 @@
                                                             <div class="mb-4 input_wrap">
                                                                 <label>Payment Mode</label>
                                                                 @php
-                                                                    $paymentMethods = ['UPI', 'Cash', 'Debit/Credit', 'Partial Payment'];
+                                                                    $paymentMethods = [
+                                                                        'UPI',
+                                                                        'Cash',
+                                                                        'Debit/Credit',
+                                                                        'Partial Payment',
+                                                                    ];
                                                                 @endphp
-                                                                <select name="payment_method" id="payment_method" class="form-select">
+                                                                <select name="payment_method" id="payment_method"
+                                                                    class="form-select">
                                                                     @foreach ($paymentMethods as $method)
-                                                                        <option value="{{ $method }}" {{ $eventbooking->payment_method == $method ? 'selected' : '' }}>
+                                                                        <option value="{{ $method }}"
+                                                                            {{ $eventbooking->payment_method == $method ? 'selected' : '' }}>
                                                                             {{ $method }}
                                                                         </option>
                                                                     @endforeach
@@ -270,13 +373,17 @@
                                                                 <div class="col-md-6">
                                                                     <div class="mb-4 input_wrap">
                                                                         <label>Advance Amount</label>
-                                                                        <input type="number" class="form-control" value="{{ $eventbooking->advance_amount }}" placeholder="Advance Amount" id="advance_amount" name="advance_amount">
+                                                                        <input type="number" class="form-control"
+                                                                            value="{{ $eventbooking->advance_amount }}"
+                                                                            placeholder="Advance Amount"
+                                                                            id="advance_amount" name="advance_amount">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-6 input_wrap time">
                                                                     <div class="mb-4 input_wrap">
                                                                         <label>Payment Method</label>
-                                                                        <select name="advance_payment_method" class="form-select">
+                                                                        <select name="advance_payment_method"
+                                                                            class="form-select">
 
                                                                             @if ($eventbooking->advance_payment_method == 'UPI')
                                                                                 <option value="UPI" selected>UPI
@@ -317,14 +424,21 @@
                                                                 <div class="col-md-6">
                                                                     <div class="mb-4 input_wrap">
                                                                         <label>Due Amount</label>
-                                                                        <input type="text" class="form-control" value="{{ $eventbooking->due_amount }}" placeholder="Due Amount" id="due_amount_show" disabled>
-                                                                        <input type="hidden" id="due_amount" value="{{ $eventbooking->due_amount }}" name="due_amount">
+                                                                        <input type="text" class="form-control"
+                                                                            value="{{ $eventbooking->due_amount }}"
+                                                                            placeholder="Due Amount"
+                                                                            id="due_amount_show" disabled>
+                                                                        <input type="hidden" id="due_amount"
+                                                                            value="{{ $eventbooking->due_amount }}"
+                                                                            name="due_amount">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-6 input_wrap time">
                                                                     <div class="mb-4 input_wrap">
                                                                         <label>Payment in installment</label>
-                                                                        <select name="payment_in_installment" id="payment_in_installment_method" class="form-select">
+                                                                        <select name="payment_in_installment"
+                                                                            id="payment_in_installment_method"
+                                                                            class="form-select">
                                                                             @if ($eventbooking->payment_in_installment == 'No')
                                                                                 <option value="No" selected>No
                                                                                 </option>
@@ -338,17 +452,24 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="row" id="installment_amount_box" style="display:none">
+                                                            <div class="row" id="installment_amount_box"
+                                                                style="display:none">
                                                                 <div class="col-md-6">
                                                                     <div class="mb-4 input_wrap">
                                                                         <label>Installment Amount</label>
-                                                                        <input type="number" class="form-control" class="" value="{{ $eventbooking->installment_amount }}" placeholder="Installment Amount" id="installment_amount" name="installment_amount">
+                                                                        <input type="number" class="form-control"
+                                                                            class=""
+                                                                            value="{{ $eventbooking->installment_amount }}"
+                                                                            placeholder="Installment Amount"
+                                                                            id="installment_amount"
+                                                                            name="installment_amount">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-6 input_wrap time">
                                                                     <div class="mb-4 input_wrap">
                                                                         <label>Payment Method</label>
-                                                                        <select name="installment_amount_method" class="form-select">
+                                                                        <select name="installment_amount_method"
+                                                                            class="form-select">
                                                                             @if ($eventbooking->installment_amount_method == 'UPI')
                                                                                 <option value="UPI" selected>UPI
                                                                                 </option>
@@ -376,13 +497,18 @@
                                                                 <div class="col-md-6">
                                                                     <div class="mb-4 input_wrap">
                                                                         <label>Final Installment</label>
-                                                                        <input type="text" class="form-control" value="{{ $eventbooking->final_installment }}" placeholder="Final Amount" id="final_amount" name="final_installment">
+                                                                        <input type="text" class="form-control"
+                                                                            value="{{ $eventbooking->final_installment }}"
+                                                                            placeholder="Final Amount"
+                                                                            id="final_amount"
+                                                                            name="final_installment">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-6 input_wrap time">
                                                                     <div class="mb-4 input_wrap">
                                                                         <label>Payment Method</label>
-                                                                        <select name="final_installment_method" class="form-select">
+                                                                        <select name="final_installment_method"
+                                                                            class="form-select">
                                                                             @if ($eventbooking->final_installment_method == 'UPI')
                                                                                 <option value="UPI" selected>UPI
                                                                                 </option>
@@ -409,7 +535,8 @@
                                                         <div class="col-md-12">
                                                             <div class="mb-4 input_wrap">
                                                                 <label>Payment Status</label>
-                                                                <select name="payment_status" id="payment_status" class="form-select">
+                                                                <select name="payment_status" id="payment_status"
+                                                                    class="form-select">
                                                                     @if ($eventbooking->payment_status == 'Open')
                                                                         <option value="Open" selected>Open</option>
                                                                         <option value="Paid">Paid</option>
@@ -428,13 +555,15 @@
                                                             </div>
                                                         </div>
                                                         <div class="tearm_condition">
-                                                            <input type="checkbox" id="term" name="term" value="" checked="checked">
+                                                            <input type="checkbox" id="term" name="term"
+                                                                value="" checked="checked">
                                                             <p>By Agreeing to the <b>Terms and Condition</b> of HappyOn
                                                             </p>
                                                         </div>
                                                         <div class="h_btn s_btn" style="display: flex; gap: 2px;">
                                                             <button class="btn btn-primary">Update Event</button>
-                                                            <a href="{{ route('events') }}" class="btn btn-secondary" style="margin-top: 0px;color: #fff; background-color: #6c757d; border-color: #6c757d;">Cancel</a>
+                                                            <a href="{{ route('events') }}" class="btn btn-secondary"
+                                                                style="margin-top: 0px;color: #fff; background-color: #6c757d; border-color: #6c757d;">Cancel</a>
                                                         </div>
                                                     </div>
                                                 </form>
@@ -666,7 +795,8 @@
 
             for (let i = 0; i < item_price.length; i++) {
                 if (item_qty[i] == 0 || item_price[i] == 0) {
-                    $('#errorMsg').html('<span class="alert alert-danger">Minimum Qty/Price should be 1.</span>').fadeOut(8000);
+                    $('#errorMsg').html('<span class="alert alert-danger">Minimum Qty/Price should be 1.</span>').fadeOut(
+                        8000);
                 } else {
                     let qty = parseFloat(item_qty[i]) || 0;
                     let price = parseFloat(item_price[i]) || 0;
@@ -720,7 +850,8 @@
                 discountRate = discountTotal;
             for (let i = 0; i < item_price.length; i++) {
                 if (item_qty[i] == 0 || item_price[i] == 0) {
-                    $('#errorMsg').html('<span class="alert alert-danger">Minimum Qty/Price should be 1.</span>').fadeOut(8000);
+                    $('#errorMsg').html('<span class="alert alert-danger">Minimum Qty/Price should be 1.</span>').fadeOut(
+                        8000);
                 } else {
                     let qty = parseFloat(item_qty[i]) || 0;
                     let price = parseFloat(item_price[i]) || 0;
@@ -783,6 +914,14 @@
 
             $('#totalAmount').text(totalAmount.toFixed(2));
             $('#chargeAmount').val(totalAmount.toFixed(2));
+            var advance_amount = parseFloat($('#advance_amount').val());
+            if (totalAmount && advance_amount && totalAmount > advance_amount) {
+                let due_amount_show = totalAmount - advance_amount;
+                $('#due_amount_show').val(due_amount_show.toFixed(2))
+                $('#due_amount').val(due_amount_show.toFixed(2))
+                $('#final_amount_show').val(due_amount_show.toFixed(2))
+                $('#final_amount').val(due_amount_show.toFixed(2))
+            }
 
             if (couponName) {
                 $('#couponValue').val(discountTotal.toFixed(2));
