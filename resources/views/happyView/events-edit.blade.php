@@ -677,6 +677,7 @@
                 $('#due_amount').val(0);
                 $('#due_amount_show').val(0);
             } else {
+
                 if ($('#payment_in_installment_method').val() == 'Yes') {
 
                     var installment_amount = parseFloat($('#installment_amount').val().toFixed(2));
@@ -694,9 +695,8 @@
 
                     }
                 } else {
-
-                    var advance_amount = parseFloat($('#advance_amount').val().toFixed(2));
-                    var totalAmount = parseFloat($('#chargeAmount').val().toFixed(2));
+                    var advance_amount = parseFloat($('#advance_amount').val());
+                    var totalAmount = parseFloat($('#chargeAmount').val());
                     if (totalAmount > advance_amount && advance_amount > 0) {
 
                         var final_amount = totalAmount - advance_amount;
