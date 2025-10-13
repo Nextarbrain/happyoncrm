@@ -873,14 +873,26 @@
                         // discountAmt = (basicAmt * discountRate) / 100;
                         // basicAmt = basicAmt - discountAmt;
                         // gstAmt = (basicAmt * taxRate) / 100;
+
+                        // if (taxRate !== 5) {
+                        //     discountAmt = (rowtotal * discountRate) / 100;
+                        // }
+                        // basicAmt = rowtotal - discountAmt;
+                        // gstAmt = (basicAmt * taxRatesList[taxRate]);
                         if (taxRate !== 5) {
                             discountAmt = (rowtotal * discountRate) / 100;
                         }
-                        basicAmt = rowtotal - discountAmt;
-                        gstAmt = (basicAmt * taxRatesList[taxRate]);
+
+                        subTotal = rowtotal - discountAmt;
+
+                        gstAmt = (subTotal * taxRatesList[taxRate]);
+
+                        basicAmt = gstAmt + basicAmt;
+
 
                     }
-                    subTotal += basicAmt;
+                    // subTotal += basicAmt;
+                    // totalDiscount += discountAmt;
                     totalDiscount += discountAmt;
                     if (taxRate === 18) gst18total += gstAmt;
                     else if (taxRate === 12) gst12total += gstAmt;
