@@ -196,7 +196,7 @@
                                                                                     class="form-control hours"
                                                                                     id="k_hour_{{ $i }}"
                                                                                     name="hours[]"
-                                                                                    value="{{ $value['hours'] }}"
+                                                                                    value="{{ $value['hours'] == 0 ? 'Unlimited' : $value['hours'] }}"
                                                                                     readonly>
                                                                                 <input type="hidden"
                                                                                     name="old_hour[]"
