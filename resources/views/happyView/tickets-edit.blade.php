@@ -177,7 +177,7 @@
                                                                             <div class="mb-3 input_wrap dark">
                                                                                 <label>Price</label>
                                                                                 <input type="number"
-                                                                                    class="form-control"
+                                                                                    class="form-control kid_price"
                                                                                     id="k_price_{{ $i }}"
                                                                                     placeholder="Price"
                                                                                     name="kid_price[]"
@@ -192,15 +192,32 @@
                                                                         <div class="col-md-3 ">
                                                                             <div class="mb-4 input_wrap dark">
                                                                                 <label>Hours <span>*</span></label>
-                                                                                <input type="text"
+                                                                                <select name="hours[]"
+                                                                                    id="k_hour_{{ $i }}"
+                                                                                    class="form-select hours" required>
+                                                                                    <option value=""
+                                                                                        {{ $value['hours'] == '' ? 'selected' : '' }}>
+                                                                                        0</option>
+                                                                                    <option value="1"
+                                                                                        {{ $value['hours'] == '1' ? 'selected' : '' }}>
+                                                                                        1</option>
+                                                                                    <option value="2"
+                                                                                        {{ $value['hours'] == '2' ? 'selected' : '' }}>
+                                                                                        2</option>
+                                                                                    <option value="Unlimited"
+                                                                                        {{ $value['hours'] == 0 ? 'selected' : '' }}>
+                                                                                        Unlimited</option>
+                                                                                </select>
+                                                                                {{-- <input type="text"
                                                                                     class="form-control hours"
                                                                                     id="k_hour_{{ $i }}"
                                                                                     name="hours[]"
                                                                                     value="{{ $value['hours'] == 0 ? 'Unlimited' : $value['hours'] }}"
-                                                                                    readonly>
+                                                                                    readonly> --}}
                                                                                 <input type="hidden"
                                                                                     name="old_hour[]"
                                                                                     id="kh_hour_{{ $i }}"
+                                                                                    class="kh_hour"
                                                                                     value="{{ $value['hours'] }}">
                                                                             </div>
                                                                         </div>
@@ -671,25 +688,36 @@
         let couponDiscountAmt = {{ $coupon_discount ?? 0 }};
         let couponType = @json($coupon_type ?? '');
         //Kids Hours Options
-        $(document).on('change', 'select[id^="kid_hrs"]', function() {
+        $(document).on('change', 'select[id^="k_hour_"]', function() {
+            const cVal = $(this).val();
+            var dateInput = $('#date').val() || new Date().toISOString().split("T")[0];
             var selectBoxId = $(this);
+
             var inputTag = selectBoxId.closest('.child-div').find('.kid_price');
+            var inputKhHours = selectBoxId.closest('.child-div').find('.kh_hour');
+            var inputKhPrice = selectBoxId.closest('.child-div').find('.kh_price');
+
             // Make the AJAX call to fetch data from the server
             var baseUrl = "{{ URL::to('/') }}";
             $.ajax({
                 url: baseUrl + '/get-price-kids',
                 type: 'GET',
                 data: {
-                    option: $(this).val()
+                    option: $(this).val(),
+                    date: dateInput,
+                    branch_id: $('#hiddenBranchId').val(),
                 },
                 success: function(data) {
                     // Update the input tags with the received data
+                    inputKhHours.val(cVal)
                     inputTag.val(data);
                     var sum = 0;
                     $('.kid_price').each(function() {
                         var val = parseFloat($(this).val()) || 0;
                         sum += val;
                     });
+
+                    inputKhPrice.val(sum)
                     var basicAmtKidPrice = (sum / 1.18);
                     $("#kidsOnlyPrice").val(basicAmtKidPrice.toFixed(2));
 
@@ -700,8 +728,9 @@
                     updateGST(totalDeductGst, ['cgst18Total', 'sgst18Total'], 'gst18');
 
                     let finalAmount = sum;
+                    $('#newTotalAmount').val(finalAmount);
                     document.getElementById('totalAmount').innerHTML = '₹ ' + finalAmount.toFixed(2);
-                    // $("#chargeAmount").val(finalAmount.toFixed(2));
+                    $("#chargeAmount").val(finalAmount.toFixed(2));
                 },
                 error: function(xhr, status, error) {
                     console.log(error);
@@ -799,28 +828,38 @@
 
 
             const selectId = extraTimeDDown.id;
+            console.log("selectId => ", selectId);
+
             const kidIndex = parseInt(selectId.split("_")[1]);
 
             let inputId = `k_price_${kidIndex}`;
             let inputIdHour = `k_hour_${kidIndex}`;
+            console.log("inputIdHour => ", inputIdHour);
+            console.log("inputId => ", inputId);
 
             const targetHourElement = document.getElementById(inputIdHour);
             const hiddenHourElement = document.getElementById(`kh_hour_${kidIndex}`);
             const extraTimePrice = document.getElementById("extraTimePrice");
+            console.log("targetHourElement => ", targetHourElement);
+            console.log("hiddenHourElement => ", hiddenHourElement);
+            console.log("extraTimePrice => ", extraTimePrice);
 
             if (hiddenHourElement.value == 'Unlimited') {
                 alert('Extra Time Not Allowed on unlimited Hours');
                 return false;
             }
+
             const targetPriceElement = document.getElementById(inputId);
             const hiddenPriceElement = document.getElementById(`kh_price_${kidIndex}`);
+            console.log("extraTimeValue => ", extraTimeValue);
+            console.log("hiddenPriceElement.value => ", hiddenPriceElement.value);
 
             if (extraTimeValue > 0) {
-                targetHourElement.value = parseFloat(hiddenHourElement.value) + addedHour + " hours";
-                targetPriceElement.value = parseFloat(hiddenPriceElement.value) + addedPrice;
+                targetHourElement.value = parseFloat(hiddenHourElement.value);
+                targetPriceElement.value = parseFloat(targetPriceElement.value) + addedPrice;
                 extraTimePrice.value = parseFloat(extraTimePrice.value) + addedHour;
             } else {
-                targetPriceElement.value = parseFloat(hiddenPriceElement.value);
+                targetPriceElement.value = parseFloat(targetPriceElement.value);
                 targetHourElement.value = parseFloat(hiddenHourElement.value);
             }
             reCalculateWithExtraTime();
@@ -846,9 +885,14 @@
                 priceAmt += valP;
             });
             let differenceAmt = 0;
+            console.log("priceAmt => ", priceAmt);
+
             if (hiddenOldPriceAmt !== priceAmt) {
                 differenceAmt = priceAmt - hiddenOldPriceAmt;
             }
+            console.log(differenceAmt, "---differenceAmt")
+            console.log("hiddenTotalAmtElement => ", hiddenTotalAmtElement.value);
+
             let newTotal = parseFloat(hiddenTotalAmtElement.value) + differenceAmt;
             newTotalAmount.value = newTotal;
             totalAmtElement.innerHTML = newTotal;
@@ -1155,6 +1199,7 @@
             form.submit();
         });
     </script>
+
 </body>
 
 </html>

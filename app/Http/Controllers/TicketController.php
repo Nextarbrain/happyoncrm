@@ -460,7 +460,7 @@ class TicketController extends Controller
             $isExtraTimePurchased = UserProduct::where('user_id', $id)->where('product_name', '=', "Extra Time",)->first();
             $extraTimePrice = 0;
             if ($isExtraTimePurchased) {
-                $extraTimePrice = $isExtraTimePurchased->product_price;
+                $extraTimePrice = $isExtraTimePurchased->price;
             }
             $paymentMethod = PaymentMethod::where('user_id', $id)->first();
             $coupon_type = '';
@@ -477,7 +477,6 @@ class TicketController extends Controller
             if ($booking_date < $now) {
                 $isPastDate = true;
             }
-
             return view('happyView.tickets-edit', compact('coupon_type',  'coupon_discount', 'isPastDate', 'extraTimePrice', 'basicAmtArr', 'user', 'kid', 'product', 'paymentMethod', 'productData', 'branches', 'branchId'));
         } else {
             abort(401);
@@ -486,6 +485,7 @@ class TicketController extends Controller
 
     public function updateTickets(Request $request)
     {
+        // dd($request->all());
         hasPermission('tickets-edit');
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
         if (!$branchId) {
@@ -1200,6 +1200,33 @@ class TicketController extends Controller
                         $newHours = str_replace($search, '', $newHours);
                     }
                     $kidsDetails->extra_hour = $newHours - $kidsDetails->hours;
+                } elseif($request->input('hours')[$i] != null) {
+                    $kidsDetails = Kid::where('id', $row)->first();
+                    if ($request->input('hours')[$i] != 0) {
+                        $qty = $kidsDetails->qty ? $kidsDetails->qty : 0;
+                        $kidsDetails->qty = $qty + 1;
+                        $oldPrice = $kidsDetails->kidPrice;
+                        // dd($oldPrice, $request->input('kid_price')[$i]);
+                        $kidsDetails->kidPrice = $request->input('kid_price')[$i];
+
+                        $oldEndTime = LaravelCarbon::createFromFormat('H:i:s', $kidsDetails->end_time);
+                        $oldHours = (float) $kidsDetails->hours;
+
+                        $startTime = (clone $oldEndTime)->subHours(floor($oldHours));
+                        if (fmod($oldHours, 1) > 0) {
+                            $startTime->subMinutes(30);
+                        }
+
+                        $newHours = (float) ($request->input('hours')[$i] ?? 0);
+                        $kidsDetails->hours = $newHours;
+
+                        $newEndTime = (clone $startTime)->addHours(floor($newHours));
+                        if (fmod($newHours, 1) > 0) {
+                        $newEndTime->addMinutes(30);
+                        }
+
+                        $kidsDetails->end_time = $newEndTime->format('H:i:s');
+                    }
                 }
                 $kidsDetails->save();
             }
