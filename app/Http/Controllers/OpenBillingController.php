@@ -261,7 +261,7 @@ class OpenBillingController extends Controller
     public function deleteOpenBilling(Request $request)
     {
         $admin = Admin::find(auth('admin')->user()->id);
-        if ($admin->has_delete == 1) {
+        if (can('delete-openbilling')) {
             $selectedItems = $request->input('selectedItems');
             if (strtolower($admin->role) != 'Super Admin' && strtolower($admin->role) != 'Admin') {
                 $data = OpenBilling::whereIn('id', $selectedItems)->get();

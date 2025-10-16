@@ -164,7 +164,7 @@ class UserDataTable extends DataTable
             })
             ->editColumn('hours', function ($user) {
                 $hours = (isset($user->firstKid->hours) ? (float)$user->firstKid->hours : 0) + (isset($user->firstKid->extra_hour) ? (float)$user->firstKid->extra_hour : 0);
-                return $hours;
+                return $hours == 0 ? 'Unlimited' : $hours;
             })
             ->addColumn('hours', function ($user) {
                 $hours = (isset($user->firstKid->hours) ? (float)$user->firstKid->hours : 0) + (isset($user->firstKid->extra_hour) ? (float)$user->firstKid->extra_hour : 0);
