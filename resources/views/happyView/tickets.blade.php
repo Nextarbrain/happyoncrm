@@ -101,7 +101,7 @@
                                                                 <input type="date" class="form-control"
                                                                     placeholder="date" name="date" id="date"
                                                                     required
-                                                                    {{ $branchId == 8 || $branchId == 2 ? '' : 'readonly' }}>
+                                                                    {{ $branchId == 8 || $branchId == 2 || $branchId == 1 ? '' : 'readonly' }}>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6 input_wrap dark time">
@@ -110,7 +110,7 @@
                                                                 <input type="time" class="form-control"
                                                                     placeholder="Time" name="time" id="time"
                                                                     required
-                                                                    {{ $branchId == 8 || $branchId == 2 ? '' : 'readonly' }}>
+                                                                    {{ $branchId == 8 || $branchId == 2 || $branchId == 1 ? '' : 'readonly' }}>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">

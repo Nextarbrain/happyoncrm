@@ -175,7 +175,9 @@
                                                             {{ $timer }}</td>
                                                         <td>{{ count($user_booking->kids) }}</td>
                                                         <!-- <td>{{ $user_booking->kids[0]->hours ?? null }}</td> -->
-                                                        <td>{{ optional($user_booking->kids->first())->hours ?? '' }}
+                                                        <td>{{ optional($user_booking->kids->first())->hours == 0
+                                                            ? 'Unlimited'
+                                                            : optional($user_booking->kids->first())->hours }}
                                                         </td>
                                                         <td>{{ $user_booking->paymentInfo?->payment_method ?? '' }}
                                                         </td>
