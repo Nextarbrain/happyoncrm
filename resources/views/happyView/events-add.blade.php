@@ -679,6 +679,7 @@
             item_tax
         }, discountTotal = 0) {
             let subTotal = 0,
+                total = 0,
                 gst18total = 0,
                 gst12total = 0,
                 gst5total = 0,
@@ -719,22 +720,18 @@
                         // gstAmt = (basicAmt * taxRate) / 100;
                         // basicAmt = rowtotal / newTaxRatesList[taxRate];
 
-                        if (taxRate !== 5) {
-                            discountAmt = (rowtotal * discountRate) / 100;
-                        }
+                        // if (taxRate !== 5) {
+                        discountAmt = (rowtotal * discountRate) / 100;
+                        // }
 
-                        subTotal = rowtotal - discountAmt;
+                        total = rowtotal - discountAmt;
 
-                        gstAmt = (subTotal * taxRatesList[taxRate]);
+                        gstAmt = (total * taxRatesList[taxRate]);
 
                         basicAmt = gstAmt + basicAmt;
 
-
-                        // basicAmt = basicAmt - discountAmt;
-
-                        // gstAmt = (basicAmt * taxRatesList[taxRate]);
                     }
-                    // subTotal += basicAmt;
+                    subTotal += total;
 
                     totalDiscount += discountAmt;
                     if (taxRate === 18) gst18total += gstAmt;
