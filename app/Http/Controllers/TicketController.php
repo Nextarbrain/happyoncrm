@@ -485,7 +485,6 @@ class TicketController extends Controller
 
     public function updateTickets(Request $request)
     {
-        // dd($request->all());
         hasPermission('tickets-edit');
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
         if (!$branchId) {
@@ -1153,11 +1152,10 @@ class TicketController extends Controller
         $user = User::where('id', $id)->first();
         $booking_date = isset($user['event']->booking_date) ? $user['event']->booking_date : null;
         $now = now()->format('Y-m-d');
-        if ($booking_date < $now) {
-            return redirect('/customers');
-        }
+        // if ($booking_date < $now) {
+        //     return redirect('/customers');
+        // }
         $userDetail = UserDetail::where('user_id', $id)->first();
-
         // update payments
         $paymentMethod = PaymentMethod::where('user_id', $id)->first();
         $paymentMethod->amounts = $request->input('newTotalAmount');
@@ -1167,14 +1165,13 @@ class TicketController extends Controller
         $paymentMethod->gst12 = ($request->input('gst12') !== '0.00') ? $request->input('gst12') : null;
         $paymentMethod->gst5 = ($request->input('gst5') !== '0.00') ? $request->input('gst5') : null;
         $paymentMethod->save();
-
         // update kids table for extra time
         $kidids = $request->input('kidids');
         if ($kidids) {
             $isExtraTimeAdded = 0;
             foreach ($kidids as $i => $row) {
                 $kidsDetails = Kid::where('id', $row)->first();
-                if ($request->input('extra_time_select')[$i] != null) {
+                if ($request->input('extra_time_select') && $request->input('extra_time_select')[$i] != null) {
                     $isExtraTimeAdded = 1;
                     $qty = $kidsDetails->qty ? $kidsDetails->qty : 0;
                     $kidsDetails->qty = $qty + 1;
@@ -1273,11 +1270,14 @@ class TicketController extends Controller
         $end_datetime = isset($user['kid']->end_time) ? $user['kid']->end_time : null;
         $booking_date = isset($user['event']->booking_date) ? $user['event']->booking_date : null;
 
-        $mobile = "91" . $userDetail->phone_no;
-        $added_time = "0:" . $request->input('extra_time_select')[0] . ":00";
-        $msg = "Your Playtime has been extended Updated details are: Date: $booking_date Time-In: $start_datetime Updated Time-Out: $end_datetime Added Time: $added_time Have a Gadget Free time of HappyOn Play!	";
-        $template_id = "1707168001515557376";
-        sendsms($mobile, $msg, $template_id);
+        if($request->input('extra_time_select')) {
+            $mobile = "91" . $userDetail->phone_no;
+            $added_time = "0:" . $request->input('extra_time_select')[0] . ":00";
+            $msg = "Your Playtime has been extended Updated details are: Date: $booking_date Time-In: $start_datetime Updated Time-Out: $end_datetime Added Time: $added_time Have a Gadget Free time of HappyOn Play!	";
+            $template_id = "1707168001515557376";
+            sendsms($mobile, $msg, $template_id);
+        }
+
 
         $items = [];
         if (isset($request["product_name"]) && is_array($request["product_name"])) {
