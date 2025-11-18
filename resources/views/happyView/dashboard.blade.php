@@ -363,7 +363,7 @@
                                     </div>
 
                                     <div class="col-md-4">
-                                        <a href="{{ url('/upcomingbirthdays') }}">
+                                        <a href="{{ url('/upcomingbirthdays/' . $branchId) }}">
                                             <h6>Upcoming Birthdays</h6>
                                         </a>
                                         <div class="row">

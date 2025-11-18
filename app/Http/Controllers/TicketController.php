@@ -59,7 +59,7 @@ class TicketController extends Controller
 
     function upcomingBirthdaysView(Request $request)
     {
-        $branchId = auth('admin')->user()->branch_id ?? null;
+        $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
         $currentDate = LaravelCarbon::today();
         $endDate = $currentDate->copy()->addDays(60);
 
