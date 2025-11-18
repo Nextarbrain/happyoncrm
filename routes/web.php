@@ -110,7 +110,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::delete('/delete-user', [TicketController::class, 'deleteUser']);
     Route::delete('/delete-customer', [TicketController::class, 'deleteCustomer']);
     Route::get('/customer-filter', [TicketController::class, 'filterCustomer']);
-    Route::get('/upcomingbirthdays', [TicketController::class, 'upcomingBirthdaysView'])->name('upcomingBirthdays');
+    Route::get('/upcomingbirthdays/{branch_id?}', [TicketController::class, 'upcomingBirthdaysView'])->name('upcomingBirthdays');
     Route::post('/sales-report', [TicketController::class, 'salesReport'])->name('sales-report');
 
     /******************* Membership Routes **************/
