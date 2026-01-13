@@ -771,9 +771,30 @@ class MembershipController extends Controller
         try {
             if (can('membership-delete')) {
                 $selectedItems = $request->input('selectedItems');
-                $integerArray = array_map('intval', $selectedItems);
-                MembershipHistory::whereIn('membership_buyer_id', $integerArray)->delete();
-                MemberShipBuy::whereIn('id', $integerArray)->delete();
+                $userIds = collect($selectedItems)->pluck('userId')->toArray();
+                $membershipId = collect($selectedItems)->pluck('membershipId')->toArray();
+                $paymentIds = collect($selectedItems)->pluck('paymentId')->filter()->toArray();
+                $userDetail = collect($selectedItems)->pluck('userdetailId')->filter()->toArray();
+                $kidId = collect($selectedItems)->pluck('kidId')->filter()->toArray();
+                MembershipHistory::whereIn('membership_buyer_id', $membershipId)->delete();
+                MemberShipBuy::whereIn('id', $membershipId)->delete();
+
+                if (!empty($userIds)) {
+                    User::whereIn('id', $userIds)->delete();
+                }
+
+                if (!empty($paymentIds)) {
+                    PaymentMethod::whereIn('id', $paymentIds)->delete();
+                }
+
+                 if (!empty($userDetail)) {
+                    UserDetail::whereIn('id', $userDetail)->delete();
+                }
+
+                if (!empty($kidId)) {
+                    Kid::whereIn('id', $kidId)->delete();
+                }
+
                 return response()->json(['success' => true]);
             } else {
                 return response()->json(['success' => false], 400);

@@ -109,6 +109,10 @@
                                                     <tr>
                                                         <td><input name="member-check" type="checkbox"
                                                                 data-item-id="{{ $membershipUser->id }}"
+                                                                data-item-payment="{{ $membershipUser->paymentInfo->id }}"
+                                                                data-item-userdetail="{{ optional($membershipUser->userDetails)->id }}"
+                                                                data-item-kids="{{ optional($membershipUser->kid)->id }}"
+                                                                data-item-user="{{ optional($membershipUser->user)->id }}"
                                                                 class="membership_checkbox"></td>
                                                         <td class="text-capitalize">
                                                             {{ optional($membershipUser['user'])->name ?? '' }}
@@ -548,7 +552,17 @@
             var selectedItems = [];
             $('.membership_checkbox:checked').each(function() {
                 var membershipId = $(this).data('item-id');
-                selectedItems.push(membershipId);
+                var paymentId = $(this).data('item-payment');
+                var userdetailId = $(this).data('item-userdetail');
+                var kidId = $(this).data('item-kids');
+                var userId = $(this).data('item-user');
+                selectedItems.push({
+                    membershipId: membershipId,
+                    paymentId: paymentId,
+                    userdetailId: userdetailId,
+                    kidId: kidId,
+                    userId: userId,
+                });
             });
             var baseUrl = "{{ URL::to('/') }}";
             if (selectedItems.length > 0) {
