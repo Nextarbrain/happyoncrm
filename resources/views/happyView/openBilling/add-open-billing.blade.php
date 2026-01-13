@@ -107,7 +107,7 @@
                                                             <div class="mb-4 input_wrap dark">
                                                                 <label>Current Date</label>
                                                                 <input type="date" class="form-control"
-                                                                    placeholder="date" id="date" required
+                                                                    placeholder="date" id="date" name="date"
                                                                     {{ $branchId == 8 || $branchId == 2 ? '' : 'readonly' }}>
                                                             </div>
                                                         </div>

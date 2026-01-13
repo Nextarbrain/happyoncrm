@@ -161,13 +161,13 @@ class OpenBillingController extends Controller
         $request->validate([
             'billing_name' => 'required',
         ]);
+        $dateInput = $request->input('date');
         // $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
         if (!$branchId) {
             return redirect()->back()->with('error', 'Please select a branch first.');
         }
         $openbilling = new OpenBilling();
-
 
         $openbilling->phone = $request->phone;
         $openbilling->bill_name = $request->billing_name;
@@ -183,7 +183,7 @@ class OpenBillingController extends Controller
         $openbilling->gst18 = $request->gst18;
         $openbilling->gst12 = $request->gst12;
         $openbilling->gst5 = $request->gst5;
-
+        $openbilling->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
 
         $openbilling->save();
 

@@ -240,6 +240,7 @@ class MembershipController extends Controller
     public function addMembershipPlan(Request $request)
     {
         hasPermission('membership-add');
+        $dateInput = $request->input('date');
         $userdetail = UserDetail::with('user')->where('phone_no', $request->input('phone'))->where('membership_plan', 1)->first();
         $getPlan = MembershipPlan::where('id', $request->input('membershipPlan'))->first();
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
@@ -342,6 +343,7 @@ class MembershipController extends Controller
                     $userSave->branch_id = $branchId;
                     $userSave->email = $request->input('name') . rand(10, 100) . '@gmail.com';
                     $userSave->role = 2;
+                    $userSave->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
                     $userSave->save();
                     if ($userSave->id) {
                         $userDetails = new UserDetail();
@@ -406,6 +408,7 @@ class MembershipController extends Controller
                             $amount->couponcode = $request->coupon_code;
                         }
                         couponCountUpdate($request->coupon_code);
+                        $amount->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
                         $amount->save();
 
                         $mobile = "91" . $request->input('phone');
