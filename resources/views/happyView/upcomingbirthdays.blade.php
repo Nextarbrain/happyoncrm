@@ -55,18 +55,13 @@
                                         </div>
                                     </div>
                                     <div class="col-md-4">
-
                                         <div class="count" id="user_delete">
                                             <i class="fa fa-trash-o  m-0" aria-hidden="true"></i>
                                         </div>
                                     </div>
-
-
                                 </div>
-
-
                             </div>
-                            <div class="user_list">
+                            <div class="mt-2" style="margin-left:9rem;">
                                 <div class="row align-items-center text-center">
                                     <div class="col-md-8">
                                         <div class="col">
@@ -88,7 +83,7 @@
                                                             placeholder="To Date">
                                                     </div>
                                                     @if (auth('admin')->user()->branch_id == null && auth('admin')->user()->isSuperAdmin == 1)
-                                                        <div class="mb-2 mx-2">
+                                                        <div class="mb-2 mx-1">
                                                             <select name="branch_id" class="form-control"
                                                                 id="branch_id">
                                                                 <option value="">-- All Branches --</option>
