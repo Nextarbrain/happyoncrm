@@ -132,11 +132,13 @@ class TicketController extends Controller
         if (!$branchId) {
             return redirect()->back()->with('error', 'Please select a branch first.');
         }
+        $dateInput = $request->input('date');
         $userSave = new User();
         $userSave->name = ucfirst($request->input('name_of_kid'));
         $userSave->branch_id = $branchId;
         $userSave->email = $request->input('name_of_kid') . rand(10000, 999999);
         $userSave->role = 1;
+        $userSave->created_at = (!empty($dateInput) && LaravelCarbon::parse($dateInput)->lte(now())) ? LaravelCarbon::parse($dateInput)->startOfDay() : now();
         $userSave->save();
         if ($userSave->id) {
             $event = new Event();
@@ -224,6 +226,7 @@ class TicketController extends Controller
             $amount->subTotal = $request->input('subTotal');
 
             $amount->amounts = $request->input('totalAmount');
+            $amount->created_at = (!empty($dateInput) && LaravelCarbon::parse($dateInput)->lte(now())) ? LaravelCarbon::parse($dateInput)->startOfDay() : now();
             $amount->save();
 
             //invoice generate
