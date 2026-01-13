@@ -60,13 +60,21 @@ class TicketController extends Controller
     function upcomingBirthdaysView(Request $request)
     {
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
-        $currentDate = LaravelCarbon::today();
-        $endDate = $currentDate->copy()->addDays(60);
+        $branches = Branch::select('id', 'name', 'type')->where('status', 'Active')->get()->toArray();
 
+        $currentDate = LaravelCarbon::today();
+        $endDate = $currentDate->copy()->addDays(5);
         $start = $currentDate->format('m-d');
         $end   = $endDate->format('m-d');
 
-        $user = UserDetail::where(function ($q) use ($start, $end) {
+        if ($request->filled('fromDate')) {
+            $start = LaravelCarbon::parse($request->fromDate)->format('m-d');
+        }
+
+        if ($request->filled('toDate')) {
+            $end = LaravelCarbon::parse($request->toDate)->format('m-d');
+        }
+        $user = UserDetail::with('branch')->where(function ($q) use ($start, $end) {
             if ($start <= $end) {
                 $q->whereRaw("DATE_FORMAT(dob, '%m-%d') BETWEEN ? AND ?", [$start, $end]);
             } else {
@@ -80,7 +88,6 @@ class TicketController extends Controller
         }
 
         $user = $user->orderByRaw("DATE_FORMAT(dob, '%m-%d')")->get();
-
         // $currentDate = LaravelCarbon::today();
         // $endDate = $currentDate->copy()->addDays(60);
         // $user = UserDetail::whereRaw("DATE_FORMAT(dob, '%m-%d') BETWEEN DATE_FORMAT('{$currentDate}', '%m-%d') AND DATE_FORMAT('{$endDate}', '%m-%d')");
@@ -88,7 +95,7 @@ class TicketController extends Controller
         //     $user->where('branch_id', $branchId);
         // }
         // $user = $user->orderByRaw("DATE_FORMAT(dob, '%m-%d')")->get();
-        return view('happyView.upcomingbirthdays', compact('user'));
+        return view('happyView.upcomingbirthdays', compact('user','branches','branchId'));
     }
 
     function filterCustomer(Request $request)
