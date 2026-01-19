@@ -432,6 +432,7 @@ class MembershipController extends Controller
                 $userSave->branch_id = $branchId;
                 $userSave->email = $request->input('name') . rand(10, 100) . '@gmail.com';
                 $userSave->role = 2;
+                $userSave->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
                 $userSave->save();
                 if ($userSave->id) {
                     $userDetails = new UserDetail();
@@ -494,6 +495,7 @@ class MembershipController extends Controller
                         $amount->couponcode = $request->coupon_code;
                     }
                     couponCountUpdate($request->coupon_code);
+                    $amount->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
                     $amount->save();
 
                     $mobile = "91" . $request->input('phone');
@@ -517,6 +519,7 @@ class MembershipController extends Controller
             $userSave->branch_id = $branchId;
             $userSave->email = $request->input('name') . rand(10, 100) . '@gmail.com';
             $userSave->role = 2;
+            $userSave->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
             $userSave->save();
             if ($userSave->id) {
                 $userDetails = new UserDetail();
@@ -579,6 +582,7 @@ class MembershipController extends Controller
                     $amount->couponcode = $request->coupon_code;
                 }
                 couponCountUpdate($request->coupon_code);
+                $amount->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
                 $amount->save();
 
                 $mobile = "91" . $request->input('phone');
