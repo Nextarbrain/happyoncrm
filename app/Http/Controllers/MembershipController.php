@@ -285,6 +285,7 @@ class MembershipController extends Controller
 
                     // $member->time = $request->input('time');
                     $member->time = now()->format('H:i');
+                    $member->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
                     $member->save();
 
                     $membershipRenewabel = new MembershipBuyRenewable();
@@ -376,6 +377,7 @@ class MembershipController extends Controller
 
                         // $member->time = $request->input('time');
                         $member->time = now()->format('H:i');
+                        $member->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
                         $member->save();
                         $membershipRenewabel = new MembershipBuyRenewable();
                         $membershipRenewabel->amount = $request->input('totalamount');
@@ -462,6 +464,7 @@ class MembershipController extends Controller
                     $dateAfter1Year = $date->addYear();
                     $member->renewal_date = $dateAfter1Year->format('Y-m-d');
                     $member->time = now()->format('H:i');
+                    $member->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
                     $member->save();
 
                     $membershipRenewabel = new MembershipBuyRenewable();
@@ -549,6 +552,7 @@ class MembershipController extends Controller
                 $dateAfter1Year = $date->addYear();
                 $member->renewal_date = $dateAfter1Year->format('Y-m-d');
                 $member->time = now()->format('H:i');
+                $member->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
                 $member->save();
 
                 $membershipRenewabel = new MembershipBuyRenewable();
