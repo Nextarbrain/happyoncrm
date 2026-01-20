@@ -31,7 +31,7 @@ class UserDataTable extends DataTable
         $userData = $users->with('paymentInfo', 'event', 'userDetails', 'firstKid')->latest();
         return DataTables::of($userData)
             ->addColumn('checkbox', function ($user) {
-                return '<input type="checkbox" name="users[]" class="users_checkbox" value="' . $user->id . '" data-item-id="' . $user->id . '" data-item-paymentId="' . (isset($user->paymentInfo->id) ? $user->paymentInfo->id : '') . '" data-item-date="' . (isset($user->event->booking_date) ? $user->event->booking_date : '') . '">';
+                return '<input type="checkbox" name="users[]" class="users_checkbox" value="' . $user->id . '" data-item-id="' . $user->id . '" data-item-paymentId="' . (isset($user->paymentInfo->id) ? $user->paymentInfo->id : '') . '" data-item-date="' . (isset($user->event->booking_date) ? $user->event->booking_date : '') . '" data-item-userdetail="'.(isset($user->userDetails->id) ? $user->userDetails->id : '').'">';
             })
             ->editColumn('name', function ($user) {
                 if (isset($user->paymentInfo) && $user->paymentInfo->payment_method == "Card") {
