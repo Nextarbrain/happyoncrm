@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class UserDetail extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     public function scopeUpcomingBirthdays($query)
     {
         return $query->whereRaw('DATE_FORMAT(dob, "%m-%d") >= DATE_FORMAT(CURRENT_DATE, "%m-%d")')
@@ -17,5 +18,10 @@ class UserDetail extends Model
     {
         return $this->belongsTo(User::class);
     }
-    
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class, 'branch_id');
+    }
+
 }

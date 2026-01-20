@@ -87,7 +87,7 @@
         $(document).ready(function() {
             if ($('#custom-toolbar').length) {
                 $('#custom-toolbar').html(
-                    `<a href="#" id="user_delete" class="btn btn-sm me-2">@if (can('tickets-delete'))
+                    `<a href="javascript:void(0)" id="user_delete" class="btn btn-sm me-2">@if (can('tickets-delete'))
                 <i class="fa fa-trash-o fa-lg" aria-hidden="true"></i>@endif</a>@if (can('customers-add'))
                 <a href="{{ url('/tickets') }}" class="btn btn-sm btn-primary">Add New +</a> @endif`
                 );
@@ -101,11 +101,13 @@
                     var userId = $(this).data('item-id');
                     var paymentId = $(this).data('item-paymentid');
                     var date = $(this).data('item-date');
+                    var userdetail = $(this).data('item-userdetail');
 
                     selectedItems.push({
                         userId: userId,
                         paymentId: paymentId || '',
                         date: date,
+                        userdetail: userdetail || '',
                     });
                 });
 
