@@ -60,13 +60,21 @@ class TicketController extends Controller
     function upcomingBirthdaysView(Request $request)
     {
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
-        $currentDate = LaravelCarbon::today();
-        $endDate = $currentDate->copy()->addDays(60);
+        $branches = Branch::select('id', 'name', 'type')->where('status', 'Active')->get()->toArray();
 
+        $currentDate = LaravelCarbon::today();
+        $endDate = $currentDate->copy()->addDays(5);
         $start = $currentDate->format('m-d');
         $end   = $endDate->format('m-d');
 
-        $user = UserDetail::where(function ($q) use ($start, $end) {
+        if ($request->filled('fromDate')) {
+            $start = LaravelCarbon::parse($request->fromDate)->format('m-d');
+        }
+
+        if ($request->filled('toDate')) {
+            $end = LaravelCarbon::parse($request->toDate)->format('m-d');
+        }
+        $user = UserDetail::with('branch')->where(function ($q) use ($start, $end) {
             if ($start <= $end) {
                 $q->whereRaw("DATE_FORMAT(dob, '%m-%d') BETWEEN ? AND ?", [$start, $end]);
             } else {
@@ -80,7 +88,6 @@ class TicketController extends Controller
         }
 
         $user = $user->orderByRaw("DATE_FORMAT(dob, '%m-%d')")->get();
-
         // $currentDate = LaravelCarbon::today();
         // $endDate = $currentDate->copy()->addDays(60);
         // $user = UserDetail::whereRaw("DATE_FORMAT(dob, '%m-%d') BETWEEN DATE_FORMAT('{$currentDate}', '%m-%d') AND DATE_FORMAT('{$endDate}', '%m-%d')");
@@ -88,7 +95,7 @@ class TicketController extends Controller
         //     $user->where('branch_id', $branchId);
         // }
         // $user = $user->orderByRaw("DATE_FORMAT(dob, '%m-%d')")->get();
-        return view('happyView.upcomingbirthdays', compact('user'));
+        return view('happyView.upcomingbirthdays', compact('user','branches','branchId'));
     }
 
     function filterCustomer(Request $request)
@@ -125,11 +132,13 @@ class TicketController extends Controller
         if (!$branchId) {
             return redirect()->back()->with('error', 'Please select a branch first.');
         }
+        $dateInput = $request->input('date');
         $userSave = new User();
         $userSave->name = ucfirst($request->input('name_of_kid'));
         $userSave->branch_id = $branchId;
         $userSave->email = $request->input('name_of_kid') . rand(10000, 999999);
         $userSave->role = 1;
+        $userSave->created_at = (!empty($dateInput) && LaravelCarbon::parse($dateInput)->lte(now())) ? LaravelCarbon::parse($dateInput)->startOfDay() : now();
         $userSave->save();
         if ($userSave->id) {
             $event = new Event();
@@ -217,6 +226,7 @@ class TicketController extends Controller
             $amount->subTotal = $request->input('subTotal');
 
             $amount->amounts = $request->input('totalAmount');
+            $amount->created_at = (!empty($dateInput) && LaravelCarbon::parse($dateInput)->lte(now())) ? LaravelCarbon::parse($dateInput)->startOfDay() : now();
             $amount->save();
 
             //invoice generate
@@ -506,7 +516,6 @@ class TicketController extends Controller
 
     public function updateTickets(Request $request)
     {
-        // dd($request->all());
         hasPermission('tickets-edit');
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
         if (!$branchId) {
@@ -1032,14 +1041,15 @@ class TicketController extends Controller
                 $userIds = collect($selectedItems)->pluck('userId')->toArray();
                 $paymentIds = collect($selectedItems)->pluck('paymentId')->filter()->toArray();
                 $date = collect($selectedItems)->pluck('date')->filter()->toArray();
+                $userDetail = collect($selectedItems)->pluck('userdetail')->filter()->toArray();
                 User::whereIn('id', $userIds)->delete();
-                // if (!empty($paymentIds)) {
-                //     PaymentMethod::whereIn('id', $paymentIds)->delete();
-                // }
+                if (!empty($paymentIds)) {
+                    PaymentMethod::whereIn('id', $paymentIds)->delete();
+                }
 
-                // if (!empty($userIds)) {
-                //     User::whereIn('id', $userIds)->delete();
-                // }
+                if (!empty($userDetail)) {
+                    UserDetail::whereIn('id', $userDetail)->delete();
+                }
                 if (!empty($userIds)) {
                     UserProduct::whereIn('user_id', $userIds)->whereIn(DB::raw('DATE(created_at)'), $date)->delete();
                 }
@@ -1174,11 +1184,10 @@ class TicketController extends Controller
         $user = User::where('id', $id)->first();
         $booking_date = isset($user['event']->booking_date) ? $user['event']->booking_date : null;
         $now = now()->format('Y-m-d');
-        if ($booking_date < $now) {
-            return redirect('/customers');
-        }
+        // if ($booking_date < $now) {
+        //     return redirect('/customers');
+        // }
         $userDetail = UserDetail::where('user_id', $id)->first();
-
         // update payments
         $paymentMethod = PaymentMethod::where('user_id', $id)->first();
         $paymentMethod->amounts = $request->input('newTotalAmount');
@@ -1188,14 +1197,13 @@ class TicketController extends Controller
         $paymentMethod->gst12 = ($request->input('gst12') !== '0.00') ? $request->input('gst12') : null;
         $paymentMethod->gst5 = ($request->input('gst5') !== '0.00') ? $request->input('gst5') : null;
         $paymentMethod->save();
-
         // update kids table for extra time
         $kidids = $request->input('kidids');
         if ($kidids) {
             $isExtraTimeAdded = 0;
             foreach ($kidids as $i => $row) {
                 $kidsDetails = Kid::where('id', $row)->first();
-                if ($request->input('extra_time_select')[$i] != null) {
+                if ($request->input('extra_time_select') && $request->input('extra_time_select')[$i] != null) {
                     $isExtraTimeAdded = 1;
                     $qty = $kidsDetails->qty ? $kidsDetails->qty : 0;
                     $kidsDetails->qty = $qty + 1;
@@ -1294,11 +1302,14 @@ class TicketController extends Controller
         $end_datetime = isset($user['kid']->end_time) ? $user['kid']->end_time : null;
         $booking_date = isset($user['event']->booking_date) ? $user['event']->booking_date : null;
 
-        $mobile = "91" . $userDetail->phone_no;
-        $added_time = "0:" . $request->input('extra_time_select')[0] . ":00";
-        $msg = "Your Playtime has been extended Updated details are: Date: $booking_date Time-In: $start_datetime Updated Time-Out: $end_datetime Added Time: $added_time Have a Gadget Free time of HappyOn Play!	";
-        $template_id = "1707168001515557376";
-        sendsms($mobile, $msg, $template_id);
+        if($request->input('extra_time_select')) {
+            $mobile = "91" . $userDetail->phone_no;
+            $added_time = "0:" . $request->input('extra_time_select')[0] . ":00";
+            $msg = "Your Playtime has been extended Updated details are: Date: $booking_date Time-In: $start_datetime Updated Time-Out: $end_datetime Added Time: $added_time Have a Gadget Free time of HappyOn Play!	";
+            $template_id = "1707168001515557376";
+            sendsms($mobile, $msg, $template_id);
+        }
+
 
         $items = [];
         if (isset($request["product_name"]) && is_array($request["product_name"])) {

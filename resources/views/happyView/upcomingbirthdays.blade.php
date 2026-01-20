@@ -55,16 +55,56 @@
                                         </div>
                                     </div>
                                     <div class="col-md-4">
-
                                         <div class="count" id="user_delete">
                                             <i class="fa fa-trash-o  m-0" aria-hidden="true"></i>
                                         </div>
                                     </div>
-
-
                                 </div>
+                            </div>
+                            <div class="mt-2" style="margin-left:9rem;">
+                                <div class="row align-items-center text-center">
+                                    <div class="col-md-8">
+                                        <div class="col">
+                                            <form action="{{ url()->current() }}" method="get">
+                                                @csrf
+                                                <div class="d-flex flex-wrap align-items-center">
+                                                    <label class="font-weight-bold">Select Date:</label>
+                                                    <div class="mb-2 mx-2">
+                                                        <input type="date" name="fromDate"
+                                                            value="{{ request()->get('fromDate') }}"
+                                                            class="form-control-sm border border-primary"
+                                                            placeholder="From Date">
+                                                    </div>
 
-
+                                                    <div class="mb-2">
+                                                        <input type="date" name="toDate"
+                                                            value="{{ request()->get('toDate') }}"
+                                                            class="form-control-sm border border-primary"
+                                                            placeholder="To Date">
+                                                    </div>
+                                                    @if (auth('admin')->user()->branch_id == null && auth('admin')->user()->isSuperAdmin == 1)
+                                                        <div class="mb-2 mx-1">
+                                                            <select name="branch_id" class="form-control"
+                                                                id="branch_id">
+                                                                <option value="">-- All Branches --</option>
+                                                                @foreach ($branches as $branch)
+                                                                    <option value="{{ $branch['id'] }}"
+                                                                        {{ request()->get('branch_id') == $branch['id'] ? 'selected' : '' }}>
+                                                                        {{ $branch['name'] . '-' . $branch['type'] }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    @endif
+                                                    <div class="mb-2 mx-2">
+                                                        <button type="submit"
+                                                            class="btn btn-sm btn-primary">Apply</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <!-- data table  -->
                             <div class="container">
@@ -82,6 +122,7 @@
                                                     <th>Age</th>
                                                     <th>Amount Spent</th>
                                                     <th>Phone</th>
+                                                    <th>Branch</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -136,6 +177,8 @@
                                                         </td>
                                                         <td>{{ $amount_spent }}</td>
                                                         <td>{{ isset($users->phone_no) ? $users->phone_no : '' }}</td>
+                                                        <td>{{ isset($users->branch) ? $users->branch->name : '' }}
+                                                        </td>
 
                                                         <td><a
                                                                 href="{{ url('/tickets-edit-view/' . $users->user_id) }}""><i
