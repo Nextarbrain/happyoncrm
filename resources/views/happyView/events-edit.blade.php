@@ -86,9 +86,9 @@
                                                             <div class="mb-4 input_wrap dark">
                                                                 <label>Booking Date </label>
                                                                 <input type="date" class="form-control"
-                                                                    placeholder="date" id='date'
-                                                                    value="{{ date('Y-m-d', strtotime($eventbooking->created_at)) }}"
-                                                                    required readonly>
+                                                                    placeholder="date" id="date"
+                                                                    value="{{ $eventbooking->created_at->format('Y-m-d') }}"
+                                                                    readonly>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6 input_wrap dark time">
@@ -96,7 +96,7 @@
                                                                 <label>Booking Time</label>
                                                                 <input type="time" class="form-control"
                                                                     placeholder="Time" id='time'
-                                                                    value="{{ date('H:i', strtotime($eventbooking->created_at)) }}"
+                                                                    value="{{ $eventbooking->created_at->format('H:i') }}"
                                                                     required readonly>
                                                             </div>
                                                         </div>
@@ -1063,21 +1063,21 @@
         //Current Date
 
         //var today1 =  new Date().toISOString().substr(0,10);
-        var today = new Date();
-        var day = ("0" + today.getDate()).slice(-2);
-        var month = ("0" + (today.getMonth() + 1)).slice(-2);
-        var year = today.getFullYear();
-        var formattedDate = year + '-' + month + '-' + day;
-        document.getElementById('date').value = formattedDate;
+        // var today = new Date();
+        // var day = ("0" + today.getDate()).slice(-2);
+        // var month = ("0" + (today.getMonth() + 1)).slice(-2);
+        // var year = today.getFullYear();
+        // var formattedDate = year + '-' + month + '-' + day;
+        // document.getElementById('date').value = formattedDate;
 
         // Current Time
-        var dateInput = document.getElementById('date');
-        var timeInput = document.getElementById('time');
-        var now = new Date();
-        var hours = now.getHours().toString().padStart(2, '0');
-        var minutes = now.getMinutes().toString().padStart(2, '0');
-        var timeString = hours + ":" + minutes;
-        timeInput.value = timeString;
+        // var dateInput = document.getElementById('date');
+        // var timeInput = document.getElementById('time');
+        // var now = new Date();
+        // var hours = now.getHours().toString().padStart(2, '0');
+        // var minutes = now.getMinutes().toString().padStart(2, '0');
+        // var timeString = hours + ":" + minutes;
+        // timeInput.value = timeString;
 
         //Validation on date and Time
         dateInput.addEventListener('input', function() {
