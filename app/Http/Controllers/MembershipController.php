@@ -290,6 +290,7 @@ class MembershipController extends Controller
 
                     $membershipRenewabel = new MembershipBuyRenewable();
                     $membershipRenewabel->amount = $request->input('totalamount');
+                    $membershipRenewabel->membership_buys_id = $member->id;
                     $membershipRenewabel->branch_id = $branchId;
                     $membershipRenewabel->user_id = $userdetail->user_id;
                     $membershipRenewabel->payment_method = $payment_method;
@@ -379,11 +380,13 @@ class MembershipController extends Controller
                         $member->time = now()->format('H:i');
                         $member->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
                         $member->save();
+
                         $membershipRenewabel = new MembershipBuyRenewable();
                         $membershipRenewabel->amount = $request->input('totalamount');
                         $membershipRenewabel->branch_id = $branchId;
                         $membershipRenewabel->user_id = $userSave->id;
                         $membershipRenewabel->payment_method = $payment_method;
+                        $membershipRenewabel->membership_buys_id = $member->id;
                         $membershipRenewabel->created_at = now();
                         $membershipRenewabel->save();
 
@@ -472,6 +475,7 @@ class MembershipController extends Controller
                     $membershipRenewabel->branch_id = $branchId;
                     $membershipRenewabel->user_id = $userSave->id;
                     $membershipRenewabel->payment_method = $payment_method;
+                    $membershipRenewabel->membership_buys_id = $member->id;
                     $membershipRenewabel->created_at = now();
                     $membershipRenewabel->save();
 
@@ -560,6 +564,7 @@ class MembershipController extends Controller
                 $membershipRenewabel->branch_id = $branchId;
                 $membershipRenewabel->user_id = $userSave->id;
                 $membershipRenewabel->payment_method = $payment_method;
+                $membershipRenewabel->membership_buys_id = $member->id;
                 $membershipRenewabel->created_at = now();
                 $membershipRenewabel->save();
 
@@ -789,6 +794,8 @@ class MembershipController extends Controller
                 $kidId = collect($selectedItems)->pluck('kidId')->filter()->toArray();
                 MembershipHistory::whereIn('membership_buyer_id', $membershipId)->delete();
                 MemberShipBuy::whereIn('id', $membershipId)->delete();
+                MembershipBuyRenewable::whereIn('membership_buys_id', $membershipId)->delete();
+
 
                 if (!empty($userIds)) {
                     User::whereIn('id', $userIds)->delete();

@@ -16,6 +16,7 @@ class MembershipBuyRenewable extends Model
         'user_id',
         'payment_method',
         'created_at',
+        'membership_buys_id'
     ];
 
 }
