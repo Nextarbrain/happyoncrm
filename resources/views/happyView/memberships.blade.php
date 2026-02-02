@@ -109,7 +109,7 @@
                                                     <tr>
                                                         <td><input name="member-check" type="checkbox"
                                                                 data-item-id="{{ $membershipUser->id }}"
-                                                                data-item-payment="{{ $membershipUser->paymentInfo->id }}"
+                                                                data-item-payment="{{ optional($membershipUser->paymentInfo)->id }}"
                                                                 data-item-userdetail="{{ optional($membershipUser->userDetails)->id }}"
                                                                 data-item-kids="{{ optional($membershipUser->kid)->id }}"
                                                                 data-item-user="{{ optional($membershipUser->user)->id }}"
@@ -143,7 +143,7 @@
                                                         <td>{{ $membershipUser->credit_left }} hrs</td>
                                                         <td>{{ $membershipUser->payment_method }}</td>
                                                         <td class="gree_c">
-                                                            <span>{{ $membershipUser['userDetails']->number_of_kids }}</span>
+                                                            <span>{{ optional($membershipUser['userDetails'])->number_of_kids }}</span>
                                                             <i class="fa fa-eye" aria-hidden="true"></i>
                                                         </td>
                                                         <td class="status">SMS Sent</td>
