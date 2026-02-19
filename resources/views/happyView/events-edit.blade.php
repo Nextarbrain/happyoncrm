@@ -837,12 +837,84 @@
             };
         }
 
+        // function calculateCouponTotals({
+        //     item_price,
+        //     item_qty,
+        //     item_tax
+        // }, discountTotal = 0) {
+        //     let subTotal = 0,
+        //         gst18total = 0,
+        //         gst12total = 0,
+        //         gst5total = 0,
+        //         totalDiscount = 0,
+        //         discountRate = discountTotal;
+        //     for (let i = 0; i < item_price.length; i++) {
+        //         if (item_qty[i] == 0 || item_price[i] == 0) {
+        //             $('#errorMsg').html('<span class="alert alert-danger">Minimum Qty/Price should be 1.</span>').fadeOut(
+        //                 8000);
+        //         } else {
+        //             let qty = parseFloat(item_qty[i]) || 0;
+        //             let price = parseFloat(item_price[i]) || 0;
+        //             let taxRate = parseFloat(item_tax[i]) || 0;
+
+        //             let rowtotal = price * qty;
+        //             let gstAmt = 0;
+        //             let basicAmt = 0;
+        //             let discountAmt = 0;
+
+        //             const taxRatesList = {
+        //                 '18': 0.18,
+        //                 '12': 0.12,
+        //                 '5': 0.05,
+        //                 '0': 1
+        //             };
+        //             if (taxRatesList.hasOwnProperty(taxRate)) {
+        //                 // basicAmt = rowtotal / taxRatesList[taxRate];
+        //                 // discountAmt = (basicAmt * discountRate) / 100;
+        //                 // basicAmt = basicAmt - discountAmt;
+        //                 // gstAmt = (basicAmt * taxRate) / 100;
+
+        //                 // if (taxRate !== 5) {
+        //                 //     discountAmt = (rowtotal * discountRate) / 100;
+        //                 // }
+        //                 // basicAmt = rowtotal - discountAmt;
+        //                 // gstAmt = (basicAmt * taxRatesList[taxRate]);
+        //                 if (taxRate !== 5) {
+        //                     discountAmt = (rowtotal * discountRate) / 100;
+        //                 }
+
+        //                 subTotal = rowtotal - discountAmt;
+
+        //                 gstAmt = (subTotal * taxRatesList[taxRate]);
+
+        //                 basicAmt = gstAmt + basicAmt;
+
+
+        //             }
+        //             // subTotal += basicAmt;
+        //             // totalDiscount += discountAmt;
+        //             totalDiscount += discountAmt;
+        //             if (taxRate === 18) gst18total += gstAmt;
+        //             else if (taxRate === 12) gst12total += gstAmt;
+        //             else if (taxRate === 5) gst5total += gstAmt;
+        //         }
+        //     }
+        //     return {
+        //         subTotal,
+        //         gst18total,
+        //         gst12total,
+        //         gst5total,
+        //         totalDiscount
+        //     };
+        // }
+
         function calculateCouponTotals({
             item_price,
             item_qty,
             item_tax
         }, discountTotal = 0) {
             let subTotal = 0,
+                total = 0,
                 gst18total = 0,
                 gst12total = 0,
                 gst5total = 0,
@@ -868,31 +940,34 @@
                         '5': 0.05,
                         '0': 1
                     };
+
+                    const newTaxRatesList = {
+                        '18': 1.18,
+                        '12': 1.12,
+                        '5': 0.05,
+                        '0': 1
+                    };
+
                     if (taxRatesList.hasOwnProperty(taxRate)) {
                         // basicAmt = rowtotal / taxRatesList[taxRate];
                         // discountAmt = (basicAmt * discountRate) / 100;
                         // basicAmt = basicAmt - discountAmt;
                         // gstAmt = (basicAmt * taxRate) / 100;
+                        // basicAmt = rowtotal / newTaxRatesList[taxRate];
 
                         // if (taxRate !== 5) {
-                        //     discountAmt = (rowtotal * discountRate) / 100;
+                        discountAmt = (rowtotal * discountRate) / 100;
                         // }
-                        // basicAmt = rowtotal - discountAmt;
-                        // gstAmt = (basicAmt * taxRatesList[taxRate]);
-                        if (taxRate !== 5) {
-                            discountAmt = (rowtotal * discountRate) / 100;
-                        }
 
-                        subTotal = rowtotal - discountAmt;
+                        total = rowtotal - discountAmt;
 
-                        gstAmt = (subTotal * taxRatesList[taxRate]);
+                        gstAmt = (total * taxRatesList[taxRate]);
 
                         basicAmt = gstAmt + basicAmt;
 
-
                     }
-                    // subTotal += basicAmt;
-                    // totalDiscount += discountAmt;
+                    subTotal += total;
+
                     totalDiscount += discountAmt;
                     if (taxRate === 18) gst18total += gstAmt;
                     else if (taxRate === 12) gst12total += gstAmt;
@@ -1080,29 +1155,29 @@
         // timeInput.value = timeString;
 
         //Validation on date and Time
-        dateInput.addEventListener('input', function() {
-            validateDateTime();
-        });
+        // dateInput.addEventListener('input', function() {
+        //     validateDateTime();
+        // });
 
-        timeInput.addEventListener('input', function() {
-            validateDateTime();
-        });
+        // timeInput.addEventListener('input', function() {
+        //     validateDateTime();
+        // });
 
-        function validateDateTime() {
-            var date = new Date(dateInput.value);
-            var time = timeInput.value.split(':');
-            var hour = parseInt(time[0]);
-            var minute = parseInt(time[1]);
-            var now1 = new Date();
-            var datetime = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour, minute);
-            console.log(datetime);
-            if (datetime < now1) {
-                alert('Please select current or future date and time');
+        // function validateDateTime() {
+        //     var date = new Date(dateInput.value);
+        //     var time = timeInput.value.split(':');
+        //     var hour = parseInt(time[0]);
+        //     var minute = parseInt(time[1]);
+        //     var now1 = new Date();
+        //     var datetime = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour, minute);
+        //     console.log(datetime);
+        //     if (datetime < now1) {
+        //         alert('Please select current or future date and time');
 
-                dateInput.value = today;
-                timeInput.value = timeString;
-            }
-        }
+        //         dateInput.value = today;
+        //         timeInput.value = timeString;
+        //     }
+        // }
         $(document).ready(function() {
             toastr.options.timeOut = 10000;
             @if (Session::has('error'))
