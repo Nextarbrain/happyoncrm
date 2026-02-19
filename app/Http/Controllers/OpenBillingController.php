@@ -18,7 +18,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Carbon;
 use Illuminate\Support\Facades\Http;
 use Dompdf\Dompdf;
-
+use Illuminate\Support\Carbon as LaravelCarbon;
 
 //import class hash password
 use Illuminate\Support\Facades\Hash;
