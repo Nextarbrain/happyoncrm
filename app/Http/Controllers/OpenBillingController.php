@@ -162,6 +162,17 @@ class OpenBillingController extends Controller
             'billing_name' => 'required',
         ]);
         $dateInput = $request->input('date');
+        $time = $request->input('time');
+        if (!empty($dateInput) && !empty($time)) {
+            $newDateTime = LaravelCarbon::createFromFormat(
+                'Y-m-d H:i',
+                $dateInput . ' ' . $time
+            );
+        } elseif (!empty($dateInput)) {
+            $newDateTime = LaravelCarbon::parse($dateInput)->startOfDay();
+        } else {
+            $newDateTime = now();
+        }
         // $branchId = auth('admin')->user()->branch_id ?  auth('admin')->user()->branch_id : null;
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
         if (!$branchId) {
@@ -183,7 +194,8 @@ class OpenBillingController extends Controller
         $openbilling->gst18 = $request->gst18;
         $openbilling->gst12 = $request->gst12;
         $openbilling->gst5 = $request->gst5;
-        $openbilling->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+        // $openbilling->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+        $openbilling->created_at = $newDateTime;
 
         $openbilling->save();
 

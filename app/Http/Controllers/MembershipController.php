@@ -241,6 +241,17 @@ class MembershipController extends Controller
     {
         hasPermission('membership-add');
         $dateInput = $request->input('date');
+        $time = $request->input('time');
+        if (!empty($dateInput) && !empty($time)) {
+            $newDateTime = LaravelCarbon::createFromFormat(
+                'Y-m-d H:i',
+                $dateInput . ' ' . $time
+            );
+        } elseif (!empty($dateInput)) {
+            $newDateTime = LaravelCarbon::parse($dateInput)->startOfDay();
+        } else {
+            $newDateTime = now();
+        }
         $userdetail = UserDetail::with('user')->where('phone_no', $request->input('phone'))->where('membership_plan', 1)->first();
         $getPlan = MembershipPlan::where('id', $request->input('membershipPlan'))->first();
         $branchId = $request->branch_id != null ? (int)$request->branch_id :  auth('admin')->user()->branch_id;
@@ -285,7 +296,8 @@ class MembershipController extends Controller
 
                     // $member->time = $request->input('time');
                     $member->time = now()->format('H:i');
-                    $member->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+                    // $member->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+                    $member->created_at = $newDateTime;
                     $member->save();
 
                     $membershipRenewabel = new MembershipBuyRenewable();
@@ -345,7 +357,8 @@ class MembershipController extends Controller
                     $userSave->branch_id = $branchId;
                     $userSave->email = $request->input('name') . rand(10, 100) . '@gmail.com';
                     $userSave->role = 2;
-                    $userSave->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+                    // $userSave->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+                    $userSave->created_at = $newDateTime;
                     $userSave->save();
                     if ($userSave->id) {
                         $userDetails = new UserDetail();
@@ -378,7 +391,8 @@ class MembershipController extends Controller
 
                         // $member->time = $request->input('time');
                         $member->time = now()->format('H:i');
-                        $member->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+                        // $member->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+                        $member->created_at = $newDateTime;
                         $member->save();
 
                         $membershipRenewabel = new MembershipBuyRenewable();
@@ -413,7 +427,8 @@ class MembershipController extends Controller
                             $amount->couponcode = $request->coupon_code;
                         }
                         couponCountUpdate($request->coupon_code);
-                        $amount->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+                        // $amount->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+                        $amount->created_at = $newDateTime;
                         $amount->save();
 
                         $mobile = "91" . $request->input('phone');
@@ -437,7 +452,8 @@ class MembershipController extends Controller
                 $userSave->branch_id = $branchId;
                 $userSave->email = $request->input('name') . rand(10, 100) . '@gmail.com';
                 $userSave->role = 2;
-                $userSave->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+                // $userSave->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+                $userSave->created_at = $newDateTime;
                 $userSave->save();
                 if ($userSave->id) {
                     $userDetails = new UserDetail();
@@ -467,7 +483,8 @@ class MembershipController extends Controller
                     $dateAfter1Year = $date->addYear();
                     $member->renewal_date = $dateAfter1Year->format('Y-m-d');
                     $member->time = now()->format('H:i');
-                    $member->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+                    // $member->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+                    $member->created_at = $newDateTime;
                     $member->save();
 
                     $membershipRenewabel = new MembershipBuyRenewable();
@@ -502,7 +519,8 @@ class MembershipController extends Controller
                         $amount->couponcode = $request->coupon_code;
                     }
                     couponCountUpdate($request->coupon_code);
-                    $amount->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+                    // $amount->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+                    $amount->created_at = $newDateTime;
                     $amount->save();
 
                     $mobile = "91" . $request->input('phone');
@@ -526,7 +544,8 @@ class MembershipController extends Controller
             $userSave->branch_id = $branchId;
             $userSave->email = $request->input('name') . rand(10, 100) . '@gmail.com';
             $userSave->role = 2;
-            $userSave->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+            // $userSave->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+            $userSave->created_at = $newDateTime;
             $userSave->save();
             if ($userSave->id) {
                 $userDetails = new UserDetail();
@@ -556,7 +575,8 @@ class MembershipController extends Controller
                 $dateAfter1Year = $date->addYear();
                 $member->renewal_date = $dateAfter1Year->format('Y-m-d');
                 $member->time = now()->format('H:i');
-                $member->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+                // $member->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+                $member->created_at = $newDateTime;
                 $member->save();
 
                 $membershipRenewabel = new MembershipBuyRenewable();
@@ -591,7 +611,8 @@ class MembershipController extends Controller
                     $amount->couponcode = $request->coupon_code;
                 }
                 couponCountUpdate($request->coupon_code);
-                $amount->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+                // $amount->created_at = (!empty($dateInput) && Carbon\Carbon::parse($dateInput)->lte(now())) ? Carbon\Carbon::parse($dateInput)->startOfDay() : now();
+                $amount->created_at = $newDateTime;
                 $amount->save();
 
                 $mobile = "91" . $request->input('phone');
