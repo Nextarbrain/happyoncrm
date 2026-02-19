@@ -133,12 +133,23 @@ class TicketController extends Controller
             return redirect()->back()->with('error', 'Please select a branch first.');
         }
         $dateInput = $request->input('date');
+        $time = $request->input('time');
+        if (!empty($dateInput) && !empty($time)) {
+            $newDateTime = LaravelCarbon::createFromFormat(
+                'Y-m-d H:i',
+                $dateInput . ' ' . $time
+            );
+        } elseif (!empty($dateInput)) {
+            $newDateTime = LaravelCarbon::parse($dateInput)->startOfDay();
+        } else {
+            $newDateTime = now();
+        }
         $userSave = new User();
         $userSave->name = ucfirst($request->input('name_of_kid'));
         $userSave->branch_id = $branchId;
         $userSave->email = $request->input('name_of_kid') . rand(10000, 999999);
         $userSave->role = 1;
-        $userSave->created_at = (!empty($dateInput) && LaravelCarbon::parse($dateInput)->lte(now())) ? LaravelCarbon::parse($dateInput)->startOfDay() : now();
+        $userSave->created_at = $newDateTime;
         $userSave->save();
         if ($userSave->id) {
             $event = new Event();
@@ -226,7 +237,7 @@ class TicketController extends Controller
             $amount->subTotal = $request->input('subTotal');
 
             $amount->amounts = $request->input('totalAmount');
-            $amount->created_at = (!empty($dateInput) && LaravelCarbon::parse($dateInput)->lte(now())) ? LaravelCarbon::parse($dateInput)->startOfDay() : now();
+            $amount->created_at = $newDateTime;
             $amount->save();
 
             //invoice generate
