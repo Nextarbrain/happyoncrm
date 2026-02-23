@@ -116,6 +116,7 @@
                                                                 <label>current Time</label>
                                                                 <input type="time" class="form-control"
                                                                     placeholder="Time" id="time" required
+                                                                    name="time"
                                                                     {{ $branchId == 8 || $branchId == 2 ? '' : 'readonly' }}>
                                                             </div>
                                                         </div>
