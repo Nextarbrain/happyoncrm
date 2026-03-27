@@ -706,12 +706,23 @@ class AdminController extends Controller
             }
             $totalMembershipBuy = $totalMembershipBuy->count();
 
-            $memberSale = User::has('membership')->with(['paymentInfos', 'membership'])
-                ->whereDate('created_at', $today)
+            $memberSale = User::has('membership')
+                ->with([
+                    'membership',
+                    'paymentInfos' => function ($q) use ($today) {
+                        $q->whereDate('created_at', $today);
+                    }
+                ])
+                ->where(function ($query) use ($today) {
+                    $query->whereDate('created_at', $today)
+                        ->orWhereDate('updated_at', $today);
+                })
                 ->where('role', 2);
+
             if ($branchId) {
                 $memberSale->where('branch_id', $branchId);
             }
+
             $memberSale = $memberSale->get();
             $amountMember = [];
             foreach ($memberSale as $memberTicket) {
