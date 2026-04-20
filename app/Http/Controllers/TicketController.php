@@ -1242,6 +1242,7 @@ class TicketController extends Controller
                     $kidsDetails->extra_hour = $newHours - $kidsDetails->hours;
                 } elseif($request->input('hours')[$i] != null) {
                     $kidsDetails = Kid::where('id', $row)->first();
+
                     if ($request->input('hours')[$i] != 0) {
                         $qty = $kidsDetails->qty ? $kidsDetails->qty : 0;
                         $kidsDetails->qty = $qty + 1;
@@ -1249,23 +1250,76 @@ class TicketController extends Controller
                         // dd($oldPrice, $request->input('kid_price')[$i]);
                         $kidsDetails->kidPrice = $request->input('kid_price')[$i];
 
-                        $oldEndTime = LaravelCarbon::createFromFormat('H:i:s', $kidsDetails->end_time);
-                        $oldHours = (float) $kidsDetails->hours;
+                        if($kidsDetails->end_time !== null){
+                            $oldEndTime = LaravelCarbon::createFromFormat('H:i:s', $kidsDetails->end_time);
+                            $oldHours = (float) $kidsDetails->hours;
 
-                        $startTime = (clone $oldEndTime)->subHours(floor($oldHours));
-                        if (fmod($oldHours, 1) > 0) {
-                            $startTime->subMinutes(30);
+                            $startTime = (clone $oldEndTime)->subHours(floor($oldHours));
+                            if (fmod($oldHours, 1) > 0) {
+                                $startTime->subMinutes(30);
+                            }
+
+                            $newHours = (float) ($request->input('hours')[$i] ?? 0);
+                            $kidsDetails->hours = $newHours;
+
+                            $newEndTime = (clone $startTime)->addHours(floor($newHours));
+                            if (fmod($newHours, 1) > 0) {
+                            $newEndTime->addMinutes(30);
+                            }
+
+                            $kidsDetails->end_time = $newEndTime->format('H:i:s');
+                            $oldEndTime = LaravelCarbon::createFromFormat('H:i:s', $kidsDetails->end_time);
+                            $oldHours = (float) $kidsDetails->hours;
+
+                            $startTime = (clone $oldEndTime)->subHours(floor($oldHours));
+                            if (fmod($oldHours, 1) > 0) {
+                                $startTime->subMinutes(30);
+                            }
+
+                            $newHours = (float) ($request->input('hours')[$i] ?? 0);
+                            $kidsDetails->hours = $newHours;
+
+                            $newEndTime = (clone $startTime)->addHours(floor($newHours));
+                            if (fmod($newHours, 1) > 0) {
+                            $newEndTime->addMinutes(30);
+                            }
+
+                            $kidsDetails->end_time = $newEndTime->format('H:i:s');
+                            $oldEndTime = LaravelCarbon::createFromFormat('H:i:s', $kidsDetails->end_time);
+                            $oldHours = (float) $kidsDetails->hours;
+
+                            $startTime = (clone $oldEndTime)->subHours(floor($oldHours));
+                            if (fmod($oldHours, 1) > 0) {
+                                $startTime->subMinutes(30);
+                            }
+
+                            $newHours = (float) ($request->input('hours')[$i] ?? 0);
+                            $kidsDetails->hours = $newHours;
+
+                            $newEndTime = (clone $startTime)->addHours(floor($newHours));
+                            if (fmod($newHours, 1) > 0) {
+                            $newEndTime->addMinutes(30);
+                            }
+
+                            $kidsDetails->end_time = $newEndTime->format('H:i:s');
+                            $oldEndTime = LaravelCarbon::createFromFormat('H:i:s', $kidsDetails->end_time);
+                            $oldHours = (float) $kidsDetails->hours;
+
+                            $startTime = (clone $oldEndTime)->subHours(floor($oldHours));
+                            if (fmod($oldHours, 1) > 0) {
+                                $startTime->subMinutes(30);
+                            }
+
+                            $newHours = (float) ($request->input('hours')[$i] ?? 0);
+                            $kidsDetails->hours = $newHours;
+
+                            $newEndTime = (clone $startTime)->addHours(floor($newHours));
+                            if (fmod($newHours, 1) > 0) {
+                            $newEndTime->addMinutes(30);
+                            }
+
+                            $kidsDetails->end_time = $newEndTime->format('H:i:s');
                         }
-
-                        $newHours = (float) ($request->input('hours')[$i] ?? 0);
-                        $kidsDetails->hours = $newHours;
-
-                        $newEndTime = (clone $startTime)->addHours(floor($newHours));
-                        if (fmod($newHours, 1) > 0) {
-                        $newEndTime->addMinutes(30);
-                        }
-
-                        $kidsDetails->end_time = $newEndTime->format('H:i:s');
                     }
                 }
                 $kidsDetails->save();

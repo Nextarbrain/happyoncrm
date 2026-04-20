@@ -140,8 +140,10 @@
                                                                 <label>Number of kids <span>*</span></label>
                                                                 <select name="kids" id="kidsQty"
                                                                     class="form-select" required readonly>
-                                                                    <option value="" selected disabled>
-                                                                        {{ isset($user['userDetails']->number_of_kids) ? $user['userDetails']->number_of_kids : '' }}
+                                                                    <option
+                                                                        value="{{ $user['userDetails']->number_of_kids ?? '' }}"
+                                                                        selected>
+                                                                        {{ $user['userDetails']->number_of_kids ?? '' }}
                                                                     </option>
                                                                     <input type='hidden' name='kids_value'
                                                                         value='{{ isset($user['userDetails']->number_of_kids) ? $user['userDetails']->number_of_kids : '' }}'>
