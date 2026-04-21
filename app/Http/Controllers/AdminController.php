@@ -1120,7 +1120,7 @@ class AdminController extends Controller
                     }
                     $card = $card->get();
 
-                    $card_membership = MembershipBuy::where('payment_method', 'Debit/Credit')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59'])->get();
+                    $card_membership = MembershipBuy::where('payment_method', 'Debit/Credit')->whereBetween('created_at', [$daterange[0] . ' 00:00:00', $daterange[1] . ' 23:59:59']);
                     if ($branchId) {
                         $card_membership->where('branch_id', $branchId);
                     }
