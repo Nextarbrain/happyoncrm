@@ -346,16 +346,16 @@
                                                                 {{-- @if (!hasTwoProduct(request()->route('id'), $pro->product_name, $user['userDetails']->number_of_kids)) --}}
                                                                 @if ($branchId == 8 || $branchId == 2 || $branchId == 1)
                                                                     <div class="h_btn">
-                                                                        @if ($isPastDate)
+                                                                        {{-- @if ($isPastDate)
                                                                             <a href="javascript:void(0)"
                                                                                 class="more_adult"
                                                                                 style="pointer-events: none; opacity: 0.5; cursor: not-allowed;">+{{ $pro->product_name }}</a>
-                                                                        @else
-                                                                            <a href="javascript:void(0)"
-                                                                                onclick="AddItems(event, '{{ $pro->product_name }}', '{{ $pro->product_price }}', '{{ $pro->product_tax }}', {{ $pro->id }})"
-                                                                                class="more_adult">+
-                                                                                {{ $pro->product_name }}</a>
-                                                                        @endif
+                                                                        @else --}}
+                                                                        <a href="javascript:void(0)"
+                                                                            onclick="AddItems(event, '{{ $pro->product_name }}', '{{ $pro->product_price }}', '{{ $pro->product_tax }}', {{ $pro->id }})"
+                                                                            class="more_adult">+
+                                                                            {{ $pro->product_name }}</a>
+                                                                        {{-- @endif --}}
                                                                     </div>
                                                                 @endif
                                                                 {{-- @endif --}}
