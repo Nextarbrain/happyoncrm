@@ -343,7 +343,8 @@
                                                         </table>
                                                         <div class="button_wrap">
                                                             @foreach ($productData as $pro)
-                                                                @if (!hasTwoProduct(request()->route('id'), $pro->product_name, $user['userDetails']->number_of_kids))
+                                                                {{-- @if (!hasTwoProduct(request()->route('id'), $pro->product_name, $user['userDetails']->number_of_kids)) --}}
+                                                                @if ($branchId == 8 || $branchId == 2 || $branchId == 1)
                                                                     <div class="h_btn">
                                                                         @if ($isPastDate)
                                                                             <a href="javascript:void(0)"
@@ -357,6 +358,7 @@
                                                                         @endif
                                                                     </div>
                                                                 @endif
+                                                                {{-- @endif --}}
                                                             @endforeach
                                                         </div>
                                                         <hr>
