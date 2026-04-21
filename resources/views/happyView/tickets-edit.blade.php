@@ -230,7 +230,8 @@
                                                                                     class="form-select"
                                                                                     id="time_{{ $i }}"
                                                                                     onchange="AddExtratime(event, '{{ $branchId }}')"
-                                                                                    {{ $isPastDate ? 'disabled' : '' }}>
+                                                                                    {{-- {{ $isPastDate ? 'disabled' : '' }} --}}
+                                                                                    {{ $branchId == 8 || $branchId == 2 || $branchId == 1 ? '' : 'disabled' }}>
                                                                                     <option value="">Select Here
                                                                                     </option>
                                                                                     <option value="30">30 Min
