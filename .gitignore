@@ -14,3 +14,14 @@ yarn-error.log
 changes.txt
 composer.lock
 storage/framework/views
+
+# Secrets, dumps, logs, and local tooling (not for git)
+public/adminer.php
+composer2.phar
+*.sql
+db/*.sql
+*.zip
+storage/logs/*
+!storage/logs/.gitignore
+public/php_errorlog
+php_errorlog
