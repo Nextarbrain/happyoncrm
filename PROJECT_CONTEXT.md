@@ -197,6 +197,38 @@ Almost every operational table is branch-scoped, **not** tenant-scoped. One data
 
 _Each work round should add a dated entry: date (Asia/Calcutta), who/what agent, what changed, what is still open. Newest first._
 
+### 2026-11-23 — Round 1: Visual POS
+- **Agent**: Antigravity
+- **What changed**:
+  - **New table**: `product_categories` (`id`, `name`, `colour`, `icon`, `sort_order`, `branch_id`, timestamps).
+  - **Products table alters**: added `image_path`, `category_id` (FK to `product_categories`), `sort_order`, `is_active`, `sku`. Safe and additive migrations with sqlite/mysql driver-aware rollback safety.
+  - **Models**: Created `ProductCategory` model with relations; updated `Product` model with `category()` relation, fillable attributes, and `image_url` accessor returning uploaded thumbnail or inline SVG placeholder.
+  - **Product Admin Upgrade**: Added image upload handling with automatic aspect-ratio thumbnail resizing (max 300x300, JPEG/PNG/WebP, max 2MB), image cleanup on delete, SKU, sort order, and active toggle. Added full Category CRUD (create, edit, delete, list) with color pickers and icons in `resources/views/happyView/admin.blade.php` and `footer.blade.php`.
+  - **Visual POS Screen (`resources/views/happyView/pos.blade.php`)**: Built touch-first POS billing screen inspired by Petpooja/Square:
+    - Real-time live clock and branch switcher for superadmins.
+    - Category chips with custom badge colors, icons, and product counts.
+    - Barcode and keyboard-friendly search bar (shortcut key `/`, auto-focus, live filter).
+    - Responsive product image card grid (mobile 390px, tablet 768px/1024px, desktop 1440px) with tap feedback and floating in-cart quantity badges.
+    - Play pass entry integration with automatic DayPrice schedule lookup.
+    - Sticky cart panel with customer phone live autocomplete (`/get-ticket-phone-list`), guardian name, DOB, dynamic kids play rows, product line items with `[-]` `[Qty]` `[+]` touch steppers, coupon code validation (`/get-coupon`), subtotal, GST breakdown (18%, 12%, 5%), and Cash / UPI / Card payment selectors.
+    - Mobile bottom sheet with review and checkout drawer.
+    - Seamlessly feeds existing `/add-tickets` route so ticket records, PDF invoices, post-play review SMS, Reelo loyalty calls, and reports continue working without disruption.
+  - **Sidebar & Fallback**: Added "Visual POS" nav item with "NEW" badge in `sidebar.blade.php` while preserving classic `/tickets` view as fallback.
+  - **TicketController robustness**: Added null-safety in `addTickets` for `$kidsName` to ensure pure retail merchandise orders succeed cleanly on PHP 8+.
+  - **New routes registered**:
+    - `GET /pos` (`PosController@index`, name: `pos`)
+    - `GET /pos/search` (`PosController@search`, name: `pos.search`)
+    - `GET /get-categories` (`ProductCategoryController@index`)
+    - `POST /categoryPostData` (`ProductCategoryController@store`)
+    - `POST /editCategoryPost` (`ProductCategoryController@update`)
+    - `GET /edit-category-modal` (`ProductCategoryController@show`)
+    - `DELETE /delete-category` (`ProductCategoryController@destroy`)
+- **How to test**:
+  - Run migrations: `php artisan migrate`
+  - Manage categories & products: Go to `/admin`, create categories, upload product images, set SKUs and sort order.
+  - Test Visual POS: Navigate to `/pos`, tap category chips, search by text or scan barcode, tap cards to add to cart, fill customer details, apply coupons, select payment mode, and submit "Charge". Receipt prints and records populate identically to `/tickets`.
+- **Open**: None for Round 1.
+
 <!--
 ### YYYY-MM-DD — short title
 - Done:
