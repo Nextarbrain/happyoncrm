@@ -13,6 +13,8 @@ use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\OpenBillingController;
 use App\Http\Controllers\TrashController;
+use App\Http\Controllers\PosController;
+use App\Http\Controllers\ProductCategoryController;
 
 Route::get('/', [AdminController::class, 'index'])->name('login');
 Route::get('/logout-g', [AdminController::class, 'logout'])->name('logoutA');
@@ -69,6 +71,14 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::get('/edit-products-modal', [AdminController::class, 'editOpenModel']);
     Route::delete('/delete-products', [AdminController::class, 'deleteProduct']);
 
+    /********** Product Categories *************/
+
+    Route::get('/get-categories', [ProductCategoryController::class, 'index']);
+    Route::post('/categoryPostData', [ProductCategoryController::class, 'store']);
+    Route::post('/editCategoryPost', [ProductCategoryController::class, 'update']);
+    Route::get('/edit-category-modal', [ProductCategoryController::class, 'show']);
+    Route::delete('/delete-category', [ProductCategoryController::class, 'destroy']);
+
 
     /********** Coupon Code *************/
 
@@ -85,6 +95,10 @@ Route::group(['middleware' => 'admin_auth'], function () {
 
     Route::post('/editWeekendPost', [AdminController::class, 'editWeekendPost']);
     Route::get('/edit-weekend-modal', [AdminController::class, 'editWeekendModal']);
+
+    /******************* Visual POS Routes **************/
+    Route::get('/pos', [PosController::class, 'index'])->name('pos');
+    Route::get('/pos/search', [PosController::class, 'search'])->name('pos.search');
 
     /******************* Ticket Routes **************/
 

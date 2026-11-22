@@ -93,6 +93,25 @@
                 </ul>
             </li>
         @endif
+        @if (can('tickets') || can('tickets-add'))
+            <li>
+                <a href="{{ url('/pos') }}" class="{{ Route::currentRouteName() == 'pos' ? 'active' : '' }}">
+                    <div class="parent-icon">
+                        <svg width="22" height="20" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <rect x="2" y="3" width="20" height="18" rx="3" stroke="#FDCF6F" stroke-width="2"/>
+                            <path d="M6 8H18" stroke="#FDCF6F" stroke-width="2" stroke-linecap="round"/>
+                            <rect x="6" y="12" width="2.5" height="2" rx="0.5" fill="#FDCF6F"/>
+                            <rect x="10.75" y="12" width="2.5" height="2" rx="0.5" fill="#FDCF6F"/>
+                            <rect x="15.5" y="12" width="2.5" height="2" rx="0.5" fill="#FDCF6F"/>
+                            <rect x="6" y="16" width="2.5" height="2" rx="0.5" fill="#FDCF6F"/>
+                            <rect x="10.75" y="16" width="7.25" height="2" rx="0.5" fill="#FDCF6F"/>
+                        </svg>
+                    </div>
+                    <div class="menu-title">Visual POS <span class="badge bg-warning text-dark ms-1" style="font-size: 10px; font-weight: 700;">NEW</span></div>
+                </a>
+            </li>
+        @endif
         @if (can('tickets'))
             <li>
                 <a href="{{ url('/tickets') }}" class="{{ Route::currentRouteName() == 'tickets' ? 'active' : '' }}">
