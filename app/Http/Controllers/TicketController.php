@@ -191,27 +191,28 @@ class TicketController extends Controller
                 }
             }
             /* add on product in user_product table */
+            $kidsCount = is_array($kidsName) ? count($kidsName) : 0;
             if (isset($request->product_quantity)) {
                 foreach ($request->product_quantity as $key => $val) {
-                    if ($val !== "0") {
+                    if ($val !== "0" && $val > 0) {
                         $product_add = new UserProduct();
                         $product_add->user_id = $userSave->id;
                         $product_add->branch_id = $branchId;
                         $product_add->product_name = $request->product_name[$key];
                         $product_add->price = $request->final_price[$key] / $val;
                         // $product_add->price = $request->price[$key] / $val;
-                        $product_add->qty = ($request->product_name[$key] == 'Socks') ? $val + count($kidsName) : $val;
+                        $product_add->qty = ($request->product_name[$key] == 'Socks') ? $val + $kidsCount : $val;
                         $product_add->save();
                     }
                 }
             }
-            if (!isset($request->product_name) || isset($request->product_name) && !in_array('Socks', $request->product_name)) {
+            if ($kidsCount > 0 && (!isset($request->product_name) || !in_array('Socks', (array)$request->product_name))) {
                 $product_add = new UserProduct();
                 $product_add->user_id = $userSave->id;
                 $product_add->branch_id = $branchId;
                 $product_add->product_name = 'Socks';
                 $product_add->price = 0;
-                $product_add->qty = count($kidsName);
+                $product_add->qty = $kidsCount;
                 $product_add->save();
             }
             $amount = new PaymentMethod();
@@ -295,9 +296,9 @@ class TicketController extends Controller
                 "couponvalue" => $user['paymentInfo']->couponvalue,
                 "invoiceNo" => $paymentMethod->id,
                 'gst5' => $paymentMethod->gst5,
-                "kidTotal" => $totalKidCount,
-                "totalKidPrice" => $totalKidPrice,
-                "KidPrice" => $KidPrices['kidPrice'],
+                "kidTotal" => $totalKidCount ?? $kidTotal,
+                "totalKidPrice" => $totalKidPrice ?? 0,
+                "KidPrice" => $KidPrices ? $KidPrices['kidPrice'] : 0,
                 "playtime" => $totalHours,
                 // "subTotal" => $subTotal,
                 "subTotal" => $paymentMethod->subTotal,
@@ -312,11 +313,15 @@ class TicketController extends Controller
             $mobile = "91" . $request->input('phone');
             $time_in = now()->format('h:i:s A');
 
-            if ($user['kid']->end_time == "Unlimited") {
-                $time_out = "Unlimited";
+            if (isset($user['kid']) && $user['kid']) {
+                if ($user['kid']->end_time == "Unlimited") {
+                    $time_out = "Unlimited";
+                } else {
+                    $time_out = strtotime($user['kid']->end_time);
+                    $time_out = date("h:i A", $time_out);
+                }
             } else {
-                $time_out = strtotime($user['kid']->end_time);
-                $time_out = date("h:i A", $time_out);
+                $time_out = "N/A";
             }
 
             $date = $request->input('date');

@@ -445,7 +445,7 @@
                                                                     </button>
                                                                 </div>
                                                                 <form action="{{ url('/productPostData') }}"
-                                                                    method="post">
+                                                                    method="post" enctype="multipart/form-data">
                                                                     @csrf
                                                                     <div class="modal-body">
                                                                         @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
@@ -475,6 +475,26 @@
                                                                         <input type="number" class="form-control"
                                                                             id="taxModalForm" placeholder="Tax"
                                                                             name="tax">
+                                                                        <label for="categoryModalForm">Category</label>
+                                                                        <select name="category_id" id="categoryModalForm" class="form-select">
+                                                                            <option value="">— None —</option>
+                                                                            @foreach ($categories as $cat)
+                                                                                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                        <label for="skuModalForm">SKU (optional)</label>
+                                                                        <input type="text" class="form-control"
+                                                                            id="skuModalForm" placeholder="SKU"
+                                                                            name="sku">
+                                                                        <label for="sortOrderModalForm">Sort Order</label>
+                                                                        <input type="number" class="form-control"
+                                                                            id="sortOrderModalForm" placeholder="0"
+                                                                            name="sort_order" value="0">
+                                                                        <label for="productImageModalForm" class="mt-2">Image (jpg/png/webp, max 2MB)</label>
+                                                                        <input type="file" class="form-control"
+                                                                            id="productImageModalForm"
+                                                                            name="product_image"
+                                                                            accept="image/jpeg,image/png,image/webp">
                                                                     </div>
                                                                     <div class="modal-footer">
                                                                         <button type="button"
@@ -512,7 +532,7 @@
                                                                 </button>
                                                             </div>
                                                             <form action="{{ url('/editProductPost') }}"
-                                                                method="post">
+                                                                method="post" enctype="multipart/form-data">
                                                                 @csrf
                                                                 <div class="modal-body">
                                                                     @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
@@ -540,6 +560,32 @@
                                                                     <input type="number" class="form-control"
                                                                         id="edittaxModalForm" placeholder="editTax"
                                                                         name="tax">
+                                                                    <label for="editCategoryModalForm">Category</label>
+                                                                    <select name="category_id" id="editCategoryModalForm" class="form-select">
+                                                                        <option value="">— None —</option>
+                                                                        @foreach ($categories as $cat)
+                                                                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                    <label for="editSkuModalForm">SKU</label>
+                                                                    <input type="text" class="form-control"
+                                                                        id="editSkuModalForm" placeholder="SKU"
+                                                                        name="sku">
+                                                                    <label for="editSortOrderModalForm">Sort Order</label>
+                                                                    <input type="number" class="form-control"
+                                                                        id="editSortOrderModalForm" placeholder="0"
+                                                                        name="sort_order">
+                                                                    <div class="form-check mt-2">
+                                                                        <input type="checkbox" class="form-check-input"
+                                                                            id="editIsActiveModalForm" name="is_active" checked>
+                                                                        <label class="form-check-label" for="editIsActiveModalForm">Active</label>
+                                                                    </div>
+                                                                    <div id="editProductImagePreview" class="mt-2"></div>
+                                                                    <label for="editProductImageModalForm" class="mt-2">Image (jpg/png/webp, max 2MB)</label>
+                                                                    <input type="file" class="form-control"
+                                                                        id="editProductImageModalForm"
+                                                                        name="product_image"
+                                                                        accept="image/jpeg,image/png,image/webp">
                                                                     <input type="hidden" id="productId"
                                                                         name="productId">
                                                                 </div>
@@ -558,10 +604,13 @@
                                                 <thead>
                                                     <tr>
                                                         <th><input type="checkbox" onclick="checkProductAll(this)"></th>
+                                                        <th></th>
                                                         <th>Product Name</th>
                                                         <th>Price</th>
                                                         <th>Qty</th>
                                                         <th>Tax</th>
+                                                        <th>Category</th>
+                                                        <th>Active</th>
                                                         <th>Branch</th>
                                                     </tr>
                                                 </thead>
@@ -572,10 +621,13 @@
                                                                     class="product_checkbox"
                                                                     value="{{ $productList->id }}"
                                                                     data-item-id="{{ $productList->id }}"></td>
+                                                            <td><img src="{{ $productList->image_url }}" alt="" style="width:36px;height:36px;object-fit:cover;border-radius:6px;"></td>
                                                             <td>{{ $productList->product_name }}</td>
                                                             <td>{{ $productList->product_price }}</td>
                                                             <td>{{ $productList->product_qty }}</td>
                                                             <td>{{ $productList->product_tax }} %</td>
+                                                            <td>{{ optional($productList->category)->name ?? '—' }}</td>
+                                                            <td>{!! $productList->is_active ? '<span class="text-success">✓</span>' : '<span class="text-danger">✗</span>' !!}</td>
                                                             <td>{{ optional($productList['branch'])->name ?? '' }}</td>
                                                         </tr>
                                                     @endforeach
@@ -778,6 +830,178 @@
                                     @endif
                                 </div>
                                 <div class="row">
+                                    @if(can('admin-products') || auth('admin')->user()->isSuperAdmin)
+                                    <div class="col-md-6">
+                                        <div class="data_table admin_table table-responsive">
+                                            <div class="table_header">
+                                                <div class="a_add_btn">
+                                                    @if(can('admin-products-add') || auth('admin')->user()->isSuperAdmin)
+                                                    <button type="button" class="btn" data-toggle="modal"
+                                                        data-target="#categoryModal">ADD Category +</button>
+                                                    @endif
+                                                    <!-- Modal -->
+                                                    <div class="modal fade" id="categoryModal" tabindex="-1"
+                                                        role="dialog" aria-labelledby="categoryModalLabel"
+                                                        aria-hidden="true">
+                                                        <div class="modal-dialog" role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="categoryModalLabel">Add
+                                                                        New Category</h5>
+                                                                    <button type="button" class="close"
+                                                                        data-dismiss="modal" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                    </button>
+                                                                </div>
+                                                                <form action="{{ url('/categoryPostData') }}"
+                                                                    method="post">
+                                                                    @csrf
+                                                                    <div class="modal-body">
+                                                                        @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                                            <label>Branch <span style="color: red">*</span></label>
+                                                                            <select name="branch_id"
+                                                                                class="form-select" required>
+                                                                                @foreach ($branches as $branch)
+                                                                                    <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                        @endif
+                                                                        <label for="categoryNameModal">Category Name <span class="text-danger">*</span></label>
+                                                                        <input type="text" class="form-control"
+                                                                            id="categoryNameModal" placeholder="e.g. Socks & Wear"
+                                                                            name="name" required>
+
+                                                                        <label for="categoryColourModal" class="mt-2">Badge Colour</label>
+                                                                        <div class="d-flex align-items-center" style="gap:10px;">
+                                                                            <input type="color" class="form-control form-control-color"
+                                                                                id="categoryColourModal" name="colour" value="#0A5F59"
+                                                                                style="width:50px;height:38px;padding:2px;">
+                                                                            <input type="text" class="form-control"
+                                                                                id="categoryColourTextModal" placeholder="#0A5F59"
+                                                                                value="#0A5F59" onkeyup="document.getElementById('categoryColourModal').value = this.value">
+                                                                        </div>
+
+                                                                        <label for="categoryIconModal" class="mt-2">Icon (Font Awesome class)</label>
+                                                                        <input type="text" class="form-control"
+                                                                            id="categoryIconModal" placeholder="fa fa-tags, fa fa-coffee, fa fa-gamepad"
+                                                                            name="icon" value="fa fa-tags">
+
+                                                                        <label for="categorySortOrderModal" class="mt-2">Sort Order</label>
+                                                                        <input type="number" class="form-control"
+                                                                            id="categorySortOrderModal" placeholder="0"
+                                                                            name="sort_order" value="0">
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button"
+                                                                            class="btn btn-secondary"
+                                                                            data-dismiss="modal">Cancel</button>
+                                                                        <button type="submit"
+                                                                            class="btn btn-primary">Submit</button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="count" id="category_div">
+                                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                                </div>
+                                                @if(can('admin-products-edit') || auth('admin')->user()->isSuperAdmin)
+                                                <div class="count" id="category_edit">
+                                                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                                                </div>
+                                                @endif
+                                                <div class="modal fade" id="editCategoryModal" tabindex="-1"
+                                                    role="dialog" aria-labelledby="editCategoryModalLabel"
+                                                    aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="editCategoryModalLabel">
+                                                                    Edit Category</h5>
+                                                                <button type="button" class="close"
+                                                                    onClick="modalClose();" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <form action="{{ url('/editCategoryPost') }}"
+                                                                method="post">
+                                                                @csrf
+                                                                <input type="hidden" id="editCategoryId" name="id">
+                                                                <div class="modal-body">
+                                                                    @if(auth('admin')->user()->branch_id === null && auth('admin')->user()->isSuperAdmin == 1)
+                                                                        <label>Branch <span style="color: red">*</span></label>
+                                                                        <select name="branch_id" id="editCategoryBranchId"
+                                                                            class="form-select">
+                                                                            @foreach ($branches as $branch)
+                                                                                <option value="{{ $branch['id'] }}">{{ $branch['name'] }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    @endif
+                                                                    <label for="editCategoryNameModal">Category Name <span class="text-danger">*</span></label>
+                                                                    <input type="text" class="form-control"
+                                                                        id="editCategoryNameModal" name="name" required>
+
+                                                                    <label for="editCategoryColourModal" class="mt-2">Badge Colour</label>
+                                                                    <div class="d-flex align-items-center" style="gap:10px;">
+                                                                        <input type="color" class="form-control form-control-color"
+                                                                            id="editCategoryColourModal" name="colour" value="#0A5F59"
+                                                                            style="width:50px;height:38px;padding:2px;">
+                                                                        <input type="text" class="form-control"
+                                                                            id="editCategoryColourTextModal" name="colour_text" value="#0A5F59"
+                                                                            onkeyup="document.getElementById('editCategoryColourModal').value = this.value">
+                                                                    </div>
+
+                                                                    <label for="editCategoryIconModal" class="mt-2">Icon</label>
+                                                                    <input type="text" class="form-control"
+                                                                        id="editCategoryIconModal" name="icon">
+
+                                                                    <label for="editCategorySortOrderModal" class="mt-2">Sort Order</label>
+                                                                    <input type="number" class="form-control"
+                                                                        id="editCategorySortOrderModal" name="sort_order">
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button"
+                                                                        class="btn btn-secondary"
+                                                                        onClick="modalClose();">Cancel</button>
+                                                                    <button type="submit"
+                                                                        class="btn btn-primary">Submit</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <table class="table table-striped text-center" style="width:100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th><input type="checkbox" onclick="checkCategoryAll(this)"></th>
+                                                        <th>Colour</th>
+                                                        <th>Icon</th>
+                                                        <th>Category Name</th>
+                                                        <th>Order</th>
+                                                        <th>Branch</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($categories as $cat)
+                                                        <tr>
+                                                            <td><input type="checkbox" name="category[]"
+                                                                    class="category_checkbox"
+                                                                    value="{{ $cat->id }}"
+                                                                    data-item-id="{{ $cat->id }}"></td>
+                                                            <td><span style="display:inline-block;width:22px;height:22px;border-radius:50%;background-color:{{ $cat->colour }};border:1px solid #ccc;vertical-align:middle;"></span></td>
+                                                            <td><i class="{{ $cat->icon ?? 'fa fa-tags' }}"></i></td>
+                                                            <td><strong>{{ $cat->name }}</strong></td>
+                                                            <td>{{ $cat->sort_order }}</td>
+                                                            <td>{{ optional($cat['branch'])->name ?? 'All' }}</td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    @endif
                                     <div class="col-md-6 d-none">
                                         <div class="data_table admin_table table-responsive">
                                             <div class="table_header">
@@ -993,6 +1217,15 @@
 
                 function checkProductAll(bx) {
                     var cbs = document.getElementsByClassName('product_checkbox');
+                    for (var i = 0; i < cbs.length; i++) {
+                        if (cbs[i].type == 'checkbox') {
+                            cbs[i].checked = bx.checked;
+                        }
+                    }
+                }
+
+                function checkCategoryAll(bx) {
+                    var cbs = document.getElementsByClassName('category_checkbox');
                     for (var i = 0; i < cbs.length; i++) {
                         if (cbs[i].type == 'checkbox') {
                             cbs[i].checked = bx.checked;

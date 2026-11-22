@@ -21,36 +21,68 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.0/js/toastr.js"></script>
 
     <script>
-        document.getElementById('product_div').addEventListener("click", function() {
-            var selectedItems = [];
-            $('.product_checkbox:checked').each(function(){
-               var productId =  $(this).data('item-id');
-               selectedItems.push(productId);
-            });
-            var baseUrl = "{{URL::to('/')}}";
-            if(selectedItems.length > 0){
-                $.ajax({
-                    type: 'Delete',
-                    url: baseUrl+'/delete-products',
-                    headers: {
-                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    data:{
-                        selectedItems: selectedItems
-                    },
-                    success: function(response){
-                        toastr.success('Items deleted successfully');
-                        $('#message_container').text('Items deleted successfully');
-                        location.reload();
-                    },
-                    error: function(xhr,status, error){
-
-                    }
-
+        const product_div = document.getElementById('product_div');
+        if (product_div) {
+            product_div.addEventListener("click", function() {
+                var selectedItems = [];
+                $('.product_checkbox:checked').each(function(){
+                   var productId =  $(this).data('item-id');
+                   selectedItems.push(productId);
                 });
-            }
+                var baseUrl = "{{URL::to('/')}}";
+                if(selectedItems.length > 0){
+                    $.ajax({
+                        type: 'Delete',
+                        url: baseUrl+'/delete-products',
+                        headers: {
+                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        data:{
+                            selectedItems: selectedItems
+                        },
+                        success: function(response){
+                            toastr.success('Items deleted successfully');
+                            $('#message_container').text('Items deleted successfully');
+                            location.reload();
+                        },
+                        error: function(xhr,status, error){
 
-        });
+                        }
+
+                    });
+                }
+            });
+        }
+
+        const category_div = document.getElementById('category_div');
+        if (category_div) {
+            category_div.addEventListener("click", function() {
+                var selectedItems = [];
+                $('.category_checkbox:checked').each(function(){
+                   selectedItems.push($(this).data('item-id'));
+                });
+                var baseUrl = "{{URL::to('/')}}";
+                if(selectedItems.length > 0){
+                    $.ajax({
+                        type: 'Delete',
+                        url: baseUrl+'/delete-category',
+                        headers: {
+                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        data:{
+                            selectedItems: selectedItems
+                        },
+                        success: function(response){
+                            toastr.success('Category deleted successfully');
+                            location.reload();
+                        },
+                        error: function(xhr,status, error){
+                            toastr.error('Failed to delete category');
+                        }
+                    });
+                }
+            });
+        }
 
         const membership_div = document.getElementById('membership_div');
         if(membership_div) {
@@ -150,42 +182,93 @@
 
         });
 
-        document.getElementById('product_edit').addEventListener("click", function() {
-            var selectedItems = [];
-            $('.product_checkbox:checked').each(function(){
-               var productId =  $(this).data('item-id');
-               selectedItems.push(productId);
-            });
-            console.log(selectedItems);
-            var baseUrl = "{{URL::to('/')}}";
-            if(selectedItems.length > 0){
-                $.ajax({
-                    type: 'GET',
-                    url: baseUrl+'/edit-products-modal',
-                    headers: {
-                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    data:{
-                        selectedItems: selectedItems
-                    },
-                    success: function(response){
-                        $('#editproductModal').addClass('show');
-                        $('#editproductModal').show();
-                        $('#editProductName').val(response.product_name);
-                        $('#editpriceModalForm').val(response.product_price);
-                        $('#editquantityModalForm').val(response.product_qty);
-                        $('#edittaxModalForm').val(response.product_tax);
-                        $('#productId').val(response.id);
-                        $('#editProductBranchId').val(response.branch_id.toString());
-                    },
-                    error: function(xhr,status, error){
-
-                    }
-
+        const product_edit = document.getElementById('product_edit');
+        if (product_edit) {
+            product_edit.addEventListener("click", function() {
+                var selectedItems = [];
+                $('.product_checkbox:checked').each(function(){
+                   var productId =  $(this).data('item-id');
+                   selectedItems.push(productId);
                 });
-            }
+                console.log(selectedItems);
+                var baseUrl = "{{URL::to('/')}}";
+                if(selectedItems.length > 0){
+                    $.ajax({
+                        type: 'GET',
+                        url: baseUrl+'/edit-products-modal',
+                        headers: {
+                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        data:{
+                            selectedItems: selectedItems
+                        },
+                        success: function(response){
+                            $('#editproductModal').addClass('show');
+                            $('#editproductModal').show();
+                            $('#editProductName').val(response.product_name);
+                            $('#editpriceModalForm').val(response.product_price);
+                            $('#editquantityModalForm').val(response.product_qty);
+                            $('#edittaxModalForm').val(response.product_tax);
+                            $('#productId').val(response.id);
+                            if (response.branch_id) {
+                                $('#editProductBranchId').val(response.branch_id.toString());
+                            }
+                            $('#editCategoryModalForm').val(response.category_id || '');
+                            $('#editSkuModalForm').val(response.sku || '');
+                            $('#editSortOrderModalForm').val(response.sort_order || 0);
+                            $('#editIsActiveModalForm').prop('checked', response.is_active == 1 || response.is_active === true);
+                            if (response.image_url) {
+                                $('#editProductImagePreview').html('<img src="' + response.image_url + '" style="max-height:80px;border-radius:6px;border:1px solid #ddd;padding:2px;" alt="preview">');
+                            } else {
+                                $('#editProductImagePreview').html('');
+                            }
+                        },
+                        error: function(xhr,status, error){
 
-        });
+                        }
+
+                    });
+                }
+
+            });
+        }
+
+        const category_edit = document.getElementById('category_edit');
+        if (category_edit) {
+            category_edit.addEventListener("click", function() {
+                var selectedItems = [];
+                $('.category_checkbox:checked').each(function(){
+                   selectedItems.push($(this).data('item-id'));
+                });
+                var baseUrl = "{{URL::to('/')}}";
+                if(selectedItems.length > 0){
+                    $.ajax({
+                        type: 'GET',
+                        url: baseUrl+'/edit-category-modal',
+                        headers: {
+                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        data:{
+                            selectedItems: selectedItems[0]
+                        },
+                        success: function(response){
+                            $('#editCategoryModal').addClass('show').show();
+                            $('#editCategoryId').val(response.id);
+                            $('#editCategoryNameModal').val(response.name);
+                            $('#editCategoryColourModal').val(response.colour || '#0A5F59');
+                            $('#editCategoryColourTextModal').val(response.colour || '#0A5F59');
+                            $('#editCategoryIconModal').val(response.icon || '');
+                            $('#editCategorySortOrderModal').val(response.sort_order || 0);
+                            if (response.branch_id) {
+                                $('#editCategoryBranchId').val(response.branch_id.toString());
+                            }
+                        }
+                    });
+                } else {
+                    toastr.warning('Please select a category to edit');
+                }
+            });
+        }
         const membership_edit = document.getElementById('membership_edit');
         if(membership_edit) {
              document.getElementById('membership_edit').addEventListener("click", function() {
