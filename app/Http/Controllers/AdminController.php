@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Admin;
 use App\Models\Coupon;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\Branch;
 
 use App\Models\DayPrice;
@@ -228,7 +229,10 @@ class AdminController extends Controller
             $users->where('branch_id', $branchId);
         }
         $users = $users->get();
-        return view('happyView.admin', compact('product', 'eventitem', 'coupon', 'membership', 'hourPlan', 'users', 'branches'));
+        $categories = ProductCategory::when($branchId, fn($q) => $q->where('branch_id', $branchId))
+            ->orderBy('sort_order')
+            ->get();
+        return view('happyView.admin', compact('product', 'eventitem', 'coupon', 'membership', 'hourPlan', 'users', 'branches', 'categories'));
     }
 
     public function dashboard(Request $request)
@@ -1509,7 +1513,13 @@ class AdminController extends Controller
     public function deleteProduct(Request $request)
     {
         $selectedItems = $request->input('selectedItems');
-        Product::whereIn('id', $selectedItems)->delete();
+        $products = Product::whereIn('id', (array)$selectedItems)->get();
+        foreach ($products as $p) {
+            if ($p->image_path && file_exists(public_path($p->image_path))) {
+                @unlink(public_path($p->image_path));
+            }
+        }
+        Product::whereIn('id', (array)$selectedItems)->delete();
         return response()->json(['success' => true]);
     }
 
@@ -1530,7 +1540,10 @@ class AdminController extends Controller
     public function editOpenModel(Request $request)
     {
         $selectedItems = $request->input('selectedItems');
-        $product = Product::with('branch')->where('id', $selectedItems)->first();
+        $product = Product::with('branch', 'category')->where('id', $selectedItems)->first();
+        if ($product) {
+            $product->image_url = $product->image_url;
+        }
         return response()->json($product);
     }
 
@@ -1561,10 +1574,66 @@ class AdminController extends Controller
         $product->product_tax = $request->input('tax');
         $product->product_description = $request->input('product_name');
         $product->branch_id = $branchId;
+        $product->category_id = $request->input('category_id') ?: null;
+        $product->sort_order = (int) $request->input('sort_order', 0);
+        $product->is_active = $request->has('is_active') ? 1 : 1;
+        $product->sku = $request->input('sku');
+
+        // Handle image upload
+        if ($request->hasFile('product_image')) {
+            $request->validate(['product_image' => 'image|mimes:jpg,jpeg,png,webp|max:2048']);
+            $file = $request->file('product_image');
+            $filename = 'prod_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $dir = public_path('uploads/products');
+            if (!is_dir($dir)) {
+                mkdir($dir, 0755, true);
+            }
+            // Create thumbnail (max 300×300)
+            $this->saveResizedImage($file, $dir . '/' . $filename, 300, 300);
+            $product->image_path = 'uploads/products/' . $filename;
+        }
+
         $product->save();
         if ($product->id) {
             return back()->with('success', 'Success! Product created');
         }
+    }
+
+    /**
+     * Resize and save an uploaded image (keeps aspect ratio).
+     */
+    private function saveResizedImage($file, string $destPath, int $maxW, int $maxH): void
+    {
+        $src = null;
+        $mime = $file->getMimeType();
+        switch ($mime) {
+            case 'image/jpeg': $src = imagecreatefromjpeg($file->getRealPath()); break;
+            case 'image/png':  $src = imagecreatefrompng($file->getRealPath());  break;
+            case 'image/webp': $src = imagecreatefromwebp($file->getRealPath()); break;
+        }
+        if (!$src) {
+            $file->move(dirname($destPath), basename($destPath));
+            return;
+        }
+        $origW = imagesx($src);
+        $origH = imagesy($src);
+        $ratio = min($maxW / $origW, $maxH / $origH, 1);
+        $newW = (int) round($origW * $ratio);
+        $newH = (int) round($origH * $ratio);
+        $dst = imagecreatetruecolor($newW, $newH);
+        // Preserve transparency for PNG
+        if ($mime === 'image/png') {
+            imagealphablending($dst, false);
+            imagesavealpha($dst, true);
+        }
+        imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
+        switch ($mime) {
+            case 'image/jpeg': imagejpeg($dst, $destPath, 85); break;
+            case 'image/png':  imagepng($dst, $destPath);      break;
+            case 'image/webp': imagewebp($dst, $destPath, 85); break;
+        }
+        imagedestroy($src);
+        imagedestroy($dst);
     }
 
     public function addCoupon(Request $request)
@@ -1644,6 +1713,28 @@ class AdminController extends Controller
         $product->product_qty = $request->editqty;
         $product->product_tax = $request->tax;
         $product->branch_id = $branchId;
+        $product->category_id = $request->input('category_id') ?: $product->category_id;
+        $product->sort_order = $request->has('sort_order') ? (int) $request->sort_order : $product->sort_order;
+        $product->is_active = $request->has('is_active') ? 1 : 0;
+        $product->sku = $request->has('sku') ? $request->sku : $product->sku;
+
+        // Handle image upload on edit
+        if ($request->hasFile('product_image')) {
+            $request->validate(['product_image' => 'image|mimes:jpg,jpeg,png,webp|max:2048']);
+            // Remove old image
+            if ($product->image_path && file_exists(public_path($product->image_path))) {
+                @unlink(public_path($product->image_path));
+            }
+            $file = $request->file('product_image');
+            $filename = 'prod_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $dir = public_path('uploads/products');
+            if (!is_dir($dir)) {
+                mkdir($dir, 0755, true);
+            }
+            $this->saveResizedImage($file, $dir . '/' . $filename, 300, 300);
+            $product->image_path = 'uploads/products/' . $filename;
+        }
+
         $product->save();
         session()->flash('success', 'Product Updated successfully!');
         return redirect()->back();
